@@ -22,11 +22,11 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
         switch (position) {
             case 0:
 
-                return new TabFragment1();
+                return new SongTabFragment();
 
             case 1:
 
-                return new TabFragment2();
+                return new AlbumTabFragment();
 
             default:
 
