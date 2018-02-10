@@ -154,7 +154,7 @@ public class SongActivity extends AppCompatActivity {
         mediaPlayer.release();
     }
 
-    public String getDay()
+    private String getDay()
     {
         Calendar calendar = Calendar.getInstance();
         int day = calendar.get(Calendar.DAY_OF_WEEK);
@@ -180,7 +180,7 @@ public class SongActivity extends AppCompatActivity {
         return "";
     }
 
-    public String getTime()
+    private String getTime()
     {
         int hours = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);//currentTime.getHours();
         int mins = Calendar.getInstance().get(Calendar.MINUTE);//currentTime.getMinutes();
