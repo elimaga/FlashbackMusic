@@ -1,10 +1,18 @@
 package com.example.team13.flashbackmusic;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,13 +20,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class SongActivity extends AppCompatActivity {
 
     private MediaPlayer mediaPlayer;
     private LocationManager locationManager;
+    static final int REQUEST_LOCATION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +50,8 @@ public class SongActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         String path = "";
+        double latitude = 0.0;
+        double longitude = 0.0;
 
         if(extras != null)
         {
@@ -42,7 +59,8 @@ public class SongActivity extends AppCompatActivity {
             songNameView.setText("Name: " + (String) extras.getString("name"));
             songArtistView.setText("Artist: " + (String) extras.getString("artist"));
             songAlbumView.setText("Album: " + (String) extras.getString("album"));
-            songLocationView.setText("Location: " + (String) extras.getString("location"));
+            latitude = extras.getDouble("latitude");
+            longitude = extras.getDouble("longitude");
             songDayView.setText("Day: " + (String) extras.getString("day"));
             songTimeView.setText("Time: " + (String) extras.getString("time"));
             */
@@ -50,11 +68,37 @@ public class SongActivity extends AppCompatActivity {
             path = (String) extras.getString("path");
         }
 
+        /* Shows the last location to the user
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            // Only want to show a location if we have a valid latitude and longitude
+            if(latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 )
+            {
+
+                List<Address> list = geocoder.getFromLocation(latitude, longitude, 1);
+                if(list != null && list.size() > 0)
+                {
+                    Address address = list.get(0);
+                    String result = address.getAddressLine(0);
+                    songLocationView.setText("Location: " + result);
+
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }*/
+
+
         //get new location, day, and time
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        double[] newLocation = getLocation();
+
         String newDay = getDay();
         String newTime = getTime();
 
-        System.out.println(newDay + " " + newTime);
+        System.out.println(newLocation[0] + " " + newLocation[1] + " " + newDay + " " + newTime);
         //put new location, day, and time in extras
 
         loadMedia(path);
@@ -138,37 +182,59 @@ public class SongActivity extends AppCompatActivity {
 
     public String getTime()
     {
-        Date currentTime = Calendar.getInstance().getTime();
-        int hours = currentTime.getHours();
-        int mins = currentTime.getMinutes();
-        String ampm;
+        int hours = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);//currentTime.getHours();
+        int mins = Calendar.getInstance().get(Calendar.MINUTE);//currentTime.getMinutes();
 
-        if (hours == 0)
-        {
-            hours = hours + 12;
-            ampm = "am";
-        }
-        else if(hours < 11)
-        {
-            ampm = "am";
-        }
-        else if(hours > 12)
-        {
-            hours = hours - 12;
-            ampm = "pm";
-        }
-        else
-        {
-            ampm = "pm";
-        }
+        return hours + ":" + mins;
+    }
 
-        if(mins < 10)
-        {
-            return hours + ":0" + mins + " " + ampm;
+    private double[] getLocation()
+    {
+        LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        };
+
+        if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
+                != PackageManager.PERMISSION_GRANTED  && ActivityCompat.checkSelfPermission ( this ,
+                Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+
+            ActivityCompat.requestPermissions ( this ,
+                    new  String[]{Manifest.permission.ACCESS_FINE_LOCATION },  REQUEST_LOCATION );
         }
-        else
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (location != null)
         {
-            return hours + ":" + mins + " " + ampm;
+            double[] newLocation = {location.getLatitude(), location.getLongitude()};
+            return newLocation;
         }
+        else {
+            double[] newLocation = {0.0, 0.0};
+            return newLocation;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
