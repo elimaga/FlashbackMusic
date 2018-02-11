@@ -16,7 +16,7 @@ public class Song {
         this.artist = artist;
         this.albumName = albumName;
         this.path = path;
-        this.track = Integer.parseInt(track);
+        this.track = Integer.parseInt(track.substring(0, track.indexOf("/")));
         this.liked = 0;
     }
 
