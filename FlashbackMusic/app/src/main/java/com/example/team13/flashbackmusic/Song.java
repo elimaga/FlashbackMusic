@@ -1,40 +1,24 @@
 package com.example.team13.flashbackmusic;
 
-import android.location.Location;
-import java.sql.Array;
-import java.sql.Time;
-
 /*
  * Created by rolandkong and luzannebatoon on 2/6/18.
  */
 
-/* SONG CLASS */
 public class Song {
-    private String title, artist, albumName, path, track, lastTime, setting;
+    private String title, artist, albumName, path, lastTime, setting;
     private double lastLatitude, lastLongitude;
+    private int track;
     private int liked; // neutral = 0, dislike = -1, like = 1
 
-    // What type to store location and time?
-//    private Location lastLocation;
-//    private Time lastTime;
-
-    public Song(String title, String artist, String albumName, String duration,
+    public Song(String title, String artist, String albumName,
                 String path, String track) {
         this.title = title;
         this.artist = artist;
         this.albumName = albumName;
         this.path = path;
-        this.track = track;
+        this.track = Integer.parseInt(track);
         this.liked = 0;
     }
-
-    // Isn't playing the song handled by the activity?
-    //public void playSong() {
-    // Fake methods. How to get time and location?
-    //lastLocation = getLocation();
-    //lastTime = getTime();
-    //mediaPlayer.start();
-    //}
 
     public String getTitle() {
         return this.title;
@@ -52,30 +36,33 @@ public class Song {
         return this.path;
     }
 
-    public String getTrack() { return this.track; }
+    public int getTrack() { return this.track; }
 
     public void likeSong(int like) {
         this.liked = like;
     }
 
-    private double getLastLatitude() {
+    public double getLastLatitude() {
         return this.lastLatitude;
     }
 
-    private double getLastLongitude() {
+    public double getLastLongitude() {
         return this.lastLongitude;
     }
 
-    private String getLastTime() {
+    public String getLastTime() {
         return this.lastTime;
     }
 
-    private void setData(double lastLatitude, double lastLongitude,
+    public void setData(double lastLatitude, double lastLongitude,
                          String time) {
         this.lastTime = time;
         this.lastLatitude = lastLatitude;
         this.lastLongitude = lastLongitude;
+        setTimeOfDay(time);
+    }
 
+    private void setTimeOfDay(String time) {
         int hour = Integer.parseInt(time.substring(0, time.indexOf((":"))));
         if ((hour >= 5) && (hour < 11))
             this.setting = "Morning";
@@ -86,5 +73,3 @@ public class Song {
     }
 
 }
-
-/* END OF SONG CLASS */
