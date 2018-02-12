@@ -20,10 +20,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -227,7 +223,7 @@ public class SongActivity extends AppCompatActivity {
             return newLocation;
         }
         else {
-            double[] newLocation = {0.0, 0.0};
+            double[] newLocation = {100, 200};
             return newLocation;
         }
     }
