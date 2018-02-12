@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
             return newLocation;
         }
         else {
-            double[] newLocation = {0.0, 0.0};
+            double[] newLocation = {100, 200};
             return newLocation;
         }
     }
