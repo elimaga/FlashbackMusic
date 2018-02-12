@@ -3,6 +3,7 @@ package com.example.team13.flashbackmusic;
 import android.Manifest;
 import android.content.Context;
 
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
+    final int INVALID_COORDINATE = 200;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +78,10 @@ public class MainActivity extends AppCompatActivity {
                 double[] userLocation = getLocation();
                 String userTime = getTime();
                 String userDay = getDay();
-                playSong();
+
+
+                // Play the playlist
+                //playSong();
             }
         });
     }
@@ -155,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             return newLocation;
         }
         else {
-            double[] newLocation = {100, 200};
+            double[] newLocation = {INVALID_COORDINATE, INVALID_COORDINATE};
             return newLocation;
         }
     }
@@ -166,38 +171,50 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    public void playSong()//Song song)
+    public void playSong(Song song)
     {
         Intent intent = new Intent(this, SongActivity.class);
-        /*
-        String name = song.getName();
+        String name = song.getTitle();
         String artist = song.getArtist();
-        String album = song.getAlbum();
-        String location = song.getLocation();
-        String time = song.getTime();
-        String day = song.getDay();
+        String album = song.getAlbumName();
+        double latitude = song.getLastLatitude();
+        double longitude = song.getLastLongitude();
+        String time = song.getLastTime();
+        String day = song.getLastDay();
         String path = song.getPath();
         intent.putExtra("name", name);
         intent.putExtra("artist", artist);
         intent.putExtra("album", album);
-        intent.putExtra("location", location);
+        intent.putExtra("latitude", latitude);
+        intent.putExtra("longitude", longitude);
         intent.putExtra("time", time);
         intent.putExtra("day", day);
         intent.putExtra("path", path);
-        */
 
-        intent.putExtra("path", "albums/loveiseverywhere/america-religious.mp3");
+        //intent.putExtra("path", "albums/loveiseverywhere/america-religious.mp3");
         startActivity(intent);
         Bundle extras = intent.getExtras();
         if(extras != null)
         {
-            //String newLocation = (String) extras.getString("newLocation");
-            //String newDay = (String) extras.getString("newDay");
-            //String newTime = (String) extras.getString("newTime");
+            double newLatitude = (double) extras.getDouble("newLatitude");
+            double newLongitude = (double) extras.getDouble("newLongitude");
+            String newDay = (String) extras.getString("newDay");
+            String newTime = (String) extras.getString("newTime");
 
-            //song.setLocation(newLocation);
-            //song.setDay(newDay);
-            //song.setTime(newTime);
+            // Update the data in the Song object
+            song.setData(newLatitude, newLongitude, newDay, newTime);
+
+            // Save the info in the SharedPreferences
+            SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            editor.putString(name + "_latitude", "" + newLatitude);
+            editor.putString(name + "_longitude", "" + newLongitude);
+            editor.putString(name + "_day", newDay);
+            editor.putString(name + "_time", newTime);
+
+            editor.apply();
+
         }
 
 

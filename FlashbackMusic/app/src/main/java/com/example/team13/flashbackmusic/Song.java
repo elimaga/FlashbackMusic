@@ -4,8 +4,10 @@ package com.example.team13.flashbackmusic;
  * Created by rolandkong and luzannebatoon on 2/6/18.
  */
 
+import android.content.SharedPreferences;
+
 public class Song {
-    private String title, artist, albumName, path, lastTime, setting;
+    private String title, artist, albumName, path, lastDay, lastTime, setting;
     private double lastLatitude, lastLongitude;
     private int track;
     private int liked; // neutral = 0, dislike = -1, like = 1
@@ -50,12 +52,17 @@ public class Song {
         return this.lastLongitude;
     }
 
+    public String getLastDay() {
+        return this.lastTime;
+    }
+
     public String getLastTime() {
         return this.lastTime;
     }
 
     public void setData(double lastLatitude, double lastLongitude,
-                         String time) {
+                         String day, String time) {
+        this.lastDay = day;
         this.lastTime = time;
         this.lastLatitude = lastLatitude;
         this.lastLongitude = lastLongitude;
