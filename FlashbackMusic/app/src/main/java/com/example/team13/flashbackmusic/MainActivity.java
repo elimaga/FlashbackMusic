@@ -81,7 +81,11 @@ public class MainActivity extends AppCompatActivity {
 
 
                 // Play the playlist
-                //playSong();
+                Song song = new Song("America Religious","unknown","Love Is Everywhere",
+                        "albums/loveiseverywhere/america-religious.mp3", "01/10", 0);
+                song.setData(0.0, 0.0, "Monday", "1:48");
+                playSong(song);
+
             }
         });
     }
@@ -174,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
     public void playSong(Song song)
     {
         Intent intent = new Intent(this, SongActivity.class);
-        String name = song.getTitle();
+        String title = song.getTitle();
         String artist = song.getArtist();
         String album = song.getAlbumName();
         double latitude = song.getLastLatitude();
@@ -182,7 +186,8 @@ public class MainActivity extends AppCompatActivity {
         String time = song.getLastTime();
         String day = song.getLastDay();
         String path = song.getPath();
-        intent.putExtra("name", name);
+        int index = song.getIndex();
+        intent.putExtra("title", title);
         intent.putExtra("artist", artist);
         intent.putExtra("album", album);
         intent.putExtra("latitude", latitude);
@@ -190,33 +195,72 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("time", time);
         intent.putExtra("day", day);
         intent.putExtra("path", path);
+        intent.putExtra("index", index);
 
-        //intent.putExtra("path", "albums/loveiseverywhere/america-religious.mp3");
-        startActivity(intent);
-        Bundle extras = intent.getExtras();
-        if(extras != null)
-        {
+        startActivityForResult(intent, 0);
+
+    }
+
+    /*
+     * When our song activity finishes, this method is called and stores all the new data for the
+     * song in the shared preferences. This data has to be retrieved to store in the Song object
+     * after playSong() finishes.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 0 && resultCode == RESULT_OK && data != null) {
+            Bundle extras = data.getExtras();
+
+            int index = extras.getInt("index");
+            // can just get the Song object from the array right here and then get title
+            // String title = songs[index].getTitle();
+            // DOn't forget to remove "title" extra from SongActivity
+
+            String title = (String) extras.get("title");
             double newLatitude = (double) extras.getDouble("newLatitude");
             double newLongitude = (double) extras.getDouble("newLongitude");
             String newDay = (String) extras.getString("newDay");
             String newTime = (String) extras.getString("newTime");
-
-            // Update the data in the Song object
-            song.setData(newLatitude, newLongitude, newDay, newTime);
+            System.out.println(newLatitude + " " + newLongitude + " " + newDay + " " + newTime);
 
             // Save the info in the SharedPreferences
             SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            editor.putString(name + "_latitude", "" + newLatitude);
-            editor.putString(name + "_longitude", "" + newLongitude);
-            editor.putString(name + "_day", newDay);
-            editor.putString(name + "_time", newTime);
+            editor.putString(title + "_latitude", "" + newLatitude);
+            editor.putString(title + "_longitude", "" + newLongitude);
+            editor.putString(title + "_day", newDay);
+            editor.putString(title + "_time", newTime);
 
             editor.apply();
 
-        }
+            // Update the info for this song, need arraylist of songs first
+            // songs[index].setData(newLatitude, newLongitude, newDay, newTime);
 
+        }
+    }
+
+    /*
+     * Method to retrieve the prior info of the song from the SharedPreferences and then set the
+     * data in the Song object.
+     */
+    private void retrieveInfo(Song song) {
+
+        String title = song.getTitle();
+
+        //Get the info from the new info from the shared preferences
+        SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
+        double newLatitude = Double.parseDouble(sharedPreferences.getString(title + "_latitude", "" + INVALID_COORDINATE));
+        double newLongitude = Double.parseDouble(sharedPreferences.getString(title + "_longitude", "" + INVALID_COORDINATE));
+        String newDay = sharedPreferences.getString(title + "_day", "");
+        String newTime = sharedPreferences.getString(title + "_time", "");
+
+        // Update the data in the Song object
+        song.setData(newLatitude, newLongitude, newDay, newTime);
+
+        System.out.println(newLatitude + " " + newLongitude + " " + newDay + " " + newTime);
 
     }
 

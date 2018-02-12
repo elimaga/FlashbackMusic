@@ -1,6 +1,7 @@
 package com.example.team13.flashbackmusic;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -45,8 +46,7 @@ public class SongActivity extends AppCompatActivity {
         TextView songDayView = (TextView) findViewById(R.id.dayTextView);
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
 
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
+        Bundle extras = getIntent().getExtras();
         String path = "";
         double latitude = INVALID_COORDINATE;
         double longitude = INVALID_COORDINATE;
@@ -61,8 +61,6 @@ public class SongActivity extends AppCompatActivity {
             longitude = extras.getDouble("longitude");
             songDayView.setText("Day: " + (String) extras.getString("day"));
             songTimeView.setText("Time: " + (String) extras.getString("time"));
-
-
             path = (String) extras.getString("path");
         }
 
@@ -97,7 +95,15 @@ public class SongActivity extends AppCompatActivity {
         String newTime = getTime();
 
         //System.out.println(newLocation[0] + " " + newLocation[1] + " " + newDay + " " + newTime);
-        //put new location, day, and time in extras
+        // put new location, day, and time in extras
+        Intent newData = new Intent();
+        newData.putExtra("title", (String) extras.getString("title"));
+        newData.putExtra("newLatitude", newLocation[0]);
+        newData.putExtra("newLongitude", newLocation[1]);
+        newData.putExtra("newTime", newTime);
+        newData.putExtra("newDay", newDay);
+        newData.putExtra("index", (int) extras.get("index"));
+        setResult(Activity.RESULT_OK, newData);
 
         loadMedia(path);
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {

@@ -10,15 +10,17 @@ public class Song {
     private String title, artist, albumName, path, lastDay, lastTime, setting;
     private double lastLatitude, lastLongitude;
     private int track;
+    private int index; // index in the ArrayList of Songs
     private int liked; // neutral = 0, dislike = -1, like = 1
 
     public Song(String title, String artist, String albumName,
-                String path, String track) {
+                String path, String track, int index) {
         this.title = title;
         this.artist = artist;
         this.albumName = albumName;
         this.path = path;
         this.track = Integer.parseInt(track.substring(0, track.indexOf("/")));
+        this.index = index;
         this.liked = 0;
     }
 
@@ -40,6 +42,8 @@ public class Song {
 
     public int getTrack() { return this.track; }
 
+    public int getIndex() { return this.index; }
+
     public void likeSong(int like) {
         this.liked = like;
     }
@@ -53,7 +57,7 @@ public class Song {
     }
 
     public String getLastDay() {
-        return this.lastTime;
+        return this.lastDay;
     }
 
     public String getLastTime() {
@@ -70,13 +74,18 @@ public class Song {
     }
 
     private void setTimeOfDay(String time) {
-        int hour = Integer.parseInt(time.substring(0, time.indexOf((":"))));
-        if ((hour >= 5) && (hour < 11))
-            this.setting = "Morning";
-        else if ((hour >=11) && (hour < 17))
-            this.setting = "Afternoon";
-        else
-            this.setting = "Evening";
+        if(!time.equals("")) {
+
+            int hour = Integer.parseInt(time.substring(0, time.indexOf((":"))));
+
+            if ((hour >= 5) && (hour < 11))
+                this.setting = "Morning";
+            else if ((hour >= 11) && (hour < 17))
+                this.setting = "Afternoon";
+            else
+                this.setting = "Evening";
+
+        }
     }
 
 }
