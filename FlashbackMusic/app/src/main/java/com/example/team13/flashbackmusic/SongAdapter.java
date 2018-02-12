@@ -48,11 +48,11 @@ public class SongAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent){
         View rowView = mInflater.inflate(R.layout.list_item_song, parent, false);
 
-        TextView titleTextView = rowView.findViewById(R.id.song_title);
+        TextView titleTextView = rowView.findViewById(R.id.title);
 
-        TextView artistTextView = rowView.findViewById(R.id.song_artist);
+        TextView artistTextView = rowView.findViewById(R.id.artist);
 
-        TextView durationTextView = rowView.findViewById(R.id.song_duration);
+        TextView durationTextView = rowView.findViewById(R.id.info);
 
         Song song = (Song) getItem(position);
 
