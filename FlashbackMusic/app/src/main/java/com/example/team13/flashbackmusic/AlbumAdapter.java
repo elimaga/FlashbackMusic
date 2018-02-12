@@ -41,19 +41,19 @@ public class AlbumAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
-        View rowView = mInflater.inflate(R.layout.list_item_album, parent, false);
+        View rowView = mInflater.inflate(R.layout.list_item, parent, false);
 
-        TextView albumTitleTextView = rowView.findViewById(R.id.album_title);
+        TextView albumTitleTextView = rowView.findViewById(R.id.title);
 
-        TextView albumArtistTextView = rowView.findViewById(R.id.album_artist);
+        TextView albumArtistTextView = rowView.findViewById(R.id.artist);
 
-        TextView numOfSongTextView = rowView.findViewById(R.id.album_numOfSong);
+        TextView numOfSongTextView = rowView.findViewById(R.id.info);
 
         Album album = (Album) getItem(position);
 
         albumTitleTextView.setText(album.albumTitle);
         albumArtistTextView.setText(album.artistName);
-        numOfSongTextView.setText(""+ album.numOfSong);
+        numOfSongTextView.setText(Integer.toString(album.numOfSong)+" songs");
 
         return rowView;
     }
