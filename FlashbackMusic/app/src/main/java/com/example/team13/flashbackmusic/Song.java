@@ -48,6 +48,10 @@ public class Song {
         this.liked = like;
     }
 
+    public boolean isLiked() {
+        return this.liked == 1;
+    }
+
     public double getLastLatitude() {
         return this.lastLatitude;
     }
@@ -63,6 +67,11 @@ public class Song {
     public String getLastTime() {
         return this.lastTime;
     }
+
+    public String getLastSetting() {
+        return this.setting;
+    }
+
 
     public void setData(double lastLatitude, double lastLongitude,
                          String day, String time) {
@@ -85,6 +94,9 @@ public class Song {
             else
                 this.setting = "Evening";
 
+        }
+        else {
+            this.setting = "";
         }
     }
 

@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 String userTime = getTime();
                 String userDay = getDay();
 
+                // Create playlist object
 
                 // Play the playlist
                 Song song = new Song("America Religious","unknown","Love Is Everywhere",
