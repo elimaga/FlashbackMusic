@@ -30,7 +30,7 @@ public class SongTabFragment extends Fragment {
 
         for (int i = 0 ; i < capacity; i++){
             String duration = "2:30";
-            Song newSong = new Song("Hello","Adele", duration);
+            Song newSong = new Song("Hello", "Adele","","","1/1");
             songList.add(newSong);
         }
 
