@@ -52,9 +52,10 @@ public class SongAdapter extends BaseAdapter {
 
         Song song = (Song) getItem(position);
 
-        titleTextView.setText(song.title);
-        artistTextView.setText(song.artist);
-        durationTextView.setText(song.duration);
+        titleTextView.setText(song.getTitle());
+        artistTextView.setText(song.getArtist());
+        // TODO: needs to be replaced with song.getDuration()
+        durationTextView.setText("3:22");
 
         return rowView;
     }

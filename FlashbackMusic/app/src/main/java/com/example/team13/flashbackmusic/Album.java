@@ -1,18 +1,36 @@
 package com.example.team13.flashbackmusic;
 
+import java.util.ArrayList;
+
 /**
- * Created by KM on 2/10/2018.
- * A simple class to create an album object
+ * Created by Luzanne on 2/11/18.
  */
 
 public class Album {
-    String albumTitle;
-    String artistName;
-    int numOfSong;
+    private String albumName, artist;
+    private ArrayList<Song> songs;
 
-    public Album(String albumTitle, String artistName, int numOfSong){
-        this.albumTitle = albumTitle;
-        this.artistName = artistName;
-        this.numOfSong = numOfSong;
+    public Album (String albumName, String artist, int numTracks) {
+        this.albumName = albumName;
+        this.artist = artist;
+        songs = new ArrayList<>(numTracks);
+    }
+
+    public String getAlbumName() {
+        return this.albumName;
+    }
+
+    public String getArtist() {
+        return this.artist;
+    }
+
+    public ArrayList<Song> getSongs() {
+        return this.songs;
+    }
+
+    public void addSong(Song s) {
+        // Adds song at correct track index
+        songs.add(s.getTrack() - 1, s);
+
     }
 }

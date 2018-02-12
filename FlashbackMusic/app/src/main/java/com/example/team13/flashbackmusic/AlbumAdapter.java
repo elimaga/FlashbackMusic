@@ -51,9 +51,9 @@ public class AlbumAdapter extends BaseAdapter {
 
         Album album = (Album) getItem(position);
 
-        albumTitleTextView.setText(album.albumTitle);
-        albumArtistTextView.setText(album.artistName);
-        numOfSongTextView.setText(Integer.toString(album.numOfSong)+" songs");
+        albumTitleTextView.setText(album.getAlbumName());
+        albumArtistTextView.setText(album.getArtist());
+        numOfSongTextView.setText(Integer.toString(album.getSongs().size())+" songs");
 
         return rowView;
     }
