@@ -2,11 +2,15 @@ package com.example.team13.flashbackmusic;
 
 import android.Manifest;
 import android.content.Context;
+
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
+
+import android.content.Intent;
+
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
@@ -67,13 +71,16 @@ public class MainActivity extends AppCompatActivity {
                 // TODO: Please remove the following line
                 Toast.makeText(MainActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
 
+
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 double[] userLocation = getLocation();
                 String userTime = getTime();
                 String userDay = getDay();
+                playSong();
             }
         });
     }
+
 
     private String getDay()
     {
@@ -158,4 +165,42 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
+    public void playSong()//Song song)
+    {
+        Intent intent = new Intent(this, SongActivity.class);
+        /*
+        String name = song.getName();
+        String artist = song.getArtist();
+        String album = song.getAlbum();
+        String location = song.getLocation();
+        String time = song.getTime();
+        String day = song.getDay();
+        String path = song.getPath();
+        intent.putExtra("name", name);
+        intent.putExtra("artist", artist);
+        intent.putExtra("album", album);
+        intent.putExtra("location", location);
+        intent.putExtra("time", time);
+        intent.putExtra("day", day);
+        intent.putExtra("path", path);
+        */
+
+        intent.putExtra("path", "albums/loveiseverywhere/america-religious.mp3");
+        startActivity(intent);
+        Bundle extras = intent.getExtras();
+        if(extras != null)
+        {
+            //String newLocation = (String) extras.getString("newLocation");
+            //String newDay = (String) extras.getString("newDay");
+            //String newTime = (String) extras.getString("newTime");
+
+            //song.setLocation(newLocation);
+            //song.setDay(newDay);
+            //song.setTime(newTime);
+        }
+
+
+    }
+
 }
