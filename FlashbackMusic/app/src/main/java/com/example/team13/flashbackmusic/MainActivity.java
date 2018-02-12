@@ -1,6 +1,7 @@
 package com.example.team13.flashbackmusic;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -53,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
 
                 // TODO: transition flashback mode activity!!
                 // TODO: Please remove the following line
-                Toast.makeText(MainActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, FlashbackActivity.class);
+                startActivity(intent);
 
             }
         });
