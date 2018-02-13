@@ -24,7 +24,6 @@ public class FlashbackPlaylist {
 
 
     private ArrayList<Song> playlist;      // the songs in the flashback playlist
-    private ArrayList<Integer> numMatches;  // the number of matches the song has with the user's info
 
     /*
      * Constructs the Flashback Playlist from the user's current location, day, and time, and the
@@ -32,6 +31,8 @@ public class FlashbackPlaylist {
      * TODO: Sort the playlist
      */
     public FlashbackPlaylist(ArrayList<Song> allSongs, double[] location, String day, String time) {
+
+        ArrayList<Integer> numMatches = new ArrayList<>();  // the number of matches the song has with the user's info
 
         // Loop through every song in the array of songs and add the ones with at least one match
         // to the playlist
@@ -86,9 +87,26 @@ public class FlashbackPlaylist {
                     numMatches.add(ONE_MATCH);
                 }
             }
-
         }
+
+        sortPlaylist(numMatches);
     }
+
+    private void sortPlaylist(ArrayList<Integer> numMatches) {
+        ArrayList<Song> sorted = new ArrayList<>();
+
+        for(int i = LIKED_AND_THREE_MATCHES; i > 0; i--) {
+            int index = numMatches.indexOf(i);
+            while(index != -1) {
+                sorted.add(playlist.get(index));
+                playlist.remove(index);
+                numMatches.remove(index);
+                index = numMatches.indexOf(i);
+            }
+        }
+        playlist = sorted;
+    }
+
 
     /*
      * Helper method for the constructor to check if the location of the song is close to the location
