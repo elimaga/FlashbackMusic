@@ -314,14 +314,18 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
 
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            // TODO: in addtion to checking null, the check for whether location service is on is needed here
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (location != null)
             {
                 double[] newLocation = {location.getLatitude(), location.getLongitude()};
                 return newLocation;
             }
+
         }
         return new double[] {INVALID_COORDINATE, INVALID_COORDINATE};
+
+
     }
 
 
