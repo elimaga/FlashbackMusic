@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = findViewById(R.id.pager);
-        final PagerAdapter pagerAdapter = new PagerAdapter( getSupportFragmentManager(), tabLayout.getTabCount());
+        final PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -78,12 +78,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         final int[] resourceIds = this.listRaw();
 
         ArrayList<String> songNames = loadSongs(mediaMetadataRetriever, resourceIds);
-
 
 
         //flashback button
@@ -107,13 +105,14 @@ public class MainActivity extends AppCompatActivity {
                 // Create playlist object
 
                 // Play the playlist
-                Song song = new Song("America Religious","unknown","Love Is Everywhere",
+                Song song = new Song("America Religious", "unknown", "Love Is Everywhere",
                         "albums/loveiseverywhere/america-religious.mp3", "01/10", 0);
-                song.setData(0.0, 0.0, "Monday", "1:48");
+                song.setData(0.0, 0.0, "Monday", "1:48", "1/3/2018");
                 playSong(song);
 
             }
         });
+    }
 
     /*
     public ArrayList<String> loadAlbums(ArrayList<String> songs)
@@ -237,10 +236,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return resourceIds;
-    }
-
-
-
     }
 
     private String getDay()
@@ -408,9 +403,10 @@ public class MainActivity extends AppCompatActivity {
         double newLongitude = Double.parseDouble(sharedPreferences.getString(title + "_longitude", "" + INVALID_COORDINATE));
         String newDay = sharedPreferences.getString(title + "_day", "");
         String newTime = sharedPreferences.getString(title + "_time", "");
+        String newDate = sharedPreferences.getString(title + "_date", "");
 
         // Update the data in the Song object
-        song.setData(newLatitude, newLongitude, newDay, newTime);
+        song.setData(newLatitude, newLongitude, newDay, newTime, newDate);
 
         System.out.println(newLatitude + " " + newLongitude + " " + newDay + " " + newTime);
 

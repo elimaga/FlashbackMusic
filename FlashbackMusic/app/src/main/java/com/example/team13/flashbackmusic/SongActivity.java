@@ -53,7 +53,7 @@ public class SongActivity extends AppCompatActivity {
 
         if(extras != null)
         {
-
+            // TODO : display date of when it was last played
             songNameView.setText("Title: " + (String) extras.getString("title"));
             songArtistView.setText("Artist: " + (String) extras.getString("artist"));
             songAlbumView.setText("Album: " + (String) extras.getString("album"));
@@ -93,6 +93,7 @@ public class SongActivity extends AppCompatActivity {
 
         String newDay = getDay();
         String newTime = getTime();
+        String newDate = getDate();
 
         //System.out.println(newLocation[0] + " " + newLocation[1] + " " + newDay + " " + newTime);
         // put new location, day, and time in extras
@@ -102,6 +103,7 @@ public class SongActivity extends AppCompatActivity {
         newData.putExtra("newLongitude", newLocation[1]);
         newData.putExtra("newTime", newTime);
         newData.putExtra("newDay", newDay);
+        newData.putExtra("newDate", newDate);
         newData.putExtra("index", (int) extras.get("index"));
         setResult(Activity.RESULT_OK, newData);
 
@@ -190,6 +192,15 @@ public class SongActivity extends AppCompatActivity {
         int mins = Calendar.getInstance().get(Calendar.MINUTE);//currentTime.getMinutes();
 
         return hours + ":" + mins;
+    }
+
+    private String getDate() {
+        Calendar cal = Calendar.getInstance();
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DATE);
+        int year = cal.get(Calendar.YEAR);
+
+        return month + "/" + day + "/" + year;
     }
 
     private double[] getLocation()
