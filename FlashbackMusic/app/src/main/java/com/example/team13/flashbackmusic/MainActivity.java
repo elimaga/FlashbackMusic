@@ -5,6 +5,7 @@ import android.media.MediaMetadataRetriever;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -15,13 +16,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        final int[] resourceIds = this.listRaw();
 
-        ArrayList<String> songNames = loadSongs(mediaMetadataRetriever);
+        ArrayList<String> songNames = loadSongs(mediaMetadataRetriever, resourceIds);
 
-        for(String title : songNames)
+        /*for(String title : songNames)
         {
             System.out.println(title);
-        }
+        }*/
     }
 
     /*
@@ -69,11 +71,26 @@ public class MainActivity extends AppCompatActivity {
      * @return Returns a list of song (names)
      * TODO: currently returns a list of song titles, once song class is finished return list of songs
      */
-    public ArrayList<String> loadSongs(MediaMetadataRetriever mmr)
+    public ArrayList<String> loadSongs(MediaMetadataRetriever mmr, int[] resourceIds)
     {
         //Return list of song (names)
-        ArrayList<String> songNameList = new ArrayList<>();
+        ArrayList<String> songsList = new ArrayList<>();
 
+        for (int i = 0; i < resourceIds.length; i++)
+        {
+            AssetFileDescriptor afd = this.getResources().openRawResourceFd(resourceIds[i]);
+            mmr.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+            String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+            String album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+            String trackNumber = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER);
+
+            System.out.println(title);
+
+            //Create Song object
+        }
+
+        /*
         try {
             //get all album names in asset folder
             String dir = "albums";
@@ -109,5 +126,27 @@ public class MainActivity extends AppCompatActivity {
 
         //return song (names)
         return songNameList;
+        */
+
+        return null;
+    }
+
+    private int[] listRaw()
+    {
+        Field[] fields = R.raw.class.getFields();
+        int[] resourceIds = new int[fields.length];
+        for (int i = 0; i < fields.length; i++)
+        {
+            try
+            {
+                resourceIds[i] = fields[i].getInt(fields[i]);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        return resourceIds;
     }
 }
