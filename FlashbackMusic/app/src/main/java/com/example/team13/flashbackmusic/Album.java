@@ -10,10 +10,11 @@ public class Album {
     private String albumName, artist;
     private ArrayList<Song> songs;
 
-    public Album (String albumName, String artist, int numTracks) {
+    public Album (String albumName, String artist, String track) {
         this.albumName = albumName;
         this.artist = artist;
-        songs = new ArrayList<>(numTracks);
+        int numTracks = Integer.parseInt(track.substring(track.indexOf("/") + 1, track.length()));
+        songs = new ArrayList<> (numTracks);
     }
 
     public String getAlbumName() {
