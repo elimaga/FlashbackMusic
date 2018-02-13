@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = findViewById(R.id.pager);
-        final PagerAdapter pagerAdapter = new PagerAdapter( getSupportFragmentManager(), tabLayout.getTabCount());
+        final PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -78,12 +78,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         final int[] resourceIds = this.listRaw();
 
         ArrayList<String> songNames = loadSongs(mediaMetadataRetriever, resourceIds);
-
 
 
         //flashback button
@@ -107,13 +105,14 @@ public class MainActivity extends AppCompatActivity {
                 // Create playlist object
 
                 // Play the playlist
-                Song song = new Song("America Religious","unknown","Love Is Everywhere",
+                Song song = new Song("America Religious", "unknown", "Love Is Everywhere",
                         "albums/loveiseverywhere/america-religious.mp3", "01/10", 0);
                 song.setData(0.0, 0.0, "Monday", "1:48");
                 playSong(song);
 
             }
         });
+    }
 
     /*
     public ArrayList<String> loadAlbums(ArrayList<String> songs)
@@ -241,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    }
+
 
     private String getDay()
     {

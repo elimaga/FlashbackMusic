@@ -28,17 +28,19 @@ public class AlbumTabFragment extends Fragment {
 
         //create album object and stores as a list
         for (int i = 0; i < capacity; i++){
-            Album album =  new Album("Divide","Ed Sheeran", 2);
+            Album album =  new Album("Divide","Ed Sheeran", "2/2");
             album.addSong(new Song("Shape of You",
                                     "Ed sheeran",
                                     "Divide",
                                     "",
-                                    "1/2"));
+                                    "1/2",
+                                    0));
             album.addSong(new Song("Shape of You",
                     "Ed sheeran",
                     "Divide",
                     "",
-                    "2/2"));
+                    "2/2",
+                    1));
             albumsList.add(album);
         }
 
