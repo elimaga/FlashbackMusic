@@ -115,6 +115,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public Song getSong(int index)
+    {
+        return songs.get(index);
+    }
+
+    public Album getAlbum(int index)
+    {
+        return albums.get(index);
+    }
+
 
     /**
      * loadLibrary() reads the mp3 files in the raw folder and returns a
@@ -124,8 +134,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public void loadLibrary(MediaMetadataRetriever mmr, int[] resourceIds)
     {
-        //Return list of song (names)
-        ArrayList<String> songsList = new ArrayList<>();
+        // initialize songs and albums lists
+        songs = new ArrayList<>();
+        albums = new ArrayList<>();
 
         // loop through each mp3 file
         for (int i = 0; i < resourceIds.length; i++)

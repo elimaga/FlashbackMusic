@@ -25,6 +25,17 @@ public class Song {
         this.liked = 0;
     }
 
+    public Song()
+    {
+        this.title = "";
+        this.artist = "";
+        this.albumName = "";
+        this.resId = 0;
+        this.track = 0;
+        this.index = 0;
+        this.liked = 0;
+    }
+
     public String getTitle() {
         return this.title;
     }

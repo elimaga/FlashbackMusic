@@ -14,7 +14,11 @@ public class Album {
         this.albumName = albumName;
         this.artist = artist;
         int numTracks = Integer.parseInt(track.substring(track.indexOf("/") + 1, track.length()));
-        songs = new ArrayList<> (numTracks);
+        songs = new ArrayList<> ();
+        for (int i = 0; i < numTracks; i++)
+        {
+            songs.add(new Song());
+        }
     }
 
     public String getAlbumName() {
@@ -32,6 +36,7 @@ public class Album {
     public void addSong(Song s) {
         // Adds song at correct track index
         songs.add(s.getTrack() - 1, s);
+        songs.remove(s.getTrack());
 
     }
 }
