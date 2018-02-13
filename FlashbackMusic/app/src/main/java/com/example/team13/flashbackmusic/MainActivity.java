@@ -314,17 +314,12 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 0 && resultCode == RESULT_OK && data != null) {
             Bundle extras = data.getExtras();
 
-            int index = extras.getInt("index");
-            // can just get the Song object from the array right here and then get title
-            // String title = songs[index].getTitle();
-            // DOn't forget to remove "title" extra from SongActivity
-
-            String title = (String) extras.get("title");
+            int index = (int) extras.getInt("index");
+            String title = songs.get(index).getTitle();
             double newLatitude = (double) extras.getDouble("newLatitude");
             double newLongitude = (double) extras.getDouble("newLongitude");
             String newDay = (String) extras.getString("newDay");
             String newTime = (String) extras.getString("newTime");
-            System.out.println(newLatitude + " " + newLongitude + " " + newDay + " " + newTime);
 
             // Save the info in the SharedPreferences
             SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
@@ -337,8 +332,7 @@ public class MainActivity extends AppCompatActivity {
 
             editor.apply();
 
-            // Update the info for this song, need arraylist of songs first
-            // songs[index].setData(newLatitude, newLongitude, newDay, newTime);
+            songs.get(index).setData(newLatitude, newLongitude, newDay, newTime);
 
         }
     }

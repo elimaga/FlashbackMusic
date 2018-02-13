@@ -97,7 +97,6 @@ public class SongActivity extends AppCompatActivity {
         //System.out.println(newLocation[0] + " " + newLocation[1] + " " + newDay + " " + newTime);
         // put new location, day, and time in extras
         Intent newData = new Intent();
-        newData.putExtra("title", (String) extras.getString("title"));
         newData.putExtra("newLatitude", newLocation[0]);
         newData.putExtra("newLongitude", newLocation[1]);
         newData.putExtra("newTime", newTime);
