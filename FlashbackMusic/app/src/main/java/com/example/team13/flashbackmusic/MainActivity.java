@@ -15,7 +15,6 @@ import android.location.LocationManager;
 import android.support.annotation.NonNull;
 
 import android.content.Intent;
-
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
@@ -94,7 +93,8 @@ public class MainActivity extends AppCompatActivity {
 
                 // TODO: transition flashback mode activity!!
                 // TODO: Please remove the following line
-                Toast.makeText(MainActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, FlashbackActivity.class);
+                startActivity(intent);
 
 
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -108,10 +108,19 @@ public class MainActivity extends AppCompatActivity {
                 Song song = new Song("America Religious", "unknown", "Love Is Everywhere",
                         "albums/loveiseverywhere/america-religious.mp3", "01/10", 0);
                 song.setData(0.0, 0.0, "Monday", "1:48");
-                playSong(song);
+                // playSong(song);
 
             }
         });
+
+        // Requesting location permission
+        if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
+                != PackageManager.PERMISSION_GRANTED  && ActivityCompat.checkSelfPermission ( this ,
+                Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+
+            ActivityCompat.requestPermissions ( this ,
+                    new  String[]{Manifest.permission.ACCESS_FINE_LOCATION },  REQUEST_LOCATION );
+        }
     }
 
     /*
@@ -301,30 +310,20 @@ public class MainActivity extends AppCompatActivity {
         };
 
         if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
-                != PackageManager.PERMISSION_GRANTED  && ActivityCompat.checkSelfPermission ( this ,
-                Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+                == PackageManager.PERMISSION_GRANTED  || ActivityCompat.checkSelfPermission ( this ,
+                Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
 
-            ActivityCompat.requestPermissions ( this ,
-                    new  String[]{Manifest.permission.ACCESS_FINE_LOCATION },  REQUEST_LOCATION );
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null)
+            {
+                double[] newLocation = {location.getLatitude(), location.getLongitude()};
+                return newLocation;
+            }
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (location != null)
-        {
-            double[] newLocation = {location.getLatitude(), location.getLongitude()};
-            return newLocation;
-        }
-        else {
-            double[] newLocation = {INVALID_COORDINATE, INVALID_COORDINATE};
-            return newLocation;
-        }
+        return new double[] {INVALID_COORDINATE, INVALID_COORDINATE};
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 
     public void playSong(Song song)
     {
