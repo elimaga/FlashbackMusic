@@ -310,8 +310,8 @@ public class MainActivity extends AppCompatActivity {
         };
 
         if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
-                != PackageManager.PERMISSION_GRANTED  && ActivityCompat.checkSelfPermission ( this ,
-                Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+                == PackageManager.PERMISSION_GRANTED  || ActivityCompat.checkSelfPermission ( this ,
+                Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
 
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
