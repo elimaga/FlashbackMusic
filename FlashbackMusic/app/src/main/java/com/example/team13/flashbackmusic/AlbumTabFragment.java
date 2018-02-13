@@ -32,13 +32,13 @@ public class AlbumTabFragment extends Fragment {
             album.addSong(new Song("Shape of You",
                                     "Ed sheeran",
                                     "Divide",
-                                    "",
-                                    "1/2"));
+                                    0,
+                                    "1/2", i));
             album.addSong(new Song("Shape of You",
                     "Ed sheeran",
                     "Divide",
-                    "",
-                    "2/2"));
+                    0,
+                    "2/2", i));
             albumsList.add(album);
         }
 

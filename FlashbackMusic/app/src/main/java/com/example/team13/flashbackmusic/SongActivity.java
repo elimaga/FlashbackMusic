@@ -47,7 +47,7 @@ public class SongActivity extends AppCompatActivity {
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
 
         Bundle extras = getIntent().getExtras();
-        String path = "";
+        int resId = 0;
         double latitude = INVALID_COORDINATE;
         double longitude = INVALID_COORDINATE;
 
@@ -61,7 +61,7 @@ public class SongActivity extends AppCompatActivity {
             longitude = extras.getDouble("longitude");
             songDayView.setText("Day: " + (String) extras.getString("day"));
             songTimeView.setText("Time: " + (String) extras.getString("time"));
-            path = (String) extras.getString("path");
+            resId = (int) extras.getInt("resId");
         }
 
         // Shows the last location to the user
@@ -105,7 +105,7 @@ public class SongActivity extends AppCompatActivity {
         newData.putExtra("index", (int) extras.get("index"));
         setResult(Activity.RESULT_OK, newData);
 
-        loadMedia(path);
+        loadMedia(resId);
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
@@ -131,7 +131,7 @@ public class SongActivity extends AppCompatActivity {
         });
     }
 
-    public void loadMedia(String path)
+    public void loadMedia(int resId)
     {
         if (mediaPlayer == null)
         {
@@ -141,8 +141,8 @@ public class SongActivity extends AppCompatActivity {
 
 
         try {
-            AssetFileDescriptor afd = this.getAssets().openFd(path);
-            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            AssetFileDescriptor afd = this.getResources().openRawResourceFd(resId);
+            mediaPlayer.setDataSource(afd);
             mediaPlayer.prepareAsync();
         }
         catch (Exception e)
