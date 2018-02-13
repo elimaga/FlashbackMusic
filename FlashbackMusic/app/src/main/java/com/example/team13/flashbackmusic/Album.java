@@ -31,5 +31,6 @@ public class Album {
     public void addSong(Song s) {
         // Adds song at correct track index
         songs.add(s.getTrack() - 1, s);
+
     }
 }
