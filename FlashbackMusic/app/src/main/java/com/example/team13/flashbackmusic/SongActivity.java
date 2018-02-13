@@ -1,6 +1,7 @@
 package com.example.team13.flashbackmusic;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,46 +26,45 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+
 public class SongActivity extends AppCompatActivity {
 
     private MediaPlayer mediaPlayer;
     private LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
+    final int INVALID_COORDINATE = 200;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song);
 
-        TextView songNameView = (TextView) findViewById(R.id.nameTextView);
+        TextView songNameView = (TextView) findViewById(R.id.titleTextView);
         TextView songArtistView = (TextView) findViewById(R.id.artistTextView);
         TextView songAlbumView = (TextView) findViewById(R.id.albumTextView);
         TextView songLocationView = (TextView) findViewById(R.id.locationTextView);
         TextView songDayView = (TextView) findViewById(R.id.dayTextView);
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
 
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
+        Bundle extras = getIntent().getExtras();
         String path = "";
-        double latitude = 0.0;
-        double longitude = 0.0;
+        double latitude = INVALID_COORDINATE;
+        double longitude = INVALID_COORDINATE;
 
         if(extras != null)
         {
-            /*
-            songNameView.setText("Name: " + (String) extras.getString("name"));
+
+            songNameView.setText("Title: " + (String) extras.getString("title"));
             songArtistView.setText("Artist: " + (String) extras.getString("artist"));
             songAlbumView.setText("Album: " + (String) extras.getString("album"));
             latitude = extras.getDouble("latitude");
             longitude = extras.getDouble("longitude");
             songDayView.setText("Day: " + (String) extras.getString("day"));
             songTimeView.setText("Time: " + (String) extras.getString("time"));
-            */
-
             path = (String) extras.getString("path");
         }
 
-        /* Shows the last location to the user
+        // Shows the last location to the user
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
             // Only want to show a location if we have a valid latitude and longitude
@@ -84,7 +84,7 @@ public class SongActivity extends AppCompatActivity {
         catch (Exception e)
         {
             e.printStackTrace();
-        }*/
+        }
 
 
         //get new location, day, and time
@@ -94,8 +94,16 @@ public class SongActivity extends AppCompatActivity {
         String newDay = getDay();
         String newTime = getTime();
 
-        System.out.println(newLocation[0] + " " + newLocation[1] + " " + newDay + " " + newTime);
-        //put new location, day, and time in extras
+        //System.out.println(newLocation[0] + " " + newLocation[1] + " " + newDay + " " + newTime);
+        // put new location, day, and time in extras
+        Intent newData = new Intent();
+        newData.putExtra("title", (String) extras.getString("title"));
+        newData.putExtra("newLatitude", newLocation[0]);
+        newData.putExtra("newLongitude", newLocation[1]);
+        newData.putExtra("newTime", newTime);
+        newData.putExtra("newDay", newDay);
+        newData.putExtra("index", (int) extras.get("index"));
+        setResult(Activity.RESULT_OK, newData);
 
         loadMedia(path);
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -223,7 +231,7 @@ public class SongActivity extends AppCompatActivity {
             return newLocation;
         }
         else {
-            double[] newLocation = {100, 200};
+            double[] newLocation = {INVALID_COORDINATE, INVALID_COORDINATE};
             return newLocation;
         }
     }
