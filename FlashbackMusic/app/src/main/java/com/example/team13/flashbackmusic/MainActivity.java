@@ -22,6 +22,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
@@ -91,8 +92,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                // TODO: transition flashback mode activity!!
-                // TODO: Please remove the following line
                 Intent intent = new Intent(MainActivity.this, FlashbackActivity.class);
                 startActivity(intent);
 
@@ -109,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                         "albums/loveiseverywhere/america-religious.mp3", "01/10", 0);
                 song.setData(0.0, 0.0, "Monday", "1:48");
                 // playSong(song);
-
+                Log.d("Flashback Button", "Flaback button is pressed from main activity");
             }
         });
 
