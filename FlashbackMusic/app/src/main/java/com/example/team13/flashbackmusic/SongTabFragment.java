@@ -45,17 +45,12 @@ public class SongTabFragment extends Fragment {
             songList.add(newSong);
         }
 
-
-
-
-
         SongAdapter songAdapter = new SongAdapter(getActivity(), songList);
 
         songListView.setAdapter(songAdapter);
 
 
         return rootView;
-
 
     }
 }

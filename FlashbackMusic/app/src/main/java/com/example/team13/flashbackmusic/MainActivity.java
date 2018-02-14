@@ -15,7 +15,6 @@ import android.location.LocationManager;
 import android.support.annotation.NonNull;
 
 import android.content.Intent;
-
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
@@ -23,6 +22,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
@@ -93,9 +93,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                // TODO: transition flashback mode activity!!
-                // TODO: Please remove the following line
-                Toast.makeText(MainActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, FlashbackActivity.class);
+                startActivity(intent);
 
 
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -106,13 +105,25 @@ public class MainActivity extends AppCompatActivity {
                 // Create playlist object
 
                 // Play the playlist
+
                 //Song song = new Song("America Religious", "unknown", "Love Is Everywhere",
                 //        "albums/loveiseverywhere/america-religious.mp3", "01/10", 0);
                 //song.setData(0.0, 0.0, "Monday", "1:48");
                 //playSong(song);
 
+                Log.d("Flashback Button", "Flashback button is pressed from main activity");
+
             }
         });
+
+        // Requesting location permission
+        if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
+                != PackageManager.PERMISSION_GRANTED  && ActivityCompat.checkSelfPermission ( this ,
+                Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+
+            ActivityCompat.requestPermissions ( this ,
+                    new  String[]{Manifest.permission.ACCESS_FINE_LOCATION },  REQUEST_LOCATION );
+        }
     }
 
     public Song getSong(int index)
@@ -266,30 +277,24 @@ public class MainActivity extends AppCompatActivity {
         };
 
         if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
-                != PackageManager.PERMISSION_GRANTED  && ActivityCompat.checkSelfPermission ( this ,
-                Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+                == PackageManager.PERMISSION_GRANTED  || ActivityCompat.checkSelfPermission ( this ,
+                Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
 
-            ActivityCompat.requestPermissions ( this ,
-                    new  String[]{Manifest.permission.ACCESS_FINE_LOCATION },  REQUEST_LOCATION );
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            // TODO: in addtion to checking null, the check for whether location service is on is needed here
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null)
+            {
+                double[] newLocation = {location.getLatitude(), location.getLongitude()};
+                return newLocation;
+            }
+
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (location != null)
-        {
-            double[] newLocation = {location.getLatitude(), location.getLongitude()};
-            return newLocation;
-        }
-        else {
-            double[] newLocation = {INVALID_COORDINATE, INVALID_COORDINATE};
-            return newLocation;
-        }
+        return new double[] {INVALID_COORDINATE, INVALID_COORDINATE};
+
+
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 
     public void playSong(Song song)
     {
