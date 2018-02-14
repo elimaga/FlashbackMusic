@@ -2,7 +2,10 @@ package com.example.team13.flashbackmusic;
 
 import android.location.Location;
 
+import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Eli on 2/12/2018.
@@ -30,7 +33,7 @@ public class FlashbackPlaylist {
      * information stored in the song objects.
      * TODO: Sort the playlist
      */
-    public FlashbackPlaylist(ArrayList<Song> allSongs, double[] location, String day, String time) {
+    public FlashbackPlaylist(ArrayList<Song> allSongs, double[] location, String day, String time, String date) {
 
         ArrayList<Integer> numMatches = new ArrayList<>();  // the number of matches the song has with the user's info
 
@@ -89,24 +92,89 @@ public class FlashbackPlaylist {
             }
         }
 
-        sortPlaylist(numMatches);
+        sortPlaylist(numMatches, date, time);
     }
 
-    private void sortPlaylist(ArrayList<Integer> numMatches) {
+    private void sortPlaylist(ArrayList<Integer> numMatches, String date, String time) {
         ArrayList<Song> sorted = new ArrayList<>();
 
         for(int i = LIKED_AND_THREE_MATCHES; i > 0; i--) {
             int index = numMatches.indexOf(i);
+            ArrayList<Song> currentSongs = new ArrayList<>();
+
             while(index != -1) {
-                sorted.add(playlist.get(index));
+                currentSongs.add(playlist.get(index));
                 playlist.remove(index);
                 numMatches.remove(index);
                 index = numMatches.indexOf(i);
             }
+            currentSongs = breakTies(currentSongs, date, time);
+            playlist.addAll(currentSongs);
         }
         playlist = sorted;
     }
 
+    private ArrayList<Song> breakTies(ArrayList<Song> songs, String date, String time) {
+        ArrayList<Integer> daysApart = new ArrayList<>();
+        ArrayList<Song> result = new ArrayList<>();
+
+        for(int i = 0; i < songs.size(); i++) {
+            int num = compareDates(songs.get(i).getLastDate(), date);
+            daysApart.add(num);
+        }
+
+        while(!daysApart.isEmpty()) {
+            int max = 0;
+            int maxIndex = 0;
+            for(int i = 0; i < daysApart.size(); i++) {
+                int curr = daysApart.get(i);
+                if(i == 0) {
+                    max = curr;
+                } else if(curr > max) {
+                    max = curr;
+                    maxIndex = i;
+                }
+            }
+
+            result.add(songs.get(maxIndex));
+            songs.remove(maxIndex);
+            daysApart.remove(maxIndex);
+        }
+
+        return result;
+    }
+
+    private int compareDates(String songDate, String thisDate) {
+        int songMonth = Integer.parseInt(songDate.substring(0, songDate.indexOf(("/"))));
+        String sub = songDate.substring(songDate.indexOf(("/") + 1, songDate.length()));
+        int songDay = Integer.parseInt(sub.substring(0, songDate.indexOf(("/"))));
+        sub = sub.substring(sub.indexOf(("/") + 1, sub.length()));
+        int songYear = Integer.parseInt(sub);
+
+        int thisMonth = Integer.parseInt(thisDate.substring(0, thisDate.indexOf(("/"))));
+        sub = thisDate.substring(thisDate.indexOf(("/") + 1, thisDate.length()));
+        int thisDay = Integer.parseInt(sub.substring(0, thisDate.indexOf(("/"))));
+        sub = sub.substring(sub.indexOf(("/") + 1, sub.length()));
+        int thisYear = Integer.parseInt(sub);
+
+        int diff = (thisYear - songYear) * 365;
+        diff += (thisMonth - songMonth) * 30;
+        diff += (thisDay - songDay);
+
+        return diff;
+    }
+
+    private int compareTimes(String songTime, String thisTime) {
+        int songHour = Integer.parseInt(songTime.substring(0, songTime.indexOf(":")));
+        int songMin = Integer.parseInt(songTime.substring(songTime.indexOf(":")+1, songTime.length()));
+        int thisHour = Integer.parseInt(thisTime.substring(0, thisTime.indexOf(":")));
+        int thisMin = Integer.parseInt(thisTime.substring(thisTime.indexOf(":")+1, thisTime.length()));
+
+        int diff = (thisHour - songHour) * 60;
+        diff += (thisMin -songMin);
+
+        return diff;
+    }
 
     /*
      * Helper method for the constructor to check if the location of the song is close to the location
