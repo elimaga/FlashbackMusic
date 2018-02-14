@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
             AssetFileDescriptor afd = this.getResources().openRawResourceFd(resourceIds[i]);
             mmr.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
             String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-            String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+            String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST);
             String albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
             String trackNumber = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER);
 
@@ -180,6 +180,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Helper method to get the resource ids for all the raw files.
+     * @return int[] - the array holding all the resource ids for the mp3 files in raw folder
+     */
     private int[] listRaw()
     {
         Field[] fields = R.raw.class.getFields();
