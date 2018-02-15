@@ -49,13 +49,15 @@ public class SongAdapter extends BaseAdapter {
         TextView artistTextView = rowView.findViewById(R.id.artist);
 
         TextView durationTextView = rowView.findViewById(R.id.info);
+        TextView seperator = rowView.findViewById(R.id.separator);
 
         Song song = (Song) getItem(position);
 
         titleTextView.setText(song.getTitle());
         artistTextView.setText(song.getArtist());
         // TODO: needs to be replaced with song.getDuration()
-        durationTextView.setText("3:22");
+        durationTextView.setText("");
+        seperator.setText("");
 
         return rowView;
     }

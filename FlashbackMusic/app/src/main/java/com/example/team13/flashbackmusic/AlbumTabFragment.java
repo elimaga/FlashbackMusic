@@ -22,29 +22,30 @@ public class AlbumTabFragment extends Fragment {
         View rootView =  inflater.inflate(R.layout.album_tab_fragment, container, false);
 
         albumListView = rootView.findViewById(R.id.album_list_view);
+//
+//        int capacity = 50;
+//        final ArrayList<Album> albumsList = new ArrayList<Album>(capacity);
+//
+//        //create album object and stores as a list
+//        for (int i = 0; i < capacity; i++){
+//            Album album =  new Album("Divide","Ed Sheeran", "2/2");
+//            album.addSong(new Song("Shape of You",
+//                                    "Ed sheeran",
+//                                    "Divide",
+//                                    0,
+//                                    "1/2",
+//                                    0));
+//            album.addSong(new Song("Shape of You",
+//                    "Ed sheeran",
+//                    "Divide",
+//                    0,
+//                    "2/2",
+//                    1));
+//            albumsList.add(album);
+//        }
 
-        int capacity = 50;
-        final ArrayList<Album> albumsList = new ArrayList<Album>(capacity);
-
-        //create album object and stores as a list
-        for (int i = 0; i < capacity; i++){
-            Album album =  new Album("Divide","Ed Sheeran", "2/2");
-            album.addSong(new Song("Shape of You",
-                                    "Ed sheeran",
-                                    "Divide",
-                                    0,
-                                    "1/2",
-                                    0));
-            album.addSong(new Song("Shape of You",
-                    "Ed sheeran",
-                    "Divide",
-                    0,
-                    "2/2",
-                    1));
-            albumsList.add(album);
-        }
-
-        AlbumAdapter albumAdapter = new AlbumAdapter(getActivity(), albumsList);
+        MainActivity main = (MainActivity) getActivity();
+        AlbumAdapter albumAdapter = new AlbumAdapter(main, main.albums);
 
         albumListView.setAdapter(albumAdapter);
 
