@@ -57,8 +57,5 @@ public class SongTabFragment extends Fragment {
         return rootView;
     }
 
-    public void rotateFavoriteButton(ImageButton imageButton){
-        //need to update the field
 
-    }
 }

@@ -51,21 +51,17 @@ public class SongAdapter extends BaseAdapter {
 
         TextView durationTextView = rowView.findViewById(R.id.info);
 
-        ImageButton imageButton = rowView.findViewById(R.id.favorite);
-
         Song song = (Song) getItem(position);
+
+        FavoriteStatusImageButton imageButton = rowView.findViewById(R.id.favoriteSymbol);
+        imageButton.setSong(song);
+
 
         titleTextView.setText(song.getTitle());
         artistTextView.setText(song.getArtist());
         // TODO: needs to be replaced with song.getDuration()
         durationTextView.setText("3:22");
 
-        if(song.getFavoriteStatus() == Song.FavoriteStatus.LIKED){
-            imageButton.setImageResource(R.drawable.heart);
-
-        }else if(song.getFavoriteStatus() == Song.FavoriteStatus.DISLIKED){
-            imageButton.setImageResource(R.drawable.dislike);
-        }
 
         return rowView;
     }

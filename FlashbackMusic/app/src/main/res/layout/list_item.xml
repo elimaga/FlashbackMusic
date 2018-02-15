@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:padding="5dp">
+    android:padding="5dp"
+    android:descendantFocusability="blocksDescendants">
 
     <TextView
         android:id="@+id/title"
@@ -47,17 +48,17 @@
         android:layout_below="@+id/title"
         android:layout_toEndOf="@id/separator"/>
 
-    <ImageButton
-        android:id="@+id/favorite"
+    <com.example.team13.flashbackmusic.FavoriteStatusImageButton
+        android:id="@+id/favoriteSymbol"
         android:layout_width="15dp"
         android:layout_height="15dp"
         android:scaleType="fitCenter"
         android:background="#FFFFFF"
-        android:src="@drawable/add"
+        android:src="@drawable/neutral"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
         android:layout_marginRight="15dp"
-        android:onClick="rotateFavoriteButton"/>
+        />
 
 
 
