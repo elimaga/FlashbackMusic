@@ -33,8 +33,8 @@ import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<Song> songs;
-    ArrayList<Album> albums;
+    private ArrayList<Song> songs;
+    private ArrayList<Album> albums;
 
     LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
@@ -47,6 +47,11 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Load the songs and albums into the ArrayLists
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        final int[] resourceIds = this.listRaw();
+        loadLibrary(mediaMetadataRetriever, resourceIds);
 
         //Tab layout
         TabLayout tabLayout = findViewById(R.id.tab_layout);
@@ -75,10 +80,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Load the songs and albums into the ArrayLists
-        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-        final int[] resourceIds = this.listRaw();
-        loadLibrary(mediaMetadataRetriever, resourceIds);
+
 
 
         // Flashback button
@@ -130,6 +132,10 @@ public class MainActivity extends AppCompatActivity {
     {
         return albums.get(index);
     }
+
+    public ArrayList<Song> getSongs() {return songs;}
+
+    public ArrayList<Album> getAlbums() {return albums;}
 
 
     /**

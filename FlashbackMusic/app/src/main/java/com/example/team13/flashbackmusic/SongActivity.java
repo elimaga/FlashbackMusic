@@ -109,6 +109,14 @@ public class SongActivity extends AppCompatActivity {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
                 mediaPlayer.start();
+                if (mediaPlayer.isPlaying())
+                {
+                    Log.d("Testing Playback", "Song is playing");
+                }
+                else
+                {
+                    Log.d("Testing Playback", "Song is playing");
+                }
             }
         });
 
