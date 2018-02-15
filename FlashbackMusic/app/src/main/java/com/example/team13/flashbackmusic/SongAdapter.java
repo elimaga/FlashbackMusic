@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -50,12 +51,21 @@ public class SongAdapter extends BaseAdapter {
 
         TextView durationTextView = rowView.findViewById(R.id.info);
 
+        ImageButton imageButton = rowView.findViewById(R.id.favorite);
+
         Song song = (Song) getItem(position);
 
         titleTextView.setText(song.getTitle());
         artistTextView.setText(song.getArtist());
         // TODO: needs to be replaced with song.getDuration()
         durationTextView.setText("3:22");
+
+        if(song.getFavoriteStatus() == Song.FavoriteStatus.LIKED){
+            imageButton.setImageResource(R.drawable.heart);
+
+        }else if(song.getFavoriteStatus() == Song.FavoriteStatus.DISLIKED){
+            imageButton.setImageResource(R.drawable.dislike);
+        }
 
         return rowView;
     }

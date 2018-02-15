@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -45,12 +46,19 @@ public class SongTabFragment extends Fragment {
             songList.add(newSong);
         }
 
+        songList.get(2).setFavoriteStatus(Song.FavoriteStatus.LIKED);
+        songList.get(3).setFavoriteStatus(Song.FavoriteStatus.DISLIKED);
+
+
         SongAdapter songAdapter = new SongAdapter(getActivity(), songList);
 
         songListView.setAdapter(songAdapter);
 
-
         return rootView;
+    }
+
+    public void rotateFavoriteButton(ImageButton imageButton){
+        //need to update the field
 
     }
 }

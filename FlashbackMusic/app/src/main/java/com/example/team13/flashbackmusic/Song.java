@@ -4,7 +4,6 @@ package com.example.team13.flashbackmusic;
  * Created by rolandkong and luzannebatoon on 2/6/18.
  */
 
-import android.content.SharedPreferences;
 
 public class Song {
     private String title, artist, albumName, lastDay, lastTime, setting;
@@ -12,7 +11,11 @@ public class Song {
     private int resId;
     private int track;
     private int index; // index in the ArrayList of Songs
-    private int liked; // neutral = 0, dislike = -1, like = 1
+    private FavoriteStatus favoriteStatus; // neutral = 0, like = 1, dislike = 2
+
+    enum FavoriteStatus {
+        NEUTRAL, LIKED, DISLIKED;
+    }
 
     public Song(String title, String artist, String albumName,
                 int id, String track, int index) {
@@ -22,7 +25,7 @@ public class Song {
         this.resId = id;
         this.track = Integer.parseInt(track.substring(0, track.indexOf("/")));
         this.index = index;
-        this.liked = 0;
+        this.favoriteStatus = FavoriteStatus.NEUTRAL;
     }
 
     public Song()
@@ -33,7 +36,7 @@ public class Song {
         this.resId = 0;
         this.track = 0;
         this.index = 0;
-        this.liked = 0;
+        this.favoriteStatus = FavoriteStatus.NEUTRAL;
     }
 
     public String getTitle() {
@@ -56,12 +59,12 @@ public class Song {
 
     public int getIndex() { return this.index; }
 
-    public void likeSong(int like) {
-        this.liked = like;
+    public void setFavoriteStatus(FavoriteStatus status) {
+        this.favoriteStatus = status;
     }
 
-    public boolean isLiked() {
-        return this.liked == 1;
+    public FavoriteStatus getFavoriteStatus() {
+        return this.favoriteStatus;
     }
 
     public double getLastLatitude() {

@@ -47,6 +47,18 @@
         android:layout_below="@+id/title"
         android:layout_toEndOf="@id/separator"/>
 
+    <ImageButton
+        android:id="@+id/favorite"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:scaleType="fitCenter"
+        android:background="#FFFFFF"
+        android:src="@drawable/add"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="15dp"
+        android:onClick="rotateFavoriteButton"/>
+
 
 
 
