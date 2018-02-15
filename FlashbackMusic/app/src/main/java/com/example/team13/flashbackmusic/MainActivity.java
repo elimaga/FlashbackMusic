@@ -38,6 +38,9 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    ArrayList<Song> songs;
+    ArrayList<Album> albums;
+
     LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
     final int INVALID_COORDINATE = 200;
@@ -77,15 +80,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        // Load the songs and albums into the ArrayLists
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         final int[] resourceIds = this.listRaw();
+        loadLibrary(mediaMetadataRetriever, resourceIds);
 
-        ArrayList<String> songNames = loadSongs(mediaMetadataRetriever, resourceIds);
 
-
-        //flashback button
-
+        // Flashback button
         final Context context = getApplicationContext();
         ImageButton flashBackButton = findViewById(R.id.flashback_button);
         flashBackButton.setOnClickListener(new View.OnClickListener() {
@@ -104,11 +105,14 @@ public class MainActivity extends AppCompatActivity {
                 // Create playlist object
 
                 // Play the playlist
-                Song song = new Song("America Religious", "unknown", "Love Is Everywhere",
-                        "albums/loveiseverywhere/america-religious.mp3", "01/10", 0);
-                song.setData(0.0, 0.0, "Monday", "1:48");
-                // playSong(song);
-                Log.d("Flashback Button", "Flaback button is pressed from main activity");
+
+                //Song song = new Song("America Religious", "unknown", "Love Is Everywhere",
+                //        "albums/loveiseverywhere/america-religious.mp3", "01/10", 0);
+                //song.setData(0.0, 0.0, "Monday", "1:48");
+                //playSong(song);
+
+                Log.d("Flashback Button", "Flashback button is pressed from main activity");
+
             }
         });
 
@@ -122,111 +126,75 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*
-    public ArrayList<String> loadAlbums(ArrayList<String> songs)
+    public Song getSong(int index)
     {
-        ArrayList<String> albums = new ArrayList<String>();
+        return songs.get(index);
+    }
 
-        if(albums.isEmpty())
-        {
-            // Create a new album object and add it to the ArrayList of albums
-            Album next = new Album(songs.get(0).getArtist(), songs.get(0).getAlbum());
-            albums.add(next);
-        }
+    public Album getAlbum(int index)
+    {
+        return albums.get(index);
+    }
 
-        int index = 0;
-
-        for (String song : songs)
-        {
-            if (albums.get(index).getName().equals(song.getAlbum()))
-            {
-                albums.get(index).add(song);
-            }
-            else
-            {
-                // Create a new album object and add to the ArrayList
-                Album next = new Album(song.getArtist(), song.getAlbum());
-                next.add(song);
-                albums.add(next);
-                index++;
-            }
-        }
-
-        for(Album album : albums)
-        {
-            sort(album);
-        }
-
-        return albums;
-    }//*/
 
     /**
-     * loadSongs() reads the mp3 files in the asset folder and returns a
-     * fully constructed list of Songs.
-     * @param mmr MediaMetadataRetriever that will retrieve various metadata from an mp3 file
-     * @return Returns a list of song (names)
-     * TODO: currently returns a list of song titles, once song class is finished return list of songs
+     * loadLibrary() reads the mp3 files in the raw folder and returns a
+     * fully constructed list of Songs and Albums
+     * @param mmr - MediaMetadataRetriever that will retrieve various metadata from an mp3 file
+     * @param resourceIds - the ids for the mp3 files in the raw folder
      */
-    public ArrayList<String> loadSongs(MediaMetadataRetriever mmr, int[] resourceIds)
+    public void loadLibrary(MediaMetadataRetriever mmr, int[] resourceIds)
     {
-        //Return list of song (names)
-        ArrayList<String> songsList = new ArrayList<>();
+        // initialize songs and albums lists
+        songs = new ArrayList<>();
+        albums = new ArrayList<>();
 
+        // loop through each mp3 file
         for (int i = 0; i < resourceIds.length; i++)
         {
+            // get the metadata from the files
             AssetFileDescriptor afd = this.getResources().openRawResourceFd(resourceIds[i]);
             mmr.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
             String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-            String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-            String album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+            String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST);
+            String albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
             String trackNumber = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER);
 
-            System.out.println(title);
+            Song song = new Song(title, artist, albumName, resourceIds[i], trackNumber, i);
+            retrieveInfo(song);
+            songs.add(song);
 
-            //Create Song object
-        }
 
-        /*
-        try {
-            //get all album names in asset folder
-            String dir = "albums";
-            String[] albumNameList = this.getAssets().list(dir);
+            if(albums.isEmpty()) {
+                Album album = new Album(albumName, artist, trackNumber);
+                album.addSong(song);
+                albums.add(album);
+            }
+            else {
 
-            //iterate over all albums
-            for (String album : albumNameList) {
-                //get all song names in an album
-                String albumPath = dir + "/" + album;
-                String[] songs = this.getAssets().list(albumPath);
-                //iterate over all songs
-                for (String song : songs) {
-                    //construct a file path to the song from the asset folder
-                    String mp3File = albumPath + "/" + song;
+                boolean needNewAlbum = true;
 
-                    //Create an AssetFileDescriptor to read in the song file
-                    AssetFileDescriptor afd = this.getAssets().openFd(mp3File);
-                    //Set the MediaMetadataRetriever to read from the song file specified in the
-                    //AssetFileDescriptor, offsets are important for correct read-in
-                    mmr.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                for (Album album : albums) {
+                    if(album.getAlbumName().equals(albumName)) {
+                        album.addSong(song);
+                        needNewAlbum = false;
+                        break;
+                    }
+                }
 
-                    //Retrieve the song name
-                    String name = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-                    //Add song name to return list
-                    songNameList.add(name);
+                if(needNewAlbum) {
+                    Album album = new Album(albumName, artist, trackNumber);
+                    album.addSong(song);
+                    albums.add(album);
                 }
             }
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        //return song (names)
-        return songNameList;
-        */
-
-        return null;
     }
 
+    /**
+     * Helper method to get the resource ids for all the raw files.
+     * @return int[] - the array holding all the resource ids for the mp3 files in raw folder
+     */
     private int[] listRaw()
     {
         Field[] fields = R.raw.class.getFields();
@@ -338,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
         double longitude = song.getLastLongitude();
         String time = song.getLastTime();
         String day = song.getLastDay();
-        String path = song.getPath();
+        int resId = song.getResId();
         int index = song.getIndex();
         intent.putExtra("title", title);
         intent.putExtra("artist", artist);
@@ -347,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("longitude", longitude);
         intent.putExtra("time", time);
         intent.putExtra("day", day);
-        intent.putExtra("path", path);
+        intent.putExtra("resId", resId);
         intent.putExtra("index", index);
 
         startActivityForResult(intent, 0);
@@ -366,17 +334,12 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 0 && resultCode == RESULT_OK && data != null) {
             Bundle extras = data.getExtras();
 
-            int index = extras.getInt("index");
-            // can just get the Song object from the array right here and then get title
-            // String title = songs[index].getTitle();
-            // DOn't forget to remove "title" extra from SongActivity
-
-            String title = (String) extras.get("title");
+            int index = (int) extras.getInt("index");
+            String title = songs.get(index).getTitle();
             double newLatitude = (double) extras.getDouble("newLatitude");
             double newLongitude = (double) extras.getDouble("newLongitude");
             String newDay = (String) extras.getString("newDay");
             String newTime = (String) extras.getString("newTime");
-            System.out.println(newLatitude + " " + newLongitude + " " + newDay + " " + newTime);
 
             // Save the info in the SharedPreferences
             SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
@@ -389,8 +352,7 @@ public class MainActivity extends AppCompatActivity {
 
             editor.apply();
 
-            // Update the info for this song, need arraylist of songs first
-            // songs[index].setData(newLatitude, newLongitude, newDay, newTime);
+            songs.get(index).setData(newLatitude, newLongitude, newDay, newTime);
 
         }
     }
@@ -412,8 +374,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Update the data in the Song object
         song.setData(newLatitude, newLongitude, newDay, newTime);
-
-        System.out.println(newLatitude + " " + newLongitude + " " + newDay + " " + newTime);
 
     }
 

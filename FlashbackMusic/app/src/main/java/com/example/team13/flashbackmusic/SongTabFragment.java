@@ -41,7 +41,7 @@ public class SongTabFragment extends Fragment {
         final ArrayList<Song> songList = new ArrayList<Song>(capacity);
         for (int i = 0 ; i < capacity; i++){
             String duration = "2:30";
-            Song newSong = new Song("Hello", "Adele","","","1/1", 0);
+            Song newSong = new Song("Hello", "Adele","",0,"1/1", 0);
             songList.add(newSong);
         }
 
