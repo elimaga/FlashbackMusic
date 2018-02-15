@@ -5,6 +5,7 @@ import android.location.Location;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -92,10 +93,10 @@ public class FlashbackPlaylist {
             }
         }
 
-        sortPlaylist(numMatches, date, time);
+        sortPlaylist(numMatches, date);
     }
 
-    private void sortPlaylist(ArrayList<Integer> numMatches, String date, String time) {
+    private void sortPlaylist(ArrayList<Integer> numMatches, String date) {
         ArrayList<Song> sorted = new ArrayList<>();
 
         for(int i = LIKED_AND_THREE_MATCHES; i > 0; i--) {
@@ -108,13 +109,38 @@ public class FlashbackPlaylist {
                 numMatches.remove(index);
                 index = numMatches.indexOf(i);
             }
-            currentSongs = breakTies(currentSongs, date, time);
+            currentSongs = breakDateTies(currentSongs, date);
             playlist.addAll(currentSongs);
         }
         playlist = sorted;
     }
 
-    private ArrayList<Song> breakTies(ArrayList<Song> songs, String date, String time) {
+    private ArrayList<Song> breakTimeTies(ArrayList<Song> songs) {
+        ArrayList<Integer> timeApart = new ArrayList<>();
+        ArrayList<Song> result = new ArrayList<>();
+
+        for(int i = 0; i < songs.size(); i++) {
+            int num = compareTimes(songs.get(i).getLastTime());
+            timeApart.add(num);
+        }
+
+        while(!timeApart.isEmpty()) {
+            int minIndex = minIndex(timeApart);
+
+            result.add(songs.get(minIndex));
+            songs.remove(minIndex);
+            timeApart.remove(minIndex);
+        }
+
+        return result;
+    }
+
+    public static int minIndex(ArrayList<Integer> list) {
+        return list.indexOf (Collections.min(list));
+    }
+
+
+    private ArrayList<Song> breakDateTies(ArrayList<Song> songs, String date) {
         ArrayList<Integer> daysApart = new ArrayList<>();
         ArrayList<Song> result = new ArrayList<>();
 
@@ -123,23 +149,23 @@ public class FlashbackPlaylist {
             daysApart.add(num);
         }
 
+        ArrayList<Song> currentSongs = new ArrayList<>();
+        int prev = daysApart.get(minIndex(daysApart));
         while(!daysApart.isEmpty()) {
-            int max = 0;
-            int maxIndex = 0;
-            for(int i = 0; i < daysApart.size(); i++) {
-                int curr = daysApart.get(i);
-                if(i == 0) {
-                    max = curr;
-                } else if(curr > max) {
-                    max = curr;
-                    maxIndex = i;
-                }
+            int minIndex = minIndex(daysApart);
+
+            if(prev != daysApart.get(minIndex)) {
+                result.addAll(breakTimeTies(currentSongs));
+                currentSongs.clear();
+                prev = daysApart.get(minIndex);
             }
 
-            result.add(songs.get(maxIndex));
-            songs.remove(maxIndex);
-            daysApart.remove(maxIndex);
+            currentSongs.add(songs.get(minIndex));
+            songs.remove(minIndex);
+            daysApart.remove(minIndex);
         }
+
+        result.addAll(breakTimeTies(currentSongs));
 
         return result;
     }
@@ -164,14 +190,12 @@ public class FlashbackPlaylist {
         return diff;
     }
 
-    private int compareTimes(String songTime, String thisTime) {
+    private int compareTimes(String songTime) {
         int songHour = Integer.parseInt(songTime.substring(0, songTime.indexOf(":")));
         int songMin = Integer.parseInt(songTime.substring(songTime.indexOf(":")+1, songTime.length()));
-        int thisHour = Integer.parseInt(thisTime.substring(0, thisTime.indexOf(":")));
-        int thisMin = Integer.parseInt(thisTime.substring(thisTime.indexOf(":")+1, thisTime.length()));
 
-        int diff = (thisHour - songHour) * 60;
-        diff += (thisMin -songMin);
+        int diff = (24 - songHour) * 60;
+        diff -= songMin;
 
         return diff;
     }
