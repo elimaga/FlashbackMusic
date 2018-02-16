@@ -24,22 +24,17 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.Toast;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<Song> songs;
-    ArrayList<Album> albums;
+    private ArrayList<Song> songs;
+    private ArrayList<Album> albums;
 
     LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
@@ -52,6 +47,11 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Load the songs and albums into the ArrayLists
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        final int[] resourceIds = this.listRaw();
+        loadLibrary(mediaMetadataRetriever, resourceIds);
 
         //Tab layout
         TabLayout tabLayout = findViewById(R.id.tab_layout);
@@ -80,10 +80,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Load the songs and albums into the ArrayLists
-        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-        final int[] resourceIds = this.listRaw();
-        loadLibrary(mediaMetadataRetriever, resourceIds);
+
 
 
         // Flashback button
@@ -135,6 +132,10 @@ public class MainActivity extends AppCompatActivity {
     {
         return albums.get(index);
     }
+
+    public ArrayList<Song> getSongs() {return songs;}
+
+    public ArrayList<Album> getAlbums() {return albums;}
 
 
     /**
