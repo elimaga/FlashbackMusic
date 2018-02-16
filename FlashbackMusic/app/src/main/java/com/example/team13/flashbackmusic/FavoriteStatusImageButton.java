@@ -10,8 +10,7 @@ import android.view.View;
  * Created by KM on 2/15/2018.
  */
 
-public class FavoriteStatusImageButton extends android.support.v7.widget.AppCompatImageButton
-                                        implements View.OnClickListener {
+public class FavoriteStatusImageButton extends android.support.v7.widget.AppCompatImageButton {
 
     private Song song;
 
@@ -19,17 +18,12 @@ public class FavoriteStatusImageButton extends android.support.v7.widget.AppComp
         super(context, attrs);
     }
 
-    @Override
-    public void onClick (View view){
-        updateStatus();
-        updateImage();
-    }
     public void setSong(Song song){
         this.song = song;
         updateImage();
     }
 
-    private void updateImage() {
+    public void updateImage() {
         if(song.getFavoriteStatus() == Song.FavoriteStatus.LIKED){
             setImageResource(R.drawable.heart);
         }else if (song.getFavoriteStatus() == Song.FavoriteStatus.DISLIKED){
@@ -40,7 +34,7 @@ public class FavoriteStatusImageButton extends android.support.v7.widget.AppComp
         }
     }
 
-    private void updateStatus() {
+    public void updateStatus() {
         if(song.getFavoriteStatus() == Song.FavoriteStatus.LIKED){
             song.setFavoriteStatus(Song.FavoriteStatus.DISLIKED);
 

@@ -1,6 +1,8 @@
 package com.example.team13.flashbackmusic;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,27 +45,56 @@ public class SongAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
-        View rowView = mInflater.inflate(R.layout.list_item, parent, false);
 
-        TextView titleTextView = rowView.findViewById(R.id.title);
-
-        TextView artistTextView = rowView.findViewById(R.id.artist);
-
-        TextView durationTextView = rowView.findViewById(R.id.info);
+        ViewHolder holder;
 
         Song song = (Song) getItem(position);
 
-        FavoriteStatusImageButton imageButton = rowView.findViewById(R.id.favoriteSymbol);
-        imageButton.setSong(song);
+        if (convertView == null) {
+            convertView = mInflater.inflate(R.layout.list_item, null);
+
+            holder = new ViewHolder();
+
+            holder.titleTextView = convertView.findViewById(R.id.title);
+            holder.artistTextView = convertView.findViewById(R.id.artist);
+            holder.infoTextView = convertView.findViewById(R.id.info);
+            holder.separatorTextView = convertView.findViewById(R.id.separator);
+            holder.favoriteStatusImageButton = (FavoriteStatusImageButton) convertView.findViewById(R.id.favoriteSymbol);
+
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
+
+        holder.titleTextView.setText(song.getTitle());
+        holder.artistTextView.setText(song.getArtist());
+        holder.infoTextView.setText("");
+        holder.separatorTextView.setText("");
+
+        holder.favoriteStatusImageButton.setSong(song);
+
+        holder.favoriteStatusImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                    FavoriteStatusImageButton button = (FavoriteStatusImageButton) view;
+                    button.updateStatus();
+                    button.updateImage();
+            }
+        });
 
 
-        titleTextView.setText(song.getTitle());
-        artistTextView.setText(song.getArtist());
-        // TODO: needs to be replaced with song.getDuration()
-        durationTextView.setText("3:22");
+        return convertView;
 
 
-        return rowView;
+    }
+
+    static class ViewHolder
+    {
+        TextView titleTextView;
+        TextView artistTextView;
+        TextView infoTextView;
+        TextView separatorTextView;
+        FavoriteStatusImageButton favoriteStatusImageButton;
     }
 
 
