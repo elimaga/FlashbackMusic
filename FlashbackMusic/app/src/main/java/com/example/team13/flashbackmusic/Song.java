@@ -12,6 +12,7 @@ public class Song {
     private double lastLatitude, lastLongitude;
     private int resId;
     private int track;
+    private int resId;
     private int index; // index in the ArrayList of Songs
     private int liked; // neutral = 0, dislike = -1, like = 1
 
