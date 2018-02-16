@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
         // Flashback button
         final Context context = getApplicationContext();
         ImageButton flashBackButton = findViewById(R.id.flashback_button);
@@ -103,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Play the playlist
 
+
                 //Song song = new Song("America Religious", "unknown", "Love Is Everywhere",
                 //        "albums/loveiseverywhere/america-religious.mp3", "01/10", 0);
                 //song.setData(0.0, 0.0, "Monday", "1:48");
@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
 
         // Requesting location permission
         if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
@@ -214,9 +215,6 @@ public class MainActivity extends AppCompatActivity {
 
         return resourceIds;
     }
-
-
-
 
 
     private String getDay()
@@ -372,9 +370,10 @@ public class MainActivity extends AppCompatActivity {
         double newLongitude = Double.parseDouble(sharedPreferences.getString(title + "_longitude", "" + INVALID_COORDINATE));
         String newDay = sharedPreferences.getString(title + "_day", "");
         String newTime = sharedPreferences.getString(title + "_time", "");
+        String newDate = sharedPreferences.getString(title + "_date", "");
 
         // Update the data in the Song object
-        song.setData(newLatitude, newLongitude, newDay, newTime);
+        song.setData(newLatitude, newLongitude, newDay, newTime, newDate);
 
     }
 
