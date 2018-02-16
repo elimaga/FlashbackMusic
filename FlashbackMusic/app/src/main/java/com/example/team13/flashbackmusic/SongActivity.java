@@ -50,6 +50,7 @@ public class SongActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song);
 
+
         extras = getIntent().getExtras();
         indices = new ArrayList<>();
         newLatitudes = new ArrayList<>();
@@ -64,6 +65,7 @@ public class SongActivity extends AppCompatActivity {
         updateScreen();
         loadMedia(resIds.get(index));
         updateNewData();
+
 
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -132,95 +134,13 @@ public class SongActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private String getDay()
-    {
-        Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_WEEK);
-
-        switch(day)
-        {
-            case Calendar.SUNDAY:
-                return "Sunday";
-            case Calendar.MONDAY:
-                return "Monday";
-            case Calendar.TUESDAY:
-                return "Tuesday";
-            case Calendar.WEDNESDAY:
-                return "Wednesday";
-            case Calendar.THURSDAY:
-                return "Thursday";
-            case Calendar.FRIDAY:
-                return "Friday";
-            case Calendar.SATURDAY:
-                return "Saturday";
-        }
-
-        return "";
-    }
-
-    private String getTime()
-    {
-        int hours = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);//currentTime.getHours();
-        int mins = Calendar.getInstance().get(Calendar.MINUTE);//currentTime.getMinutes();
-
-        return hours + ":" + mins;
-    }
-
-    private double[] getLocation()
-    {
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
-        };
-
-        if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
-                != PackageManager.PERMISSION_GRANTED  && ActivityCompat.checkSelfPermission ( this ,
-                Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-
-            ActivityCompat.requestPermissions ( this ,
-                    new  String[]{Manifest.permission.ACCESS_FINE_LOCATION },  REQUEST_LOCATION );
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (location != null)
-        {
-            double[] newLocation = {location.getLatitude(), location.getLongitude()};
-            return newLocation;
-        }
-        else {
-            double[] newLocation = {INVALID_COORDINATE, INVALID_COORDINATE};
-            return newLocation;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 
     /**
      * Method to update the screen so the user know what song is playing
      */
     private void updateScreen() {
 
+        // TODO : display date of when it was last played
         TextView songNameView = (TextView) findViewById(R.id.titleTextView);
         TextView songArtistView = (TextView) findViewById(R.id.artistTextView);
         TextView songAlbumView = (TextView) findViewById(R.id.albumTextView);
@@ -271,9 +191,11 @@ public class SongActivity extends AppCompatActivity {
 
         //get new location, day, and time
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        double[] newLocation = getLocation();
-        String newDay = getDay();
-        String newTime = getTime();
+        double[] newLocation = UserInfo.getLocation(SongActivity.this);
+
+        String newDay = UserInfo.getDay();
+        String newTime = UserInfo.getTime();
+        String newDate = UserInfo.getDate();
 
         // add them and their song index to their appropriate arraylist
         indices.add(extras.getIntegerArrayList("indices").get(index));
@@ -295,3 +217,4 @@ public class SongActivity extends AppCompatActivity {
         setResult(Activity.RESULT_OK, newData);
     }
 }
+

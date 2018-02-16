@@ -7,10 +7,12 @@ package com.example.team13.flashbackmusic;
 import android.content.SharedPreferences;
 
 public class Song {
-    private String title, artist, albumName, lastDay, lastTime, setting;
+
+    private String title, artist, albumName, lastDay, lastTime, setting, lastDate;
     private double lastLatitude, lastLongitude;
     private int resId;
     private int track;
+    private int resId;
     private int index; // index in the ArrayList of Songs
     private int liked; // neutral = 0, dislike = -1, like = 1
 
@@ -76,6 +78,11 @@ public class Song {
         return this.lastDay;
     }
 
+    public String getLastDate() {
+        return this.lastDate;
+    }
+
+
     public String getLastTime() {
         return this.lastTime;
     }
@@ -86,11 +93,12 @@ public class Song {
 
 
     public void setData(double lastLatitude, double lastLongitude,
-                         String day, String time) {
+                         String day, String time, String date) {
         this.lastDay = day;
         this.lastTime = time;
         this.lastLatitude = lastLatitude;
         this.lastLongitude = lastLongitude;
+        this.lastDate = date;
         setTimeOfDay(time);
     }
 
