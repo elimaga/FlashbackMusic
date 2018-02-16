@@ -304,25 +304,39 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 0 && resultCode == RESULT_OK && data != null) {
             Bundle extras = data.getExtras();
 
-            int index = (int) extras.getInt("index");
-            String title = songs.get(index).getTitle();
-            double newLatitude = (double) extras.getDouble("newLatitude");
-            double newLongitude = (double) extras.getDouble("newLongitude");
-            String newDay = (String) extras.getString("newDay");
-            String newTime = (String) extras.getString("newTime");
-
             // Save the info in the SharedPreferences
             SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            editor.putString(title + "_latitude", "" + newLatitude);
-            editor.putString(title + "_longitude", "" + newLongitude);
-            editor.putString(title + "_day", newDay);
-            editor.putString(title + "_time", newTime);
+            ArrayList<Integer> indices = extras.getIntegerArrayList("indices");
+            ArrayList<String> newLatitudes = extras.getStringArrayList("newLatitudes");
+            ArrayList<String> newLongitudes = extras.getStringArrayList("newLongitudes");
+            ArrayList<String> newTimes = extras.getStringArrayList("newTimes");
+            ArrayList<String> newDays = extras.getStringArrayList("newDays");
 
-            editor.apply();
 
-            songs.get(index).setData(newLatitude, newLongitude, newDay, newTime);
+            for (int index = 0; index < indices.size(); index++) {
+
+                String title = songs.get(indices.get(index)).getTitle();
+                double newLatitude = Double.parseDouble(newLatitudes.get(index));
+                double newLongitude = Double.parseDouble(newLongitudes.get(index));
+                String newDay = newDays.get(index);
+                String newTime = newTimes.get(index);
+
+
+                editor.putString(title + "_latitude", "" + newLatitude);
+                editor.putString(title + "_longitude", "" + newLongitude);
+                editor.putString(title + "_day", newDay);
+                editor.putString(title + "_time", newTime);
+
+                editor.apply();
+
+                songs.get(indices.get(index)).setData(newLatitude, newLongitude, newDay, newTime);
+
+            }
+
+
+
 
         }
     }

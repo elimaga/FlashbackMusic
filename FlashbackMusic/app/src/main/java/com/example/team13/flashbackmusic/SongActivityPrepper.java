@@ -34,24 +34,26 @@ public class SongActivityPrepper {
         for(int index = 0; index < songs.size(); index++) {
 
             titles.add(songs.get(index).getTitle());
-            String artist = song.getArtist();
-            String album = song.getAlbumName();
-            double latitude = song.getLastLatitude();
-            double longitude = song.getLastLongitude();
-            String time = song.getLastTime();
-            String day = song.getLastDay();
-            int resId = song.getResId();
-            int index = song.getIndex();
+            artists.add(songs.get(index).getArtist());
+            albums.add(songs.get(index).getAlbumName());
+            latitudes[index] = songs.get(index).getLastLatitude();
+            longitudes[index] = songs.get(index).getLastLongitude();
+            times.add(songs.get(index).getLastTime());
+            days.add(songs.get(index).getLastDay());
+            indices.add(songs.get(index).getIndex());
+            resIds.add(songs.get(index).getResId());
 
         }
-        intent.putExtra("title", title);
-        intent.putExtra("artist", artist);
-        intent.putExtra("album", album);
-        intent.putExtra("latitude", latitude);
-        intent.putExtra("longitude", longitude);
-        intent.putExtra("time", time);
-        intent.putExtra("day", day);
-        intent.putExtra("resId", resId);
-        intent.putExtra("index", index);
+
+        intent.putExtra("titles", titles);
+        intent.putExtra("artists", artists);
+        intent.putExtra("albums", albums);
+        intent.putExtra("latitudes", latitudes);
+        intent.putExtra("longitudes", longitudes);
+        intent.putExtra("times", times);
+        intent.putExtra("days", days);
+        intent.putExtra("resIds", resIds);
+        intent.putExtra("indices", indices);
+
     }
 }
