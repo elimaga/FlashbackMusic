@@ -41,20 +41,33 @@ public class AlbumAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
-        View rowView = mInflater.inflate(R.layout.list_item, parent, false);
 
-        TextView albumTitleTextView = rowView.findViewById(R.id.title);
-
-        TextView albumArtistTextView = rowView.findViewById(R.id.artist);
-
-        TextView numOfSongTextView = rowView.findViewById(R.id.info);
-
+        ViewHolder holder;
         Album album = (Album) getItem(position);
 
-        albumTitleTextView.setText(album.getAlbumName());
-        albumArtistTextView.setText(album.getArtist());
-        numOfSongTextView.setText(Integer.toString(album.getSongs().size())+" songs");
+        if (convertView == null){
+            convertView = mInflater.inflate(R.layout.list_item_album,null);
+            holder = new ViewHolder();
+            holder.albumTitleTextView = convertView.findViewById(R.id.title);
+            holder.albumArtistTextView = convertView.findViewById(R.id.artist);
+            holder.numOfSongTextView = convertView.findViewById(R.id.info);
 
-        return rowView;
+            convertView.setTag(holder);
+        } else{
+            holder = (ViewHolder) convertView.getTag();
+        }
+
+        holder.albumTitleTextView.setText(album.getAlbumName());
+        holder.albumArtistTextView.setText(album.getArtist());
+        holder.numOfSongTextView.setText(album.getSongs().size() + " songs");
+
+        return convertView;
+
+    }
+
+    static class ViewHolder{
+        TextView albumTitleTextView;
+        TextView albumArtistTextView;
+        TextView numOfSongTextView;
     }
 }

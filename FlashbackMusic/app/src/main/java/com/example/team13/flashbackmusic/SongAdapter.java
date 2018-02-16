@@ -1,13 +1,10 @@
 package com.example.team13.flashbackmusic;
 
 import android.content.Context;
-import android.content.Intent;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -51,7 +48,7 @@ public class SongAdapter extends BaseAdapter {
         Song song = (Song) getItem(position);
 
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.list_item, null);
+            convertView = mInflater.inflate(R.layout.list_item_song, null);
 
             holder = new ViewHolder();
 
@@ -68,8 +65,7 @@ public class SongAdapter extends BaseAdapter {
 
         holder.titleTextView.setText(song.getTitle());
         holder.artistTextView.setText(song.getArtist());
-        holder.infoTextView.setText("");
-        holder.separatorTextView.setText("");
+
 
         holder.favoriteStatusImageButton.setSong(song);
 
