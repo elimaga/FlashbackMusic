@@ -29,64 +29,20 @@ import java.util.Locale;
 
 public class SongActivity extends AppCompatActivity {
 
-    private MediaPlayer mediaPlayer;
+    //private MediaPlayer mediaPlayer;
     private LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
     final int INVALID_COORDINATE = 200;
+    Bundle extras;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song);
 
-        TextView songNameView = (TextView) findViewById(R.id.titleTextView);
-        TextView songArtistView = (TextView) findViewById(R.id.artistTextView);
-        TextView songAlbumView = (TextView) findViewById(R.id.albumTextView);
-        TextView songLocationView = (TextView) findViewById(R.id.locationTextView);
-        TextView songDayView = (TextView) findViewById(R.id.dayTextView);
-        TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
+        updateInfo(0);
 
-        Bundle extras = getIntent().getExtras();
-        int resId = 0;
-        double latitude = INVALID_COORDINATE;
-        double longitude = INVALID_COORDINATE;
-
-        if(extras != null)
-        {
-
-            songNameView.setText("Title: " + (String) extras.getString("title"));
-            songArtistView.setText("Artist: " + (String) extras.getString("artist"));
-            songAlbumView.setText("Album: " + (String) extras.getString("album"));
-            latitude = extras.getDouble("latitude");
-            longitude = extras.getDouble("longitude");
-            songDayView.setText("Day: " + (String) extras.getString("day"));
-            songTimeView.setText("Time: " + (String) extras.getString("time"));
-            resId = (int) extras.getInt("resId");
-        }
-
-        // Shows the last location to the user
-        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-        try {
-            // Only want to show a location if we have a valid latitude and longitude
-            if(latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 )
-            {
-
-                List<Address> list = geocoder.getFromLocation(latitude, longitude, 1);
-                if(list != null && list.size() > 0)
-                {
-                    Address address = list.get(0);
-                    String result = address.getAddressLine(0);
-                    songLocationView.setText("Location: " + result);
-
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-
+/*
         //get new location, day, and time
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         double[] newLocation = getLocation();
@@ -94,17 +50,16 @@ public class SongActivity extends AppCompatActivity {
         String newDay = getDay();
         String newTime = getTime();
 
-        //System.out.println(newLocation[0] + " " + newLocation[1] + " " + newDay + " " + newTime);
         // put new location, day, and time in extras
         Intent newData = new Intent();
         newData.putExtra("newLatitude", newLocation[0]);
         newData.putExtra("newLongitude", newLocation[1]);
         newData.putExtra("newTime", newTime);
         newData.putExtra("newDay", newDay);
-        newData.putExtra("index", (int) extras.get("index"));
-        setResult(Activity.RESULT_OK, newData);
+        newData.putExtra("index", (int) extras.get("indices"));
+        setResult(Activity.RESULT_OK, newData); */
 
-        loadMedia(resId);
+        /*loadMedia(resId);
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
@@ -126,19 +81,19 @@ public class SongActivity extends AppCompatActivity {
                 //kills SongActivity when song finishes
                 finish();
             }
-        });
+        });*/
 
         final Button backButton = (Button) findViewById(R.id.BackButton);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mediaPlayer.stop();
+                //mediaPlayer.stop();
                 finish();
             }
         });
     }
 
-    public void loadMedia(int resId)
+    /*public void loadMedia(int resId)
     {
         if (mediaPlayer == null)
         {
@@ -156,14 +111,8 @@ public class SongActivity extends AppCompatActivity {
         {
             e.printStackTrace();
         }
-    }
+    }*/
 
-    @Override
-    public void onDestroy() {
-        // Write your code here
-        super.onDestroy();
-        mediaPlayer.release();
-    }
 
     private String getDay()
     {
@@ -247,5 +196,53 @@ public class SongActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    public void updateInfo(int index) {
+
+        TextView songNameView = (TextView) findViewById(R.id.titleTextView);
+        TextView songArtistView = (TextView) findViewById(R.id.artistTextView);
+        TextView songAlbumView = (TextView) findViewById(R.id.albumTextView);
+        TextView songLocationView = (TextView) findViewById(R.id.locationTextView);
+        TextView songDayView = (TextView) findViewById(R.id.dayTextView);
+        TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
+
+        double latitude = INVALID_COORDINATE;
+        double longitude = INVALID_COORDINATE;
+
+        if(extras != null)
+        {
+
+            songNameView.setText("Title: " + extras.getStringArrayList("titles").get(index));
+            songArtistView.setText("Artist: " + extras.getStringArrayList("artists").get(index));
+            songAlbumView.setText("Album: " + extras.getStringArrayList("albums").get(index));
+            latitude = extras.getDoubleArray("latitudes")[index];
+            longitude = extras.getDoubleArray("longitudes")[index];
+            songDayView.setText("Day: " + extras.getStringArrayList("days").get(index));
+            songTimeView.setText("Time: " + extras.getStringArrayList("times").get(index));
+
+        }
+
+        // Shows the last location to the user
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            // Only want to show a location if we have a valid latitude and longitude
+            if(latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 )
+            {
+
+                List<Address> list = geocoder.getFromLocation(latitude, longitude, 1);
+                if(list != null && list.size() > 0)
+                {
+                    Address address = list.get(0);
+                    String result = address.getAddressLine(0);
+                    songLocationView.setText("Location: " + result);
+
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

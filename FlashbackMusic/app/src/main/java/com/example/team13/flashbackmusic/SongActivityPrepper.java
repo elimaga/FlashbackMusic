@@ -2,39 +2,59 @@ package com.example.team13.flashbackmusic;
 
 import android.content.Intent;
 
+import java.util.ArrayList;
+
 /**
  * Created by andrewyu on 2/14/18.
  */
 
 public class SongActivityPrepper {
-    private Intent intent;
-    private Song song;
+    private Intent activityIntent;
+    private Intent playerIntent;
+    private ArrayList<Song> songs;
 
-    public SongActivityPrepper(Intent i, Song s)
+    public SongActivityPrepper(Intent activityIntent, Intent playerIntent, ArrayList<Song> songs)
     {
-        this.intent = i;
-        this.song = s;
+        this.activityIntent = activityIntent;
+        this.playerIntent = playerIntent;
+        this.songs = songs;
     }
 
     public void sendInfo()
     {
-        String title = song.getTitle();
-        String artist = song.getArtist();
-        String album = song.getAlbumName();
-        double latitude = song.getLastLatitude();
-        double longitude = song.getLastLongitude();
-        String time = song.getLastTime();
-        String day = song.getLastDay();
-        int resId = song.getResId();
-        int index = song.getIndex();
-        intent.putExtra("title", title);
-        intent.putExtra("artist", artist);
-        intent.putExtra("album", album);
-        intent.putExtra("latitude", latitude);
-        intent.putExtra("longitude", longitude);
-        intent.putExtra("time", time);
-        intent.putExtra("day", day);
-        intent.putExtra("resId", resId);
-        intent.putExtra("index", index);
+        ArrayList<String> titles = new ArrayList<>();
+        ArrayList<String> artists = new ArrayList<>();
+        ArrayList<String> albums = new ArrayList<>();
+        double[] latitudes = new double[songs.size()];
+        double[] longitudes = new double[songs.size()];
+        ArrayList<String> times = new ArrayList<>();
+        ArrayList<String> days = new ArrayList<>();
+        ArrayList<Integer> indices = new ArrayList<>();
+        ArrayList<Integer> resourceIds = new ArrayList<>();
+
+        for(int index = 0; index < songs.size(); index++) {
+
+            titles.add(songs.get(index).getTitle());
+            artists.add(songs.get(index).getArtist());
+            albums.add(songs.get(index).getAlbumName());
+            latitudes[index] = songs.get(index).getLastLatitude();
+            longitudes[index] = songs.get(index).getLastLongitude();
+            times.add(songs.get(index).getLastTime());
+            days.add(songs.get(index).getLastDay());
+            indices.add(songs.get(index).getIndex());
+            resourceIds.add(songs.get(index).getResId());
+
+        }
+
+        activityIntent.putExtra("titles", titles);
+        activityIntent.putExtra("artists", artists);
+        activityIntent.putExtra("albums", albums);
+        activityIntent.putExtra("latitudes", latitudes);
+        activityIntent.putExtra("longitudes", longitudes);
+        activityIntent.putExtra("times", times);
+        activityIntent.putExtra("days", days);
+        activityIntent.putExtra("indices", indices);
+        playerIntent.putExtra("resourceIds", resourceIds);
+
     }
 }

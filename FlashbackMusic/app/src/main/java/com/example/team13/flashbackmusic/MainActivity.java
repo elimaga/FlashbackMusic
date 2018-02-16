@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     static final int REQUEST_LOCATION = 1;
     final int INVALID_COORDINATE = 200;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         final int[] resourceIds = this.listRaw();
         loadLibrary(mediaMetadataRetriever, resourceIds);
+
+
 
         //Tab layout
         TabLayout tabLayout = findViewById(R.id.tab_layout);
@@ -103,10 +106,6 @@ public class MainActivity extends AppCompatActivity {
 
                 // Play the playlist
 
-                //Song song = new Song("America Religious", "unknown", "Love Is Everywhere",
-                //        "albums/loveiseverywhere/america-religious.mp3", "01/10", 0);
-                //song.setData(0.0, 0.0, "Monday", "1:48");
-                //playSong(song);
 
                 Log.d("Flashback Button", "Flashback button is pressed from main activity");
 
@@ -296,32 +295,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-    public void playSong(Song song)
-    {
-        Intent intent = new Intent(this, SongActivity.class);
-        String title = song.getTitle();
-        String artist = song.getArtist();
-        String album = song.getAlbumName();
-        double latitude = song.getLastLatitude();
-        double longitude = song.getLastLongitude();
-        String time = song.getLastTime();
-        String day = song.getLastDay();
-        int resId = song.getResId();
-        int index = song.getIndex();
-        intent.putExtra("title", title);
-        intent.putExtra("artist", artist);
-        intent.putExtra("album", album);
-        intent.putExtra("latitude", latitude);
-        intent.putExtra("longitude", longitude);
-        intent.putExtra("time", time);
-        intent.putExtra("day", day);
-        intent.putExtra("resId", resId);
-        intent.putExtra("index", index);
-
-        startActivityForResult(intent, 0);
-
-    }
 
     /*
      * When our song activity finishes, this method is called and stores all the new data for the

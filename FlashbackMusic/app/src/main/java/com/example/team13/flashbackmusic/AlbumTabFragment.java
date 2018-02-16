@@ -32,17 +32,21 @@ public class AlbumTabFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
+                // Get the album we are going to play and its list of songs
                 Album album = (Album) adapterView.getItemAtPosition(position);
-                Intent intent = new Intent(main, SongActivity.class);
                 ArrayList<Song> songsInAlbum = album.getSongs();
 
-                for(int index = songsInAlbum.size() - 1; index >= 0; index--) {
+                // Create the Intents to send the information and start the new activities
+                Intent activityIntent = new Intent(main, SongActivity.class);
+                Intent playerIntent = new Intent(main, PlayService.class);
+                SongActivityPrepper songActivityPrepper = new SongActivityPrepper(activityIntent, playerIntent, songsInAlbum);
+                songActivityPrepper.sendInfo();
 
-                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songsInAlbum.get(index));
-                    songActivityPrepper.sendInfo();
-                    main.startActivityForResult(intent, 0);
+                // Stop any previous song from playing, start playing the songs, and display the info to the user
+                main.stopService(playerIntent);
+                main.startService(playerIntent);
+                main.startActivityForResult(activityIntent, 0);
 
-                }
             }
         });
 
