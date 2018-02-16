@@ -33,11 +33,13 @@ public class SongTabFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 Song song = (Song) adapterView.getItemAtPosition(position);
+                ArrayList<Song> songs = new ArrayList<>();
+                songs.add(song);
+
                 Intent intent = new Intent(main, SongActivity.class);
-                SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, song);
+                SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songs);
                 songActivityPrepper.sendInfo();
                 main.startActivityForResult(intent, 0);
-
 
             }
         });

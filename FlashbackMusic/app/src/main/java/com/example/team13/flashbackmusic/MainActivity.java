@@ -102,12 +102,6 @@ public class MainActivity extends AppCompatActivity {
 
                 // Play the playlist
 
-
-                //Song song = new Song("America Religious", "unknown", "Love Is Everywhere",
-                //        "albums/loveiseverywhere/america-religious.mp3", "01/10", 0);
-                //song.setData(0.0, 0.0, "Monday", "1:48");
-                //playSong(song);
-
                 Log.d("Flashback Button", "Flashback button is pressed from main activity");
 
             }
@@ -217,31 +211,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void playSong(Song song)
-    {
-        Intent intent = new Intent(this, SongActivity.class);
-        String title = song.getTitle();
-        String artist = song.getArtist();
-        String album = song.getAlbumName();
-        double latitude = song.getLastLatitude();
-        double longitude = song.getLastLongitude();
-        String time = song.getLastTime();
-        String day = song.getLastDay();
-        int resId = song.getResId();
-        int index = song.getIndex();
-        intent.putExtra("title", title);
-        intent.putExtra("artist", artist);
-        intent.putExtra("album", album);
-        intent.putExtra("latitude", latitude);
-        intent.putExtra("longitude", longitude);
-        intent.putExtra("time", time);
-        intent.putExtra("day", day);
-        intent.putExtra("resId", resId);
-        intent.putExtra("index", index);
-
-        startActivityForResult(intent, 0);
-
-    }
 
     /*
      * When our song activity finishes, this method is called and stores all the new data for the
@@ -255,25 +224,39 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 0 && resultCode == RESULT_OK && data != null) {
             Bundle extras = data.getExtras();
 
-            int index = (int) extras.getInt("index");
-            String title = songs.get(index).getTitle();
-            double newLatitude = (double) extras.getDouble("newLatitude");
-            double newLongitude = (double) extras.getDouble("newLongitude");
-            String newDay = (String) extras.getString("newDay");
-            String newTime = (String) extras.getString("newTime");
-
             // Save the info in the SharedPreferences
             SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            editor.putString(title + "_latitude", "" + newLatitude);
-            editor.putString(title + "_longitude", "" + newLongitude);
-            editor.putString(title + "_day", newDay);
-            editor.putString(title + "_time", newTime);
+            ArrayList<Integer> indices = extras.getIntegerArrayList("indices");
+            ArrayList<String> newLatitudes = extras.getStringArrayList("newLatitudes");
+            ArrayList<String> newLongitudes = extras.getStringArrayList("newLongitudes");
+            ArrayList<String> newTimes = extras.getStringArrayList("newTimes");
+            ArrayList<String> newDays = extras.getStringArrayList("newDays");
 
-            editor.apply();
 
-            songs.get(index).setData(newLatitude, newLongitude, newDay, newTime);
+            for (int index = 0; index < indices.size(); index++) {
+
+                String title = songs.get(indices.get(index)).getTitle();
+                double newLatitude = Double.parseDouble(newLatitudes.get(index));
+                double newLongitude = Double.parseDouble(newLongitudes.get(index));
+                String newDay = newDays.get(index);
+                String newTime = newTimes.get(index);
+
+
+                editor.putString(title + "_latitude", "" + newLatitude);
+                editor.putString(title + "_longitude", "" + newLongitude);
+                editor.putString(title + "_day", newDay);
+                editor.putString(title + "_time", newTime);
+
+                editor.apply();
+
+                songs.get(indices.get(index)).setData(newLatitude, newLongitude, newDay, newTime);
+
+            }
+
+
+
 
         }
     }

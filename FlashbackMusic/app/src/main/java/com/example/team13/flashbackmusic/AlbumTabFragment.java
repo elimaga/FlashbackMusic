@@ -36,13 +36,11 @@ public class AlbumTabFragment extends Fragment {
                 Intent intent = new Intent(main, SongActivity.class);
                 ArrayList<Song> songsInAlbum = album.getSongs();
 
-                for(int index = songsInAlbum.size() - 1; index >= 0; index--) {
+                SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songsInAlbum);
+                songActivityPrepper.sendInfo();
+                main.startActivityForResult(intent, 0);
 
-                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songsInAlbum.get(index));
-                    songActivityPrepper.sendInfo();
-                    main.startActivityForResult(intent, 0);
 
-                }
             }
         });
 
