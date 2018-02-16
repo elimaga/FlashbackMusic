@@ -1,6 +1,7 @@
 package com.example.team13.flashbackmusic;
 
 import android.location.Location;
+import android.util.Log;
 
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
@@ -19,24 +20,25 @@ public class FlashbackPlaylist {
 
     // The variables that tell how many matches a song has with the user's current info and if
     // the song is liked to break ties. These are used to sort the playlist from highest to lowest
-    final int LIKED_AND_THREE_MATCHES = 6;
-    final int THREE_MATCHES = 5;
-    final int LIKED_AND_TWO_MATCHES = 4;
-    final int TWO_MATCHES = 3;
-    final int LIKED_AND_ONE_MATCH = 2;
-    final int ONE_MATCH = 1;
+    final static int LIKED_AND_THREE_MATCHES = 6;
+    final static int THREE_MATCHES = 5;
+    final static int LIKED_AND_TWO_MATCHES = 4;
+    final static int TWO_MATCHES = 3;
+    final static int LIKED_AND_ONE_MATCH = 2;
+    final static int ONE_MATCH = 1;
 
 
-    private ArrayList<Song> playlist;      // the songs in the flashback playlist
+    public static ArrayList<Song> playlist;      // the songs in the flashback playlist
+    public static ArrayList<Integer> numMatches;
 
     /*
      * Constructs the Flashback Playlist from the user's current location, day, and time, and the
      * information stored in the song objects.
-     * TODO: Sort the playlist
      */
     public FlashbackPlaylist(ArrayList<Song> allSongs, double[] location, String day, String time, String date) {
 
-        ArrayList<Integer> numMatches = new ArrayList<>();  // the number of matches the song has with the user's info
+        playlist = new ArrayList<>();
+        numMatches = new ArrayList<>();  // the number of matches the song has with the user's info
 
         // Loop through every song in the array of songs and add the ones with at least one match
         // to the playlist
@@ -92,12 +94,10 @@ public class FlashbackPlaylist {
                 }
             }
         }
-
-        sortPlaylist(numMatches, date);
+        sortPlaylist(date);
     }
 
-    private void sortPlaylist(ArrayList<Integer> numMatches, String date) {
-        ArrayList<Song> sorted = new ArrayList<>();
+    public static ArrayList<Song> sortPlaylist(String date){
 
         for(int i = LIKED_AND_THREE_MATCHES; i > 0; i--) {
             int index = numMatches.indexOf(i);
@@ -109,13 +109,16 @@ public class FlashbackPlaylist {
                 numMatches.remove(index);
                 index = numMatches.indexOf(i);
             }
+            if (currentSongs.isEmpty()){
+                continue;
+            }
             currentSongs = breakDateTies(currentSongs, date);
             playlist.addAll(currentSongs);
         }
-        playlist = sorted;
+        return playlist;
     }
 
-    private ArrayList<Song> breakTimeTies(ArrayList<Song> songs) {
+    public static ArrayList<Song> breakTimeTies(ArrayList<Song> songs) {
         ArrayList<Integer> timeApart = new ArrayList<>();
         ArrayList<Song> result = new ArrayList<>();
 
@@ -140,7 +143,7 @@ public class FlashbackPlaylist {
     }
 
 
-    private ArrayList<Song> breakDateTies(ArrayList<Song> songs, String date) {
+    public static ArrayList<Song> breakDateTies(ArrayList<Song> songs, String date) {
         ArrayList<Integer> daysApart = new ArrayList<>();
         ArrayList<Song> result = new ArrayList<>();
 
@@ -170,17 +173,17 @@ public class FlashbackPlaylist {
         return result;
     }
 
-    private int compareDates(String songDate, String thisDate) {
+    public static int compareDates(String songDate, String thisDate) {
         int songMonth = Integer.parseInt(songDate.substring(0, songDate.indexOf(("/"))));
-        String sub = songDate.substring(songDate.indexOf(("/") + 1, songDate.length()));
-        int songDay = Integer.parseInt(sub.substring(0, songDate.indexOf(("/"))));
-        sub = sub.substring(sub.indexOf(("/") + 1, sub.length()));
+        String sub = songDate.substring(songDate.indexOf("/") + 1, songDate.length());
+        int songDay = Integer.parseInt(sub.substring(0, sub.indexOf(("/"))));
+        sub = sub.substring(sub.indexOf("/") + 1, sub.length());
         int songYear = Integer.parseInt(sub);
 
         int thisMonth = Integer.parseInt(thisDate.substring(0, thisDate.indexOf(("/"))));
-        sub = thisDate.substring(thisDate.indexOf(("/") + 1, thisDate.length()));
-        int thisDay = Integer.parseInt(sub.substring(0, thisDate.indexOf(("/"))));
-        sub = sub.substring(sub.indexOf(("/") + 1, sub.length()));
+        sub = thisDate.substring(thisDate.indexOf("/") + 1, thisDate.length());
+        int thisDay = Integer.parseInt(sub.substring(0, sub.indexOf(("/"))));
+        sub = sub.substring(sub.indexOf("/") + 1, sub.length());
         int thisYear = Integer.parseInt(sub);
 
         int diff = (thisYear - songYear) * 365;
@@ -190,7 +193,7 @@ public class FlashbackPlaylist {
         return diff;
     }
 
-    private int compareTimes(String songTime) {
+    public static int compareTimes(String songTime) {
         int songHour = Integer.parseInt(songTime.substring(0, songTime.indexOf(":")));
         int songMin = Integer.parseInt(songTime.substring(songTime.indexOf(":")+1, songTime.length()));
 
