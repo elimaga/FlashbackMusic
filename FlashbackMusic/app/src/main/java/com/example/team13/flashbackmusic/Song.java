@@ -7,21 +7,34 @@ package com.example.team13.flashbackmusic;
 import android.content.SharedPreferences;
 
 public class Song {
+
     private String title, artist, albumName, lastDay, lastTime, setting, lastDate;
     private double lastLatitude, lastLongitude;
+    private int resId;
     private int track;
     private int resId;
     private int index; // index in the ArrayList of Songs
     private int liked; // neutral = 0, dislike = -1, like = 1
 
     public Song(String title, String artist, String albumName,
-                int resId, String track, int index) {
+                int id, String track, int index) {
         this.title = title;
         this.artist = artist;
         this.albumName = albumName;
-        this.resId = resId;
+        this.resId = id;
         this.track = Integer.parseInt(track.substring(0, track.indexOf("/")));
         this.index = index;
+        this.liked = 0;
+    }
+
+    public Song()
+    {
+        this.title = "";
+        this.artist = "";
+        this.albumName = "";
+        this.resId = 0;
+        this.track = 0;
+        this.index = 0;
         this.liked = 0;
     }
 
@@ -37,7 +50,7 @@ public class Song {
         return this.albumName;
     }
 
-    public String getResId() {
+    public int getResId() {
         return this.resId;
     }
 
