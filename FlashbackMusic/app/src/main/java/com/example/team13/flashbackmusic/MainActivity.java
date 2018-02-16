@@ -94,9 +94,9 @@ public class MainActivity extends AppCompatActivity {
 
 
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                double[] userLocation = getLocation();
-                String userTime = getTime();
-                String userDay = getDay();
+                double[] userLocation = UserInfo.getLocation(MainActivity.this);
+                String userTime = UserInfo.getTime();
+                String userDay = UserInfo.getDay();
 
                 // Create playlist object
 
@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-    }
 
         // Requesting location permission
         if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
@@ -176,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
                 boolean needNewAlbum = true;
 
+
                 for (Album album : albums) {
                     if(album.getAlbumName().equals(albumName)) {
                         album.addSong(song);
@@ -214,84 +214,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return resourceIds;
-    }
-
-
-    private String getDay()
-    {
-        Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_WEEK);
-
-        switch(day)
-        {
-            case Calendar.SUNDAY:
-                return "Sunday";
-            case Calendar.MONDAY:
-                return "Monday";
-            case Calendar.TUESDAY:
-                return "Tuesday";
-            case Calendar.WEDNESDAY:
-                return "Wednesday";
-            case Calendar.THURSDAY:
-                return "Thursday";
-            case Calendar.FRIDAY:
-                return "Friday";
-            case Calendar.SATURDAY:
-                return "Saturday";
-        }
-
-        return "";
-    }
-
-    private String getTime()
-    {
-        int hours = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);//currentTime.getHours();
-        int mins = Calendar.getInstance().get(Calendar.MINUTE);//currentTime.getMinutes();
-
-        return hours + ":" + mins;
-    }
-
-    private double[] getLocation()
-    {
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
-        };
-
-        if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
-                == PackageManager.PERMISSION_GRANTED  || ActivityCompat.checkSelfPermission ( this ,
-                Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
-
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-            // TODO: in addtion to checking null, the check for whether location service is on is needed here
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (location != null)
-            {
-                double[] newLocation = {location.getLatitude(), location.getLongitude()};
-                return newLocation;
-            }
-
-        }
-        return new double[] {INVALID_COORDINATE, INVALID_COORDINATE};
-
-
     }
 
 
