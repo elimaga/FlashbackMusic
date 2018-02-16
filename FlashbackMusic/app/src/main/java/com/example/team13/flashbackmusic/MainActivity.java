@@ -98,9 +98,9 @@ public class MainActivity extends AppCompatActivity {
 
 
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                double[] userLocation = getLocation();
-                String userTime = getTime();
-                String userDay = getDay();
+                double[] userLocation = UserInfo.getLocation(MainActivity.this);
+                String userTime = UserInfo.getTime();
+                String userDay = UserInfo.getDay();
 
                 // Create playlist object
 
@@ -118,16 +118,13 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<String> loadAlbums(ArrayList<String> songs)
     {
         ArrayList<String> albums = new ArrayList<String>();
-
         if(albums.isEmpty())
         {
             // Create a new album object and add it to the ArrayList of albums
             Album next = new Album(songs.get(0).getArtist(), songs.get(0).getAlbum());
             albums.add(next);
         }
-
         int index = 0;
-
         for (String song : songs)
         {
             if (albums.get(index).getName().equals(song.getAlbum()))
@@ -143,12 +140,10 @@ public class MainActivity extends AppCompatActivity {
                 index++;
             }
         }
-
         for(Album album : albums)
         {
             sort(album);
         }
-
         return albums;
     }//*/
 
@@ -183,7 +178,6 @@ public class MainActivity extends AppCompatActivity {
             //get all album names in asset folder
             String dir = "albums";
             String[] albumNameList = this.getAssets().list(dir);
-
             //iterate over all albums
             for (String album : albumNameList) {
                 //get all song names in an album
@@ -193,13 +187,11 @@ public class MainActivity extends AppCompatActivity {
                 for (String song : songs) {
                     //construct a file path to the song from the asset folder
                     String mp3File = albumPath + "/" + song;
-
                     //Create an AssetFileDescriptor to read in the song file
                     AssetFileDescriptor afd = this.getAssets().openFd(mp3File);
                     //Set the MediaMetadataRetriever to read from the song file specified in the
                     //AssetFileDescriptor, offsets are important for correct read-in
                     mmr.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-
                     //Retrieve the song name
                     String name = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
                     //Add song name to return list
@@ -211,7 +203,6 @@ public class MainActivity extends AppCompatActivity {
         {
             e.printStackTrace();
         }
-
         //return song (names)
         return songNameList;
         */
@@ -238,89 +229,6 @@ public class MainActivity extends AppCompatActivity {
         return resourceIds;
     }
 
-    private String getDay()
-    {
-        Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_WEEK);
-
-        switch(day)
-        {
-            case Calendar.SUNDAY:
-                return "Sunday";
-            case Calendar.MONDAY:
-                return "Monday";
-            case Calendar.TUESDAY:
-                return "Tuesday";
-            case Calendar.WEDNESDAY:
-                return "Wednesday";
-            case Calendar.THURSDAY:
-                return "Thursday";
-            case Calendar.FRIDAY:
-                return "Friday";
-            case Calendar.SATURDAY:
-                return "Saturday";
-        }
-
-        return "";
-    }
-
-    private String getTime()
-    {
-        int hours = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);//currentTime.getHours();
-        int mins = Calendar.getInstance().get(Calendar.MINUTE);//currentTime.getMinutes();
-
-        return hours + ":" + mins;
-    }
-
-    private double[] getLocation()
-    {
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
-        };
-
-        if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
-                != PackageManager.PERMISSION_GRANTED  && ActivityCompat.checkSelfPermission ( this ,
-                Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-
-            ActivityCompat.requestPermissions ( this ,
-                    new  String[]{Manifest.permission.ACCESS_FINE_LOCATION },  REQUEST_LOCATION );
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (location != null)
-        {
-            double[] newLocation = {location.getLatitude(), location.getLongitude()};
-            return newLocation;
-        }
-        else {
-            double[] newLocation = {INVALID_COORDINATE, INVALID_COORDINATE};
-            return newLocation;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 
     public void playSong(Song song)
     {
