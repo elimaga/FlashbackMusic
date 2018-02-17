@@ -55,7 +55,28 @@ public class UserInfo extends AppCompatActivity{
         int hours = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);//currentTime.getHours();
         int mins = Calendar.getInstance().get(Calendar.MINUTE);//currentTime.getMinutes();
 
-        return hours + ":" + mins;
+        // Convert to standard time
+        int hour = hours % 12;
+        final String ampm, minute;
+
+        // Military hours from 0-11 are am, 12-23 are pm
+        if (0 == (hours / 12)) {
+            ampm = "am";
+        } else {
+            ampm = "pm";
+        }
+        if (0 == hour) {
+            hour = 12;
+        }
+
+        // Add extra 0 if int is not a double digit
+        if (mins < 10) {
+            minute = "0" + Integer.toString(mins);
+        } else {
+            minute = Integer.toString(mins);
+        }
+
+        return hour + ":" + minute + " " + ampm;
     }
 
     public static String getDate() {
@@ -64,7 +85,11 @@ public class UserInfo extends AppCompatActivity{
         int day = cal.get(Calendar.DATE);
         int year = cal.get(Calendar.YEAR);
 
-        return month + "/" + day + "/" + year;
+        String[] months = {"January", "February", "March",
+                "April", "May", "June", "July", "August", "September", "October",
+                "November", "December"};
+
+        return months[month] + " " + day + ", " + year;
     }
 
     public static double[] getLocation(Activity activity, LocationManager locationManager)

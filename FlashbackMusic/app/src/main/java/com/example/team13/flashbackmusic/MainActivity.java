@@ -233,8 +233,7 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<String> newLongitudes = extras.getStringArrayList("newLongitudes");
             ArrayList<String> newTimes = extras.getStringArrayList("newTimes");
             ArrayList<String> newDays = extras.getStringArrayList("newDays");
-
-            // TODO: newDate
+            ArrayList<String> newDates = extras.getStringArrayList("newDates");
 
             for (int index = 0; index < indices.size(); index++) {
 
@@ -243,12 +242,12 @@ public class MainActivity extends AppCompatActivity {
                 double newLongitude = Double.parseDouble(newLongitudes.get(index));
                 String newDay = newDays.get(index);
                 String newTime = newTimes.get(index);
-                String newDate = "";
-
+                String newDate = newDates.get(index);
 
                 editor.putString(title + "_latitude", "" + newLatitude);
                 editor.putString(title + "_longitude", "" + newLongitude);
                 editor.putString(title + "_day", newDay);
+                editor.putString(title + "_date", newDate);
                 editor.putString(title + "_time", newTime);
 
                 editor.apply();
@@ -256,9 +255,6 @@ public class MainActivity extends AppCompatActivity {
                 songs.get(indices.get(index)).setData(newLatitude, newLongitude, newDay, newTime, newDate);
 
             }
-
-
-
 
         }
     }

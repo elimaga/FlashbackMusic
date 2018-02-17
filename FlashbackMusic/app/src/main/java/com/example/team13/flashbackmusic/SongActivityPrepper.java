@@ -28,6 +28,7 @@ public class SongActivityPrepper {
         double[] longitudes  = new double[songs.size()];
         ArrayList<String> times = new ArrayList<>();
         ArrayList<String> days = new ArrayList<>();
+        ArrayList<String> dates = new ArrayList<>();
         ArrayList<Integer> resIds = new ArrayList<>();
         ArrayList<Integer> indices = new ArrayList<>();
 
@@ -40,6 +41,7 @@ public class SongActivityPrepper {
             longitudes[index] = songs.get(index).getLastLongitude();
             times.add(songs.get(index).getLastTime());
             days.add(songs.get(index).getLastDay());
+            dates.add(songs.get(index).getLastDate());
             indices.add(songs.get(index).getIndex());
             resIds.add(songs.get(index).getResId());
 
@@ -52,6 +54,7 @@ public class SongActivityPrepper {
         intent.putExtra("longitudes", longitudes);
         intent.putExtra("times", times);
         intent.putExtra("days", days);
+        intent.putExtra("dates", dates);
         intent.putExtra("resIds", resIds);
         intent.putExtra("indices", indices);
 
