@@ -174,6 +174,10 @@ public class FlashbackPlaylist {
     }
 
     public static int compareDates(String songDate, String thisDate) {
+        if(songDate.isEmpty()) {
+            return Integer.MAX_VALUE;
+        }
+
         int songMonth = Integer.parseInt(songDate.substring(0, songDate.indexOf(("/"))));
         String sub = songDate.substring(songDate.indexOf("/") + 1, songDate.length());
         int songDay = Integer.parseInt(sub.substring(0, sub.indexOf(("/"))));
@@ -194,6 +198,10 @@ public class FlashbackPlaylist {
     }
 
     public static int compareTimes(String songTime) {
+        if(songTime.isEmpty()) {
+            return Integer.MAX_VALUE;
+        }
+
         int songHour = Integer.parseInt(songTime.substring(0, songTime.indexOf(":")));
         int songMin = Integer.parseInt(songTime.substring(songTime.indexOf(":")+1, songTime.length()));
 

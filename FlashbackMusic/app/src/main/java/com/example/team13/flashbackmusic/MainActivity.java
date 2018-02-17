@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
         // Flashback button
         final Context context = getApplicationContext();
         ImageButton flashBackButton = findViewById(R.id.flashback_button);
@@ -97,8 +96,10 @@ public class MainActivity extends AppCompatActivity {
                 double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
                 String userTime = UserInfo.getTime();
                 String userDay = UserInfo.getDay();
+                String userDate = UserInfo.getDate();
 
-                // Create playlist object
+                FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
+                        userDay, userTime, userDate);
 
                 // Play the playlist
 

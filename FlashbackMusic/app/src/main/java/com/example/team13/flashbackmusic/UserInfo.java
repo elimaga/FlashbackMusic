@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import java.util.Calendar;
 
@@ -23,6 +24,10 @@ public class UserInfo extends AppCompatActivity{
 
     static final int REQUEST_LOCATION = 1;
     static final int INVALID_COORDINATE = 200;
+    static final String[] months = {"January", "February", "March",
+            "April", "May", "June", "July", "August", "September", "October",
+            "November", "December"};
+
 
     public static String getDay()
     {
@@ -54,20 +59,7 @@ public class UserInfo extends AppCompatActivity{
     {
         int hours = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);//currentTime.getHours();
         int mins = Calendar.getInstance().get(Calendar.MINUTE);//currentTime.getMinutes();
-
-        // Convert to standard time
-        int hour = hours % 12;
-        final String ampm, minute;
-
-        // Military hours from 0-11 are am, 12-23 are pm
-        if (0 == (hours / 12)) {
-            ampm = "am";
-        } else {
-            ampm = "pm";
-        }
-        if (0 == hour) {
-            hour = 12;
-        }
+        String minute;
 
         // Add extra 0 if int is not a double digit
         if (mins < 10) {
@@ -76,20 +68,16 @@ public class UserInfo extends AppCompatActivity{
             minute = Integer.toString(mins);
         }
 
-        return hour + ":" + minute + " " + ampm;
+        return hours + ":" + minute;
     }
 
     public static String getDate() {
         Calendar cal = Calendar.getInstance();
-        int month = cal.get(Calendar.MONTH);
+        int month = cal.get(Calendar.MONTH) + 1;
         int day = cal.get(Calendar.DATE);
         int year = cal.get(Calendar.YEAR);
 
-        String[] months = {"January", "February", "March",
-                "April", "May", "June", "July", "August", "September", "October",
-                "November", "December"};
-
-        return months[month] + " " + day + ", " + year;
+        return month + "/" + day + "/" + year;
     }
 
     public static double[] getLocation(Activity activity, LocationManager locationManager)
@@ -128,10 +116,14 @@ public class UserInfo extends AppCompatActivity{
         if (location != null)
         {
             double[] newLocation = {location.getLatitude(), location.getLongitude()};
+            Log.d("UserInfo", Double.toString(newLocation[0]) + ", " +
+                    Double.toString(newLocation[0]));
             return newLocation;
         }
         else {
             double[] newLocation = {INVALID_COORDINATE, INVALID_COORDINATE};
+            Log.d("UserInfo", Double.toString(newLocation[0]) + ", " +
+                    Double.toString(newLocation[0]));
             return newLocation;
         }
     }

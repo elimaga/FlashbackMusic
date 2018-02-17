@@ -157,7 +157,6 @@ public class SongActivity extends AppCompatActivity {
      */
     private void updateScreen() {
 
-        // TODO : display date of when it was last played
         TextView songNameView = (TextView) findViewById(R.id.titleTextView);
         TextView songArtistView = (TextView) findViewById(R.id.artistTextView);
         TextView songAlbumView = (TextView) findViewById(R.id.albumTextView);
@@ -196,6 +195,7 @@ public class SongActivity extends AppCompatActivity {
                 }
             }
         }
+
         catch (Exception e)
         {
             e.printStackTrace();
