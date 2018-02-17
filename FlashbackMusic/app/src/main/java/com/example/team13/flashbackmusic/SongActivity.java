@@ -36,14 +36,13 @@ public class SongActivity extends AppCompatActivity {
     final int INVALID_COORDINATE = 200;
     int index = 0;
     Bundle extras;
+    Button playPauseButton;
     ArrayList<Integer> resIds;
     ArrayList<Integer> indices;
     ArrayList<String> newLatitudes;
     ArrayList<String> newLongitudes;
     ArrayList<String> newTimes;
     ArrayList<String> newDays;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,24 +63,22 @@ public class SongActivity extends AppCompatActivity {
 
         updateScreen();
         loadMedia(resIds.get(index));
-        updateNewData();
 
-
-        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                mediaPlayer.start();
-                if (mediaPlayer.isPlaying())
-                {
-                    Log.d("Testing Playback", "Song is playing");
-                    index++;
-                }
-                else
-                {
-                    Log.d("Testing Playback", "Song is playing");
-                }
-            }
-        });
+//        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//            @Override
+//            public void onPrepared(MediaPlayer mediaPlayer) {
+//                mediaPlayer.start();
+//                if (mediaPlayer.isPlaying())
+//                {
+//                    Log.d("Testing Playback", "Song is playing");
+//                    index++;
+//                }
+//                else
+//                {
+//                    Log.d("Testing Playback", "Song is not playing");
+//                }
+//            }
+//        });
 
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -96,6 +93,14 @@ public class SongActivity extends AppCompatActivity {
                     sendDataBack();
                     finish();
                 }
+            }
+        });
+
+        playPauseButton = (Button) findViewById(R.id.playPauseButton);
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleMusic();
             }
         });
 
@@ -115,8 +120,6 @@ public class SongActivity extends AppCompatActivity {
             mediaPlayer = new MediaPlayer();
         }
 
-
-
         try {
             AssetFileDescriptor afd = this.getResources().openRawResourceFd(resId);
             mediaPlayer.setDataSource(afd);
@@ -134,6 +137,18 @@ public class SongActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    private void toggleMusic() {
+        if(mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            playPauseButton.setText("PLAY");
+            Log.d("Testing Playback", "Song is paused");
+        } else {
+            updateNewData();
+            mediaPlayer.start();
+            playPauseButton.setText("PAUSE");
+            Log.d("Testing Playback", "Song is playing");
+        }
+    }
 
     /**
      * Method to update the screen so the user know what song is playing
@@ -191,7 +206,7 @@ public class SongActivity extends AppCompatActivity {
 
         //get new location, day, and time
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        double[] newLocation = UserInfo.getLocation(SongActivity.this);
+        double[] newLocation = UserInfo.getLocation(SongActivity.this, locationManager);
 
         String newDay = UserInfo.getDay();
         String newTime = UserInfo.getTime();

@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                double[] userLocation = UserInfo.getLocation(MainActivity.this);
+                double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
                 String userTime = UserInfo.getTime();
                 String userDay = UserInfo.getDay();
 
@@ -234,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<String> newTimes = extras.getStringArrayList("newTimes");
             ArrayList<String> newDays = extras.getStringArrayList("newDays");
 
+            // TODO: newDate
 
             for (int index = 0; index < indices.size(); index++) {
 
@@ -242,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
                 double newLongitude = Double.parseDouble(newLongitudes.get(index));
                 String newDay = newDays.get(index);
                 String newTime = newTimes.get(index);
+                String newDate = "";
 
 
                 editor.putString(title + "_latitude", "" + newLatitude);
@@ -251,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
 
                 editor.apply();
 
-                songs.get(indices.get(index)).setData(newLatitude, newLongitude, newDay, newTime);
+                songs.get(indices.get(index)).setData(newLatitude, newLongitude, newDay, newTime, newDate);
 
             }
 

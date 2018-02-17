@@ -2,6 +2,7 @@ package com.example.team13.flashbackmusic;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -20,7 +21,6 @@ import java.util.Calendar;
 
 public class UserInfo extends AppCompatActivity{
 
-    public static LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
     static final int INVALID_COORDINATE = 200;
 
@@ -67,7 +67,7 @@ public class UserInfo extends AppCompatActivity{
         return month + "/" + day + "/" + year;
     }
 
-    public static double[] getLocation(Activity activity)
+    public static double[] getLocation(Activity activity, LocationManager locationManager)
     {
         LocationListener locationListener = new LocationListener() {
             @Override
