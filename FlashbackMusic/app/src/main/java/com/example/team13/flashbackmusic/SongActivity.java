@@ -17,9 +17,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -58,30 +61,44 @@ public class SongActivity extends AppCompatActivity {
         newTimes = new ArrayList<>();
         newDays = new ArrayList<>();
         newDates = new ArrayList<>();
+        boolean flashbackModeOn = false;
 
         if(extras != null) {
             resIds = extras.getIntegerArrayList("resIds");
+            flashbackModeOn = extras.getBoolean("flashbackModeOn");
         }
 
+        // If Flashback Mode is on, display it to the user so they know they are in flashback mode
+        TextView flashbackMode = (TextView) findViewById(R.id.flashback_mode);
+        if(flashbackModeOn) {
+            flashbackMode.setText("Flashback Mode");
+        }
+
+        // Update the screen for the first song, load the first song to play, and update the Arraylists
+        // of new data since the song is playing.
         updateScreen();
         loadMedia(resIds.get(index));
+        updateNewData();
 
-//        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//            @Override
-//            public void onPrepared(MediaPlayer mediaPlayer) {
-//                mediaPlayer.start();
-//                if (mediaPlayer.isPlaying())
-//                {
-//                    Log.d("Testing Playback", "Song is playing");
-//                    index++;
-//                }
-//                else
-//                {
-//                    Log.d("Testing Playback", "Song is not playing");
-//                }
-//            }
-//        });
 
+        // Play the song when it is prepared
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                mediaPlayer.start();
+                if (mediaPlayer.isPlaying())
+                {
+                    Log.d("Testing Playback", "Song is playing");
+                    index++;
+                }
+                else
+                {
+                    Log.d("Testing Playback", "Song is not playing");
+                }
+            }
+        });
+
+        // Play the next song if there is one, otherwise finish the activity
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
@@ -92,7 +109,7 @@ public class SongActivity extends AppCompatActivity {
                     updateNewData();
                 }
                 else {
-                    sendDataBack();
+                    sendDataBack(false);
                     finish();
                 }
             }
@@ -108,13 +125,34 @@ public class SongActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Stops the music and and activity when the back button is pressed. Sends the new location/date/time
+     * data for the song back to the main activity.
+     */
     @Override
     public void onBackPressed() {
         mediaPlayer.stop();
-        sendDataBack();
+        sendDataBack(true);
         finish();
     }
 
+    /**
+     * Tests if the song is still playing when the home button or the menu button is pressed.
+     * Note: This test assumes that the song is playing before the home button is pressed.
+     */
+    @Override
+    protected void onUserLeaveHint() {
+        if(mediaPlayer.isPlaying()) {
+            Log.d("Testing Playback on Home or Menu Press", "Song is playing");
+        }
+        super.onUserLeaveHint();
+    }
+
+
+    /**
+     * Method to load the media in the MediaPlayer to play the song.
+     * @param resId - the resource id for the song that is to be played.
+     */
     public void loadMedia(int resId)
     {
         if (mediaPlayer == null)
@@ -139,13 +177,15 @@ public class SongActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    /**
+     * Method to play and pause the music
+     */
     private void toggleMusic() {
         if(mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             playPauseButton.setText("PLAY");
             Log.d("Testing Playback", "Song is paused");
         } else {
-            updateNewData();
             mediaPlayer.start();
             playPauseButton.setText("PAUSE");
             Log.d("Testing Playback", "Song is playing");
@@ -153,7 +193,7 @@ public class SongActivity extends AppCompatActivity {
     }
 
     /**
-     * Method to update the screen so the user know what song is playing
+     * Method to update the screen so the user knows what song is playing
      */
     private void updateScreen() {
 
@@ -163,6 +203,7 @@ public class SongActivity extends AppCompatActivity {
         TextView songLocationView = (TextView) findViewById(R.id.locationTextView);
         TextView songDateView = (TextView) findViewById(R.id.dateTextView);
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
+
 
         double latitude = INVALID_COORDINATE;
         double longitude = INVALID_COORDINATE;
@@ -203,6 +244,9 @@ public class SongActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Method to update the new data ArrayLists to send back to the MainActivity.
+     */
     private void updateNewData() {
 
         //get new location, day, and time
@@ -222,7 +266,12 @@ public class SongActivity extends AppCompatActivity {
         newDates.add(newDate);
     }
 
-    private void sendDataBack() {
+    /**
+     * Method to send data back to the MainActivity
+     * @param backPressed - tells whether the back button was pressed to cancel playback or the song(s)
+     *                    finished on their own
+     */
+    private void sendDataBack(boolean backPressed) {
         // put new location, day, and time in extras to send back to main activity
         Intent newData = new Intent();
         newData.putExtra("newLatitudes", newLatitudes);
@@ -231,7 +280,14 @@ public class SongActivity extends AppCompatActivity {
         newData.putExtra("newDays", newDays);
         newData.putExtra("newDates", newDates);
         newData.putExtra("indices", indices);
-        setResult(Activity.RESULT_OK, newData);
+
+        // Tell whether the back button is pressed or not
+        if(backPressed) {
+            setResult(Activity.RESULT_CANCELED, newData);
+        }
+        else {
+            setResult(Activity.RESULT_OK, newData);
+        }
     }
 }
 
