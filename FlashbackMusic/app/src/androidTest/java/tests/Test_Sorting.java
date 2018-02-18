@@ -31,12 +31,14 @@ public class Test_Sorting {
         Song song = new Song("Third","he","ll",0,"2/11", 0);
         song.setData(0,0, "MONDAY", "11:45", "11/15/18");
         songs.add(song);
+
         song = new Song("First","he","ll",0,"3/11", 0);
         song.setData(0,0, "MONDAY", "23:30", "11/15/18");
         songs.add(song);
         song = new Song("Second","he","ll",0,"4/11", 0);
         song.setData(0,0, "MONDAY", "17:15", "11/15/18");
         songs.add(song);
+
         song = new Song("Fourth","he","ll",0,"5/11", 0);
         song.setData(0,0, "MONDAY", "1:02", "11/15/18");
         songs.add(song);

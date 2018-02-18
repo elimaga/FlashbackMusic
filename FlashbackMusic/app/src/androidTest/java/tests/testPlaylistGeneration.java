@@ -39,6 +39,7 @@ public class testPlaylistGeneration {
                 mockLocationCoordinates,
                 "Saturday",
                 "13:57", "2/15/17");
+
     }
 
 
