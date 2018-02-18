@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*
+    /**
      * Method to retrieve the prior info of the song from the SharedPreferences and then set the
      * data in the Song object.
      */
@@ -270,14 +270,17 @@ public class MainActivity extends AppCompatActivity {
 
         //Get the info from the new info from the shared preferences
         SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
-        double newLatitude = Double.parseDouble(sharedPreferences.getString(title + "_latitude", "" + INVALID_COORDINATE));
-        double newLongitude = Double.parseDouble(sharedPreferences.getString(title + "_longitude", "" + INVALID_COORDINATE));
-        String newDay = sharedPreferences.getString(title + "_day", "");
-        String newTime = sharedPreferences.getString(title + "_time", "");
-        String newDate = sharedPreferences.getString(title + "_date", "");
+        double latitude = Double.parseDouble(sharedPreferences.getString(title + "_latitude", "" + INVALID_COORDINATE));
+        double longitude = Double.parseDouble(sharedPreferences.getString(title + "_longitude", "" + INVALID_COORDINATE));
+        String day = sharedPreferences.getString(title + "_day", "");
+        String time = sharedPreferences.getString(title + "_time", "");
+        String date = sharedPreferences.getString(title + "_date", "");
+        Song.FavoriteStatus favoriteStatus = Song.FavoriteStatus.valueOf(sharedPreferences.getString(title + "_favStatus", "NEUTRAL"));
+
 
         // Update the data in the Song object
-        song.setData(newLatitude, newLongitude, newDay, newTime, newDate);
+        song.setData(latitude, longitude, day, time, date);
+        song.setFavoriteStatus(favoriteStatus);
 
     }
 

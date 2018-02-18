@@ -26,7 +26,6 @@ public class Song {
         this.resId = id;
         this.track = Integer.parseInt(track.substring(0, track.indexOf("/")));
         this.index = index;
-        this.favoriteStatus = FavoriteStatus.NEUTRAL;
     }
 
     public Song()
@@ -37,7 +36,6 @@ public class Song {
         this.resId = 0;
         this.track = 0;
         this.index = 0;
-        this.favoriteStatus = FavoriteStatus.NEUTRAL;
     }
 
     public String getTitle() {
