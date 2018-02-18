@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    /*
+    /**
      * When our song activity finishes, this method is called and stores all the new data for the
      * song in the shared preferences. This data has to be retrieved to store in the Song object
      * after playSong() finishes.

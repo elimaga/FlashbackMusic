@@ -108,15 +108,17 @@ public class FlashbackPlaylist {
                 // If the song has been played at all, then it will have a lastDate played so add it
                 // to the playlist
                 if(song.getLastDate() != "") {
-                    // Add the song to the playlist
-                    playlist.add(song);
+                    // Only add the songs that are not disliked
+                    if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
+                        playlist.add(song);
 
-                    // If the song is liked, it should occur earlier in the playlist than a song that is
-                    // not liked
-                    if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
-                        numMatches.add(LIKED_AND_ONE_MATCH);
-                    } else {
-                        numMatches.add(ONE_MATCH);
+                        // If the song is liked, it should occur earlier in the playlist than a song that is
+                        // not liked
+                        if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
+                            numMatches.add(LIKED_AND_ONE_MATCH);
+                        } else {
+                            numMatches.add(ONE_MATCH);
+                        }
                     }
                 }
             }
@@ -257,7 +259,6 @@ public class FlashbackPlaylist {
             prevLocation.setLongitude(prevLongitude);
 
             if(curLocation.distanceTo(prevLocation) <= METERS_IN_THOUSAND_FEET) {
-                System.out.println(curLocation.distanceTo(prevLocation));
                 return true;
             }
             else {
