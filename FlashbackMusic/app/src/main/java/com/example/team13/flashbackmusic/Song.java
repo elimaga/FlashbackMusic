@@ -14,7 +14,7 @@ public class Song {
     private int index; // index in the ArrayList of Songs
     private FavoriteStatus favoriteStatus; // neutral = 0, like = 1, dislike = 2
 
-    enum FavoriteStatus {
+    public enum FavoriteStatus {
         NEUTRAL, LIKED, DISLIKED;
     }
 
