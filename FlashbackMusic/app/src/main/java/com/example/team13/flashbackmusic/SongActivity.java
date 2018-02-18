@@ -104,7 +104,7 @@ public class SongActivity extends AppCompatActivity {
                     updateNewData();
                 }
                 else {
-                    sendDataBack();
+                    sendDataBack(false);
                     finish();
                 }
             }
@@ -127,7 +127,7 @@ public class SongActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         mediaPlayer.stop();
-        sendDataBack();
+        sendDataBack(true);
         finish();
     }
 
@@ -258,7 +258,7 @@ public class SongActivity extends AppCompatActivity {
         newDates.add(newDate);
     }
 
-    private void sendDataBack() {
+    private void sendDataBack(boolean backPressed) {
         // put new location, day, and time in extras to send back to main activity
         Intent newData = new Intent();
         newData.putExtra("newLatitudes", newLatitudes);
@@ -267,7 +267,14 @@ public class SongActivity extends AppCompatActivity {
         newData.putExtra("newDays", newDays);
         newData.putExtra("newDates", newDates);
         newData.putExtra("indices", indices);
-        setResult(Activity.RESULT_OK, newData);
+
+        // Tell whether the back button is pressed or not
+        if(backPressed) {
+            setResult(Activity.RESULT_CANCELED, newData);
+        }
+        else {
+            setResult(Activity.RESULT_OK, newData);
+        }
     }
 }
 

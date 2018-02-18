@@ -33,6 +33,8 @@ import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
 
+    ImageButton flashBackButton;
+
     private ArrayList<Song> songs;
     private ArrayList<Album> albums;
 
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Flashback button
         final Context context = getApplicationContext();
-        ImageButton flashBackButton = findViewById(R.id.flashback_button);
+        flashBackButton = findViewById(R.id.flashback_button);
         flashBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, SongActivity.class);
                     SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
                     songActivityPrepper.sendInfo(true);
-                    startActivityForResult(intent, 0);
+                    startActivityForResult(intent, 1);
                 }
                 Log.d("Flashback Button", "Flashback button is pressed from main activity");
 
@@ -225,42 +227,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Bundle extras = data.getExtras();
 
-        if (requestCode == 0 && resultCode == RESULT_OK && data != null) {
-            Bundle extras = data.getExtras();
-
-            // Save the info in the SharedPreferences
-            SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-
-            ArrayList<Integer> indices = extras.getIntegerArrayList("indices");
-            ArrayList<String> newLatitudes = extras.getStringArrayList("newLatitudes");
-            ArrayList<String> newLongitudes = extras.getStringArrayList("newLongitudes");
-            ArrayList<String> newTimes = extras.getStringArrayList("newTimes");
-            ArrayList<String> newDays = extras.getStringArrayList("newDays");
-            ArrayList<String> newDates = extras.getStringArrayList("newDates");
-
-            for (int index = 0; index < indices.size(); index++) {
-
-                String title = songs.get(indices.get(index)).getTitle();
-                double newLatitude = Double.parseDouble(newLatitudes.get(index));
-                double newLongitude = Double.parseDouble(newLongitudes.get(index));
-                String newDay = newDays.get(index);
-                String newTime = newTimes.get(index);
-                String newDate = newDates.get(index);
-
-                editor.putString(title + "_latitude", "" + newLatitude);
-                editor.putString(title + "_longitude", "" + newLongitude);
-                editor.putString(title + "_day", newDay);
-                editor.putString(title + "_date", newDate);
-                editor.putString(title + "_time", newTime);
-
-                editor.apply();
-
-                songs.get(indices.get(index)).setData(newLatitude, newLongitude, newDay, newTime, newDate);
-
-            }
-
+        // If the songs ended normally or back was pressed while in default mode then simply update
+        // the info of the songs.
+        if (requestCode == 0 && (resultCode == RESULT_OK || resultCode == RESULT_CANCELED) && data != null) {
+            updateSongs(extras);
+        }
+        // Else if back button was pressed in Flashback Mode then update the songs that were played,
+        // but do not restart Flashback Mode
+        else if (requestCode == 1 && resultCode == RESULT_CANCELED && data != null) {
+            updateSongs(extras);
+        }
+        // Else if the songs ended normally in Flashback Mode then update the songs and restart
+        // flashback mode
+        else if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            updateSongs(extras);
+            flashBackButton.performClick();
         }
     }
 
@@ -287,6 +270,44 @@ public class MainActivity extends AppCompatActivity {
         song.setData(latitude, longitude, day, time, date);
         song.setFavoriteStatus(favoriteStatus);
 
+    }
+
+    /**
+     * Method to update the new location, date, and time info for the songs that have been played
+     * @param extras - contains the new data for the songs
+     */
+    private void updateSongs(Bundle extras) {
+        // Save the info in the SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        ArrayList<Integer> indices = extras.getIntegerArrayList("indices");
+        ArrayList<String> newLatitudes = extras.getStringArrayList("newLatitudes");
+        ArrayList<String> newLongitudes = extras.getStringArrayList("newLongitudes");
+        ArrayList<String> newTimes = extras.getStringArrayList("newTimes");
+        ArrayList<String> newDays = extras.getStringArrayList("newDays");
+        ArrayList<String> newDates = extras.getStringArrayList("newDates");
+
+        for (int index = 0; index < indices.size(); index++) {
+
+            String title = songs.get(indices.get(index)).getTitle();
+            double newLatitude = Double.parseDouble(newLatitudes.get(index));
+            double newLongitude = Double.parseDouble(newLongitudes.get(index));
+            String newDay = newDays.get(index);
+            String newTime = newTimes.get(index);
+            String newDate = newDates.get(index);
+
+            editor.putString(title + "_latitude", "" + newLatitude);
+            editor.putString(title + "_longitude", "" + newLongitude);
+            editor.putString(title + "_day", newDay);
+            editor.putString(title + "_date", newDate);
+            editor.putString(title + "_time", newTime);
+
+            editor.apply();
+
+            songs.get(indices.get(index)).setData(newLatitude, newLongitude, newDay, newTime, newDate);
+
+        }
     }
 
 
