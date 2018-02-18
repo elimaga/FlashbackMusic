@@ -17,9 +17,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,22 +68,23 @@ public class SongActivity extends AppCompatActivity {
 
         updateScreen();
         loadMedia(resIds.get(index));
+        updateNewData();
 
-//        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//            @Override
-//            public void onPrepared(MediaPlayer mediaPlayer) {
-//                mediaPlayer.start();
-//                if (mediaPlayer.isPlaying())
-//                {
-//                    Log.d("Testing Playback", "Song is playing");
-//                    index++;
-//                }
-//                else
-//                {
-//                    Log.d("Testing Playback", "Song is not playing");
-//                }
-//            }
-//        });
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                mediaPlayer.start();
+                if (mediaPlayer.isPlaying())
+                {
+                    Log.d("Testing Playback", "Song is playing");
+                    index++;
+                }
+                else
+                {
+                    Log.d("Testing Playback", "Song is not playing");
+                }
+            }
+        });
 
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -108,6 +112,10 @@ public class SongActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Stops the music and and activity when the back button is pressed. Sends the new location/date/time
+     * data for the song back to the main activity.
+     */
     @Override
     public void onBackPressed() {
         mediaPlayer.stop();
@@ -115,6 +123,23 @@ public class SongActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Tests if the song is still playing when the home button or the menu button is pressed.
+     * Note: This test assumes that the song is playing before the home button is pressed.
+     */
+    @Override
+    protected void onUserLeaveHint() {
+        if(mediaPlayer.isPlaying()) {
+            Log.d("Testing Playback on Home or Menu Press", "Song is playing");
+        }
+        super.onUserLeaveHint();
+    }
+
+
+    /**
+     * Method to load the media in the MediaPlayer to play the song.
+     * @param resId - the resource id for the song that is to be played.
+     */
     public void loadMedia(int resId)
     {
         if (mediaPlayer == null)
@@ -139,13 +164,15 @@ public class SongActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    /**
+     * Method to play and pause the music
+     */
     private void toggleMusic() {
         if(mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             playPauseButton.setText("PLAY");
             Log.d("Testing Playback", "Song is paused");
         } else {
-            updateNewData();
             mediaPlayer.start();
             playPauseButton.setText("PAUSE");
             Log.d("Testing Playback", "Song is playing");
