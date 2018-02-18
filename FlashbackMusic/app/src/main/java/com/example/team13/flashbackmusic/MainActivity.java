@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
         // Flashback button
         final Context context = getApplicationContext();
         ImageButton flashBackButton = findViewById(R.id.flashback_button);
@@ -94,11 +93,13 @@ public class MainActivity extends AppCompatActivity {
 
 
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                double[] userLocation = UserInfo.getLocation(MainActivity.this);
+                double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
                 String userTime = UserInfo.getTime();
                 String userDay = UserInfo.getDay();
+                String userDate = UserInfo.getDate();
 
-                // Create playlist object
+                FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
+                        userDay, userTime, userDate);
 
                 // Play the playlist
 
@@ -233,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<String> newLongitudes = extras.getStringArrayList("newLongitudes");
             ArrayList<String> newTimes = extras.getStringArrayList("newTimes");
             ArrayList<String> newDays = extras.getStringArrayList("newDays");
-
+            ArrayList<String> newDates = extras.getStringArrayList("newDates");
 
             for (int index = 0; index < indices.size(); index++) {
 
@@ -242,21 +243,19 @@ public class MainActivity extends AppCompatActivity {
                 double newLongitude = Double.parseDouble(newLongitudes.get(index));
                 String newDay = newDays.get(index);
                 String newTime = newTimes.get(index);
-
+                String newDate = newDates.get(index);
 
                 editor.putString(title + "_latitude", "" + newLatitude);
                 editor.putString(title + "_longitude", "" + newLongitude);
                 editor.putString(title + "_day", newDay);
+                editor.putString(title + "_date", newDate);
                 editor.putString(title + "_time", newTime);
 
                 editor.apply();
 
-                songs.get(indices.get(index)).setData(newLatitude, newLongitude, newDay, newTime);
+                songs.get(indices.get(index)).setData(newLatitude, newLongitude, newDay, newTime, newDate);
 
             }
-
-
-
 
         }
     }

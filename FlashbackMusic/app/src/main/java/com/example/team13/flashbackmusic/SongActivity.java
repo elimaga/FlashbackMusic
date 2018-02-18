@@ -36,14 +36,14 @@ public class SongActivity extends AppCompatActivity {
     final int INVALID_COORDINATE = 200;
     int index = 0;
     Bundle extras;
+    Button playPauseButton;
     ArrayList<Integer> resIds;
     ArrayList<Integer> indices;
     ArrayList<String> newLatitudes;
     ArrayList<String> newLongitudes;
     ArrayList<String> newTimes;
     ArrayList<String> newDays;
-
-
+    ArrayList<String> newDates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +57,7 @@ public class SongActivity extends AppCompatActivity {
         newLongitudes = new ArrayList<>();
         newTimes = new ArrayList<>();
         newDays = new ArrayList<>();
+        newDates = new ArrayList<>();
 
         if(extras != null) {
             resIds = extras.getIntegerArrayList("resIds");
@@ -64,24 +65,22 @@ public class SongActivity extends AppCompatActivity {
 
         updateScreen();
         loadMedia(resIds.get(index));
-        updateNewData();
 
-
-        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                mediaPlayer.start();
-                if (mediaPlayer.isPlaying())
-                {
-                    Log.d("Testing Playback", "Song is playing");
-                    index++;
-                }
-                else
-                {
-                    Log.d("Testing Playback", "Song is playing");
-                }
-            }
-        });
+//        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//            @Override
+//            public void onPrepared(MediaPlayer mediaPlayer) {
+//                mediaPlayer.start();
+//                if (mediaPlayer.isPlaying())
+//                {
+//                    Log.d("Testing Playback", "Song is playing");
+//                    index++;
+//                }
+//                else
+//                {
+//                    Log.d("Testing Playback", "Song is not playing");
+//                }
+//            }
+//        });
 
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -96,6 +95,14 @@ public class SongActivity extends AppCompatActivity {
                     sendDataBack();
                     finish();
                 }
+            }
+        });
+
+        playPauseButton = (Button) findViewById(R.id.playPauseButton);
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleMusic();
             }
         });
 
@@ -115,8 +122,6 @@ public class SongActivity extends AppCompatActivity {
             mediaPlayer = new MediaPlayer();
         }
 
-
-
         try {
             AssetFileDescriptor afd = this.getResources().openRawResourceFd(resId);
             mediaPlayer.setDataSource(afd);
@@ -134,18 +139,29 @@ public class SongActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    private void toggleMusic() {
+        if(mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            playPauseButton.setText("PLAY");
+            Log.d("Testing Playback", "Song is paused");
+        } else {
+            updateNewData();
+            mediaPlayer.start();
+            playPauseButton.setText("PAUSE");
+            Log.d("Testing Playback", "Song is playing");
+        }
+    }
 
     /**
      * Method to update the screen so the user know what song is playing
      */
     private void updateScreen() {
 
-        // TODO : display date of when it was last played
         TextView songNameView = (TextView) findViewById(R.id.titleTextView);
         TextView songArtistView = (TextView) findViewById(R.id.artistTextView);
         TextView songAlbumView = (TextView) findViewById(R.id.albumTextView);
         TextView songLocationView = (TextView) findViewById(R.id.locationTextView);
-        TextView songDayView = (TextView) findViewById(R.id.dayTextView);
+        TextView songDateView = (TextView) findViewById(R.id.dateTextView);
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
 
         double latitude = INVALID_COORDINATE;
@@ -159,7 +175,7 @@ public class SongActivity extends AppCompatActivity {
             songAlbumView.setText("Album: " + (String) extras.getStringArrayList("albums").get(index));
             latitude = extras.getDoubleArray("latitudes")[index];
             longitude = extras.getDoubleArray("longitudes")[index];
-            songDayView.setText("Day: " + (String) extras.getStringArrayList("days").get(index));
+            songDateView.setText("Date: " + (String) extras.getStringArrayList("dates").get(index));
             songTimeView.setText("Time: " + (String) extras.getStringArrayList("times").get(index));
         }
 
@@ -169,17 +185,17 @@ public class SongActivity extends AppCompatActivity {
             // Only want to show a location if we have a valid latitude and longitude
             if(latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 )
             {
-
                 List<Address> list = geocoder.getFromLocation(latitude, longitude, 1);
                 if(list != null && list.size() > 0)
                 {
                     Address address = list.get(0);
                     String result = address.getAddressLine(0);
+                    Log.d("SongActivity.java", result);
                     songLocationView.setText("Location: " + result);
-
                 }
             }
         }
+
         catch (Exception e)
         {
             e.printStackTrace();
@@ -191,7 +207,7 @@ public class SongActivity extends AppCompatActivity {
 
         //get new location, day, and time
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        double[] newLocation = UserInfo.getLocation(SongActivity.this);
+        double[] newLocation = UserInfo.getLocation(SongActivity.this, locationManager);
 
         String newDay = UserInfo.getDay();
         String newTime = UserInfo.getTime();
@@ -203,7 +219,7 @@ public class SongActivity extends AppCompatActivity {
         newLongitudes.add("" + newLocation[1]);
         newDays.add(newDay);
         newTimes.add(newTime);
-
+        newDates.add(newDate);
     }
 
     private void sendDataBack() {
@@ -213,6 +229,7 @@ public class SongActivity extends AppCompatActivity {
         newData.putExtra("newLongitudes", newLongitudes);
         newData.putExtra("newTimes", newTimes);
         newData.putExtra("newDays", newDays);
+        newData.putExtra("newDates", newDates);
         newData.putExtra("indices", indices);
         setResult(Activity.RESULT_OK, newData);
     }
