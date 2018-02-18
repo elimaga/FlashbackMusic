@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -37,18 +38,19 @@ import static org.hamcrest.Matchers.is;
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class testSongMetadataDisplay {
-
     final double TEST_LATITUDE = 32.881172957516185;
     final double TEST_LONGITUDE = -117.2374677658081;
     final String TEST_LOCATION = "Torrey Pines";
     final String TEST_DAY = "Sunday";
     final String TEST_TIME = "21:00";
+    final String TEST_DATE = "2/18/2018";
 
     final double DEFAULT_LATITUDE = 200.0;
     final double DEFAULT_LONGITUDE = 200.0;
     final String DEFAULT_LOCATION = "";
     final String DEFAULT_DAY = "";
     final String DEFAULT_TIME = "";
+    final String DEFAULT_DATE = "";
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -57,7 +59,7 @@ public class testSongMetadataDisplay {
     public void setup()
     {
         mActivityTestRule.getActivity().getSongs().get(0).setData(
-                DEFAULT_LATITUDE, DEFAULT_LONGITUDE, DEFAULT_DAY, DEFAULT_TIME);
+                DEFAULT_LATITUDE, DEFAULT_LONGITUDE, DEFAULT_DAY, DEFAULT_TIME, DEFAULT_DATE);
     }
 
     @Test
@@ -76,7 +78,7 @@ public class testSongMetadataDisplay {
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                0),
+                                1),
                         isDisplayed()));
         textView.check(matches(withText("Title: 123 Go")));
 
@@ -86,7 +88,7 @@ public class testSongMetadataDisplay {
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                1),
+                                2),
                         isDisplayed()));
         textView2.check(matches(withText("Artist: Keaton Simons")));
 
@@ -96,7 +98,7 @@ public class testSongMetadataDisplay {
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                2),
+                                3),
                         isDisplayed()));
         textView3.check(matches(withText("Album: New & Best of Keaton Simons")));
 
@@ -106,19 +108,19 @@ public class testSongMetadataDisplay {
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                4),
+                                5),
                         isDisplayed()));
         textView4.check(matches(withText("Location:")));
 
         ViewInteraction textView5 = onView(
-                allOf(withId(R.id.dayTextView), withText("Day: "),
+                allOf(withId(R.id.dateTextView), withText("Date: "),
                         childAtPosition(
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                5),
+                                6),
                         isDisplayed()));
-        textView5.check(matches(withText("Day: ")));
+        textView5.check(matches(withText("Date: ")));
 
         ViewInteraction textView6 = onView(
                 allOf(withId(R.id.timeTextView), withText("Time: "),
@@ -126,23 +128,15 @@ public class testSongMetadataDisplay {
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                6),
+                                7),
                         isDisplayed()));
         textView6.check(matches(withText("Time: ")));
 
-        ViewInteraction appCompatButton = onView(
-                allOf(withId(R.id.BackButton), withText("Back"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                7),
-                        isDisplayed()));
-        appCompatButton.perform(click());
+        pressBack();
 
-        //change location, day and time of song metadata
+        // change song metadata for testing
         mActivityTestRule.getActivity().getSongs().get(0).setData(
-                TEST_LATITUDE, TEST_LONGITUDE, TEST_DAY, TEST_TIME);
+                TEST_LATITUDE, TEST_LONGITUDE, TEST_DAY, TEST_TIME, TEST_DATE);
 
         DataInteraction relativeLayout2 = onData(anything())
                 .inAdapterView(allOf(withId(R.id.song_list_view),
@@ -158,19 +152,19 @@ public class testSongMetadataDisplay {
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                4),
+                                5),
                         isDisplayed()));
         textView7.check(matches(withText("Location: " + TEST_LOCATION)));
 
         ViewInteraction textView8 = onView(
-                allOf(withId(R.id.dayTextView), withText("Day: " + TEST_DAY),
+                allOf(withId(R.id.dateTextView), withText("Date: " + TEST_DATE),
                         childAtPosition(
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                5),
+                                6),
                         isDisplayed()));
-        textView8.check(matches(withText("Day: " + TEST_DAY)));
+        textView8.check(matches(withText("Date: " + TEST_DATE)));
 
         ViewInteraction textView9 = onView(
                 allOf(withId(R.id.timeTextView), withText("Time: " + TEST_TIME),
@@ -178,19 +172,11 @@ public class testSongMetadataDisplay {
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                6),
+                                7),
                         isDisplayed()));
         textView9.check(matches(withText("Time: " + TEST_TIME)));
 
-        ViewInteraction appCompatButton2 = onView(
-                allOf(withId(R.id.BackButton), withText("Back"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                7),
-                        isDisplayed()));
-        appCompatButton2.perform(click());
+        pressBack();
 
     }
 
