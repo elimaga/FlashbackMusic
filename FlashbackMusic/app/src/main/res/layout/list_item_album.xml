@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:padding="5dp">
+    android:padding="5dp"
+    android:descendantFocusability="blocksDescendants">
 
     <TextView
         android:id="@+id/title"
@@ -46,8 +47,5 @@
         android:text="duration"
         android:layout_below="@+id/title"
         android:layout_toEndOf="@id/separator"/>
-
-
-
 
 </RelativeLayout>

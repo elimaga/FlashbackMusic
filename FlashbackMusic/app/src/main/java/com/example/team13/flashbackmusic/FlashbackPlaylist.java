@@ -53,7 +53,7 @@ public class FlashbackPlaylist {
 
                 // If the song is liked, it should occur earlier in the playlist than a song that is
                 // not liked
-                if(song.isLiked()) {
+                if(song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                     numMatches.add(LIKED_AND_THREE_MATCHES);
                 }
                 else {
@@ -71,7 +71,7 @@ public class FlashbackPlaylist {
 
                 // If the song is liked, it should occur earlier in the playlist than a song that is
                 // not liked
-                if(song.isLiked()) {
+                if(song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                     numMatches.add(LIKED_AND_TWO_MATCHES);
                 }
                 else {
@@ -87,7 +87,7 @@ public class FlashbackPlaylist {
 
                 // If the song is liked, it should occur earlier in the playlist than a song that is
                 // not liked
-                if (song.isLiked()) {
+                if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                     numMatches.add(LIKED_AND_ONE_MATCH);
                 } else {
                     numMatches.add(ONE_MATCH);
