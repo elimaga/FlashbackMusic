@@ -48,17 +48,20 @@ public class FlashbackPlaylist {
             if(matchesLocation(location[0], location[1], song.getLastLatitude(), song.getLastLongitude())
                     && matchesDay(day, song.getLastDay()) && matchesTimeOfDay(time, song.getLastSetting())) {
 
-                // Add the song to the playlist
-                playlist.add(song);
+                // Only add the songs that are not disliked
+                if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
+                    playlist.add(song);
 
-                // If the song is liked, it should occur earlier in the playlist than a song that is
-                // not liked
-                if(song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
-                    numMatches.add(LIKED_AND_THREE_MATCHES);
+                    // If the song is liked, it should occur earlier in the playlist than a song that is
+                    // not liked
+                    if(song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
+                        numMatches.add(LIKED_AND_THREE_MATCHES);
+                    }
+                    else {
+                        numMatches.add(THREE_MATCHES);
+                    }
                 }
-                else {
-                    numMatches.add(THREE_MATCHES);
-                }
+
             }
             // Else check if it matches 2 of the requirements
             else if((matchesLocation(location[0], location[1], song.getLastLatitude(), song.getLastLongitude())
@@ -66,31 +69,55 @@ public class FlashbackPlaylist {
                     song.getLastLatitude(), song.getLastLongitude()) && matchesTimeOfDay(time, song.getLastSetting()))
                     || (matchesDay(day, song.getLastDay()) && matchesTimeOfDay(time, song.getLastSetting()))) {
 
-                // Add the song to the playlist
-                playlist.add(song);
+                // Only add the songs that are not disliked
+                if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
+                    playlist.add(song);
 
-                // If the song is liked, it should occur earlier in the playlist than a song that is
-                // not liked
-                if(song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
-                    numMatches.add(LIKED_AND_TWO_MATCHES);
-                }
-                else {
-                    numMatches.add(TWO_MATCHES);
+                    // If the song is liked, it should occur earlier in the playlist than a song that is
+                    // not liked
+                    if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
+                        numMatches.add(LIKED_AND_TWO_MATCHES);
+                    } else {
+                        numMatches.add(TWO_MATCHES);
+                    }
                 }
             }
             // Else check if it matches 1 of the requirements
             else if(matchesLocation(location[0], location[1], song.getLastLatitude(), song.getLastLongitude())
                     || matchesDay(day, song.getLastDay()) || matchesTimeOfDay(time, song.getLastSetting())) {
 
-                // Add the song to the playlist
-                playlist.add(song);
+                // Only add the songs that are not disliked
+                if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
+                    playlist.add(song);
 
-                // If the song is liked, it should occur earlier in the playlist than a song that is
-                // not liked
-                if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
-                    numMatches.add(LIKED_AND_ONE_MATCH);
-                } else {
-                    numMatches.add(ONE_MATCH);
+
+                    // If the song is liked, it should occur earlier in the playlist than a song that is
+                    // not liked
+                    if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
+                        numMatches.add(LIKED_AND_ONE_MATCH);
+                    } else {
+                        numMatches.add(ONE_MATCH);
+                    }
+                }
+            }
+        }
+
+        // If the playlist is empty, then all the recently played songs should be added to the playlist
+        if(playlist.isEmpty()) {
+            for(Song song : allSongs) {
+                // If the song has been played at all, then it will have a lastDate played so add it
+                // to the playlist
+                if(song.getLastDate() != "") {
+                    // Add the song to the playlist
+                    playlist.add(song);
+
+                    // If the song is liked, it should occur earlier in the playlist than a song that is
+                    // not liked
+                    if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
+                        numMatches.add(LIKED_AND_ONE_MATCH);
+                    } else {
+                        numMatches.add(ONE_MATCH);
+                    }
                 }
             }
         }
@@ -230,6 +257,7 @@ public class FlashbackPlaylist {
             prevLocation.setLongitude(prevLongitude);
 
             if(curLocation.distanceTo(prevLocation) <= METERS_IN_THOUSAND_FEET) {
+                System.out.println(curLocation.distanceTo(prevLocation));
                 return true;
             }
             else {
@@ -282,6 +310,10 @@ public class FlashbackPlaylist {
             return false;
         }
 
+    }
+
+    public ArrayList<Song> getPlaylist() {
+        return this.playlist;
     }
 
 

@@ -33,12 +33,23 @@ public class AlbumTabFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 Album album = (Album) adapterView.getItemAtPosition(position);
-                Intent intent = new Intent(main, SongActivity.class);
                 ArrayList<Song> songsInAlbum = album.getSongs();
+                ArrayList<Song> songsToPlay = new ArrayList<>();
 
-                SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songsInAlbum);
-                songActivityPrepper.sendInfo();
-                main.startActivityForResult(intent, 0);
+                // Only play the songs that are not disliked
+                for(Song song : songsInAlbum) {
+                    if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
+                        songsToPlay.add(song);
+                    }
+                }
+
+                // Only play the songs that are not disliked
+                if(!songsToPlay.isEmpty()) {
+                    Intent intent = new Intent(main, SongActivity.class);
+                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songsToPlay);
+                    songActivityPrepper.sendInfo();
+                    main.startActivityForResult(intent, 0);
+                }
 
 
             }

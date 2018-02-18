@@ -34,13 +34,20 @@ public class SongTabFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 Song song = (Song) adapterView.getItemAtPosition(position);
-                ArrayList<Song> songs = new ArrayList<>();
-                songs.add(song);
+                ArrayList<Song> songToPlay = new ArrayList<>();
 
-                Intent intent = new Intent(main, SongActivity.class);
-                SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songs);
-                songActivityPrepper.sendInfo();
-                main.startActivityForResult(intent, 0);
+                // Only play the song if it's not disliked
+                if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
+                    songToPlay.add(song);
+                }
+
+                // Only play the song if it's not disliked
+                if(!songToPlay.isEmpty()) {
+                    Intent intent = new Intent(main, SongActivity.class);
+                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songsToPlay);
+                    songActivityPrepper.sendInfo();
+                    main.startActivityForResult(intent, 0);
+                }
 
             }
         });

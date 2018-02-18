@@ -88,21 +88,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent intent = new Intent(MainActivity.this, FlashbackActivity.class);
-                startActivity(intent);
-
-
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
                 String userTime = UserInfo.getTime();
                 String userDay = UserInfo.getDay();
                 String userDate = UserInfo.getDate();
 
+                // Generate the Flashback Playlist
                 FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
                         userDay, userTime, userDate);
+                ArrayList<Song> playlist = flashbackPlaylist.getPlaylist();
 
-                // Play the playlist
-
+                // Only activate flashback mode if there are songs to play
+                if(!playlist.isEmpty()) {
+                    // Play the playlist
+                    Intent intent = new Intent(MainActivity.this, SongActivity.class);
+                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
+                    songActivityPrepper.sendInfo();
+                    startActivityForResult(intent, 0);
+                }
                 Log.d("Flashback Button", "Flashback button is pressed from main activity");
 
             }
