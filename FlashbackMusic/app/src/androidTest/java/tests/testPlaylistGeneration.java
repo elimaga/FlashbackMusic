@@ -38,7 +38,8 @@ public class testPlaylistGeneration {
                 mainActivity.getActivity().getSongs(),
                 mockLocationCoordinates,
                 "Saturday",
-                "13:57");
+                "13:57",
+                "");
     }
 
 

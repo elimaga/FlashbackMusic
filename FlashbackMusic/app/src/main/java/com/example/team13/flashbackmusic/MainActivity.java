@@ -260,11 +260,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*
+    /**
      * Method to retrieve the prior info of the song from the SharedPreferences and then set the
      * data in the Song object.
+     * @param song - the song to retrieve the info for
      */
-    private void retrieveInfo(Song song) {
+    public void retrieveInfo(Song song) {
 
         String title = song.getTitle();
 

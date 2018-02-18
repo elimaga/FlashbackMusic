@@ -28,16 +28,16 @@ public class Test_Sorting {
     @Before
     public void setUp(){
         songs = new ArrayList<>();
-        Song song = new Song("Third","he","ll","o","2/11", 0);
+        Song song = new Song("Third","he","ll",0,"2/11", 0);
         song.setData(0,0, "MONDAY", "11:45", "11/15/18");
         songs.add(song);
-        song = new Song("First","he","ll","o","3/11", 0);
+        song = new Song("First","he","ll",0,"3/11", 0);
         song.setData(0,0, "MONDAY", "23:30", "11/15/18");
         songs.add(song);
-        song = new Song("Second","he","ll","o","4/11", 0);
+        song = new Song("Second","he","ll",0,"4/11", 0);
         song.setData(0,0, "MONDAY", "17:15", "11/15/18");
         songs.add(song);
-        song = new Song("Fourth","he","ll","o","5/11", 0);
+        song = new Song("Fourth","he","ll",0,"5/11", 0);
         song.setData(0,0, "MONDAY", "1:02", "11/15/18");
         songs.add(song);
     }
@@ -100,9 +100,9 @@ public class Test_Sorting {
         double[] location = new double[2];
         location[0] = 0;
         location[1] = 0;
-        Song song = new Song("3.5", "", "", "", "3/11", 0);
+        Song song = new Song("3.5", "", "", 0, "3/11", 0);
         songs.add(song);
-        song = new Song("1.5", "", "", "", "3/11", 0);
+        song = new Song("1.5", "", "", 0, "3/11", 0);
         songs.add(song);
         songs.get(1).setData(0,0, "MONDAY", "11:30", "1/4/18");
         songs.get(5).setData(0,0, "MONDAY", "11:30", "11/4/17");
