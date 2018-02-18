@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                     // Play the playlist
                     Intent intent = new Intent(MainActivity.this, SongActivity.class);
                     SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
-                    songActivityPrepper.sendInfo();
+                    songActivityPrepper.sendInfo(true);
                     startActivityForResult(intent, 0);
                 }
                 Log.d("Flashback Button", "Flashback button is pressed from main activity");

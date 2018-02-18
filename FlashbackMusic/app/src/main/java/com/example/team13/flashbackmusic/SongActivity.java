@@ -61,9 +61,17 @@ public class SongActivity extends AppCompatActivity {
         newTimes = new ArrayList<>();
         newDays = new ArrayList<>();
         newDates = new ArrayList<>();
+        boolean flashbackModeOn = false;
 
         if(extras != null) {
             resIds = extras.getIntegerArrayList("resIds");
+            flashbackModeOn = extras.getBoolean("flashbackModeOn");
+        }
+
+        // If Flashback Mode is on, display it to the user so they know they are in flashback mode
+        TextView flashbackMode = (TextView) findViewById(R.id.flashback_mode);
+        if(flashbackModeOn) {
+            flashbackMode.setText("Flashback Mode");
         }
 
         updateScreen();
@@ -190,6 +198,7 @@ public class SongActivity extends AppCompatActivity {
         TextView songLocationView = (TextView) findViewById(R.id.locationTextView);
         TextView songDateView = (TextView) findViewById(R.id.dateTextView);
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
+
 
         double latitude = INVALID_COORDINATE;
         double longitude = INVALID_COORDINATE;

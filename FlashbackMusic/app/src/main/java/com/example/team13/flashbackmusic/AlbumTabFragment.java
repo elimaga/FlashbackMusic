@@ -47,7 +47,7 @@ public class AlbumTabFragment extends Fragment {
                 if(!songsToPlay.isEmpty()) {
                     Intent intent = new Intent(main, SongActivity.class);
                     SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songsToPlay);
-                    songActivityPrepper.sendInfo();
+                    songActivityPrepper.sendInfo(false);
                     main.startActivityForResult(intent, 0);
                 }
 
