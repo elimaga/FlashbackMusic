@@ -46,17 +46,24 @@ public class FavoriteStatusImageButton extends android.support.v7.widget.AppComp
             String newStatus = Song.FavoriteStatus.DISLIKED.toString();
             editor.putString(title + "_favStatus", newStatus);
 
+            Log.d("Testing LIKED to DISLIKED","Symbol changes from LIKED to DISLIKED");
+
         }else if (song.getFavoriteStatus() == Song.FavoriteStatus.DISLIKED){
             song.setFavoriteStatus(Song.FavoriteStatus.NEUTRAL);
 
             String newStatus = Song.FavoriteStatus.NEUTRAL.toString();
             editor.putString(title + "_favStatus", newStatus);
+
+            Log.d("Testing DISLIKED to NEUTRAL","Symbol changes from DISLIKED to NEUTRAL");
+
         }else{
             // song favoriteStatus is Neutral
             song.setFavoriteStatus(Song.FavoriteStatus.LIKED);
 
             String newStatus = Song.FavoriteStatus.LIKED.toString();
             editor.putString(title + "_favStatus", newStatus);
+
+            Log.d("Testing NEUTRAL to LIKED","Symbol changes from NEUTRAL to LIKED");
         }
 
         editor.apply();
