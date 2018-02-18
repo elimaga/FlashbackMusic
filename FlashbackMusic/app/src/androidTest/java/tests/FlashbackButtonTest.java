@@ -1,9 +1,10 @@
-package com.example.team13.flashbackmusic;
+package tests;
 
 
 import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.test.uiautomator.UiDevice;
@@ -15,6 +16,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+
+import com.example.team13.flashbackmusic.MainActivity;
+import com.example.team13.flashbackmusic.R;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -65,7 +69,7 @@ public class FlashbackButtonTest {
     public void flashbackButtonTest() {
 
         ViewInteraction imageButton = onView(
-                allOf(withId(R.id.flashback_button),
+                allOf(ViewMatchers.withId(R.id.flashback_button),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.toolbar),

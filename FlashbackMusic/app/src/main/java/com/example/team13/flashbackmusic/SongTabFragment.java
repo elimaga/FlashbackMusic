@@ -1,5 +1,6 @@
 package com.example.team13.flashbackmusic;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -18,11 +19,13 @@ import java.util.ArrayList;
 
 public class SongTabFragment extends Fragment {
 
+    private MainActivity main;
     private ListView songListView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        main = (MainActivity) getActivity();
         View rootView = inflater.inflate(R.layout.song_tab_fragment, container, false);
 
         songListView = rootView.findViewById(R.id.song_list_view);
@@ -30,32 +33,24 @@ public class SongTabFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
-                // TODO: PLAY SONG HERE!!!!!!!!!!
                 Song song = (Song) adapterView.getItemAtPosition(position);
+                ArrayList<Song> songs = new ArrayList<>();
+                songs.add(song);
+
+                Intent intent = new Intent(main, SongActivity.class);
+                SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songs);
+                songActivityPrepper.sendInfo();
+                main.startActivityForResult(intent, 0);
 
             }
         });
 
 
-        // TODO: dummy songs, needs to be replaced
-        int capacity = 50;
-        final ArrayList<Song> songList = new ArrayList<Song>(capacity);
-        for (int i = 0 ; i < capacity; i++){
-            String duration = "2:30";
-            Song newSong = new Song("Hello", "Adele","",0,"1/1", 0);
-            songList.add(newSong);
-        }
-
-        songList.get(2).setFavoriteStatus(Song.FavoriteStatus.LIKED);
-        songList.get(3).setFavoriteStatus(Song.FavoriteStatus.DISLIKED);
-
-
-        SongAdapter songAdapter = new SongAdapter(getActivity(), songList);
-
+        SongAdapter songAdapter = new SongAdapter(main, main.getSongs());
         songListView.setAdapter(songAdapter);
 
+
         return rootView;
+
     }
-
-
 }

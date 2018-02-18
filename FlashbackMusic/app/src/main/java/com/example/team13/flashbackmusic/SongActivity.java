@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -33,101 +34,85 @@ public class SongActivity extends AppCompatActivity {
     private LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
     final int INVALID_COORDINATE = 200;
+    int index = 0;
+    Bundle extras;
+    Button playPauseButton;
+    ArrayList<Integer> resIds;
+    ArrayList<Integer> indices;
+    ArrayList<String> newLatitudes;
+    ArrayList<String> newLongitudes;
+    ArrayList<String> newTimes;
+    ArrayList<String> newDays;
+    ArrayList<String> newDates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song);
 
-        TextView songNameView = (TextView) findViewById(R.id.titleTextView);
-        TextView songArtistView = (TextView) findViewById(R.id.artistTextView);
-        TextView songAlbumView = (TextView) findViewById(R.id.albumTextView);
-        TextView songLocationView = (TextView) findViewById(R.id.locationTextView);
-        TextView songDayView = (TextView) findViewById(R.id.dayTextView);
-        TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
 
-        Bundle extras = getIntent().getExtras();
-        int resId = 0;
-        double latitude = INVALID_COORDINATE;
-        double longitude = INVALID_COORDINATE;
+        extras = getIntent().getExtras();
+        indices = new ArrayList<>();
+        newLatitudes = new ArrayList<>();
+        newLongitudes = new ArrayList<>();
+        newTimes = new ArrayList<>();
+        newDays = new ArrayList<>();
+        newDates = new ArrayList<>();
 
-        if(extras != null)
-        {
-
-            songNameView.setText("Title: " + (String) extras.getString("title"));
-            songArtistView.setText("Artist: " + (String) extras.getString("artist"));
-            songAlbumView.setText("Album: " + (String) extras.getString("album"));
-            latitude = extras.getDouble("latitude");
-            longitude = extras.getDouble("longitude");
-            songDayView.setText("Day: " + (String) extras.getString("day"));
-            songTimeView.setText("Time: " + (String) extras.getString("time"));
-            resId = (int) extras.getInt("resId");
+        if(extras != null) {
+            resIds = extras.getIntegerArrayList("resIds");
         }
 
-        // Shows the last location to the user
-        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-        try {
-            // Only want to show a location if we have a valid latitude and longitude
-            if(latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 )
-            {
+        updateScreen();
+        loadMedia(resIds.get(index));
 
-                List<Address> list = geocoder.getFromLocation(latitude, longitude, 1);
-                if(list != null && list.size() > 0)
-                {
-                    Address address = list.get(0);
-                    String result = address.getAddressLine(0);
-                    songLocationView.setText("Location: " + result);
-
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-
-        //get new location, day, and time
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        double[] newLocation = getLocation();
-
-        String newDay = getDay();
-        String newTime = getTime();
-
-        //System.out.println(newLocation[0] + " " + newLocation[1] + " " + newDay + " " + newTime);
-        // put new location, day, and time in extras
-        Intent newData = new Intent();
-        newData.putExtra("newLatitude", newLocation[0]);
-        newData.putExtra("newLongitude", newLocation[1]);
-        newData.putExtra("newTime", newTime);
-        newData.putExtra("newDay", newDay);
-        newData.putExtra("index", (int) extras.get("index"));
-        setResult(Activity.RESULT_OK, newData);
-
-        loadMedia(resId);
-        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                mediaPlayer.start();
-            }
-        });
+//        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//            @Override
+//            public void onPrepared(MediaPlayer mediaPlayer) {
+//                mediaPlayer.start();
+//                if (mediaPlayer.isPlaying())
+//                {
+//                    Log.d("Testing Playback", "Song is playing");
+//                    index++;
+//                }
+//                else
+//                {
+//                    Log.d("Testing Playback", "Song is not playing");
+//                }
+//            }
+//        });
 
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                //kills SongActivity when song finishes
-                finish();
+                if(index < resIds.size()) {
+                    mediaPlayer.reset();
+                    updateScreen();
+                    loadMedia(resIds.get(index));
+                    updateNewData();
+                }
+                else {
+                    sendDataBack();
+                    finish();
+                }
             }
         });
 
-        final Button backButton = (Button) findViewById(R.id.BackButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
+        playPauseButton = (Button) findViewById(R.id.playPauseButton);
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mediaPlayer.stop();
-                finish();
+                toggleMusic();
             }
         });
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        mediaPlayer.stop();
+        sendDataBack();
+        finish();
     }
 
     public void loadMedia(int resId)
@@ -136,8 +121,6 @@ public class SongActivity extends AppCompatActivity {
         {
             mediaPlayer = new MediaPlayer();
         }
-
-
 
         try {
             AssetFileDescriptor afd = this.getResources().openRawResourceFd(resId);
@@ -152,92 +135,103 @@ public class SongActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        // Write your code here
-        super.onDestroy();
         mediaPlayer.release();
+        super.onDestroy();
     }
 
-    private String getDay()
-    {
-        Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_WEEK);
+    private void toggleMusic() {
+        if(mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            playPauseButton.setText("PLAY");
+            Log.d("Testing Playback", "Song is paused");
+        } else {
+            updateNewData();
+            mediaPlayer.start();
+            playPauseButton.setText("PAUSE");
+            Log.d("Testing Playback", "Song is playing");
+        }
+    }
 
-        switch(day)
+    /**
+     * Method to update the screen so the user know what song is playing
+     */
+    private void updateScreen() {
+
+        TextView songNameView = (TextView) findViewById(R.id.titleTextView);
+        TextView songArtistView = (TextView) findViewById(R.id.artistTextView);
+        TextView songAlbumView = (TextView) findViewById(R.id.albumTextView);
+        TextView songLocationView = (TextView) findViewById(R.id.locationTextView);
+        TextView songDateView = (TextView) findViewById(R.id.dateTextView);
+        TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
+
+        double latitude = INVALID_COORDINATE;
+        double longitude = INVALID_COORDINATE;
+
+        if(extras != null)
         {
-            case Calendar.SUNDAY:
-                return "Sunday";
-            case Calendar.MONDAY:
-                return "Monday";
-            case Calendar.TUESDAY:
-                return "Tuesday";
-            case Calendar.WEDNESDAY:
-                return "Wednesday";
-            case Calendar.THURSDAY:
-                return "Thursday";
-            case Calendar.FRIDAY:
-                return "Friday";
-            case Calendar.SATURDAY:
-                return "Saturday";
+
+            songNameView.setText("Title: " + (String) extras.getStringArrayList("titles").get(index));
+            songArtistView.setText("Artist: " + (String) extras.getStringArrayList("artists").get(index));
+            songAlbumView.setText("Album: " + (String) extras.getStringArrayList("albums").get(index));
+            latitude = extras.getDoubleArray("latitudes")[index];
+            longitude = extras.getDoubleArray("longitudes")[index];
+            songDateView.setText("Date: " + (String) extras.getStringArrayList("dates").get(index));
+            songTimeView.setText("Time: " + (String) extras.getStringArrayList("times").get(index));
         }
 
-        return "";
-    }
-
-    private String getTime()
-    {
-        int hours = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);//currentTime.getHours();
-        int mins = Calendar.getInstance().get(Calendar.MINUTE);//currentTime.getMinutes();
-
-        return hours + ":" + mins;
-    }
-
-    private double[] getLocation()
-    {
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-
+        // Shows the last location to the user
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            // Only want to show a location if we have a valid latitude and longitude
+            if(latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 )
+            {
+                List<Address> list = geocoder.getFromLocation(latitude, longitude, 1);
+                if(list != null && list.size() > 0)
+                {
+                    Address address = list.get(0);
+                    String result = address.getAddressLine(0);
+                    Log.d("SongActivity.java", result);
+                    songLocationView.setText("Location: " + result);
+                }
             }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
-        };
-
-        if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
-                != PackageManager.PERMISSION_GRANTED  && ActivityCompat.checkSelfPermission ( this ,
-                Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-
-            ActivityCompat.requestPermissions ( this ,
-                    new  String[]{Manifest.permission.ACCESS_FINE_LOCATION },  REQUEST_LOCATION );
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (location != null)
+
+        catch (Exception e)
         {
-            double[] newLocation = {location.getLatitude(), location.getLongitude()};
-            return newLocation;
+            e.printStackTrace();
         }
-        else {
-            double[] newLocation = {INVALID_COORDINATE, INVALID_COORDINATE};
-            return newLocation;
-        }
+
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    private void updateNewData() {
+
+        //get new location, day, and time
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        double[] newLocation = UserInfo.getLocation(SongActivity.this, locationManager);
+
+        String newDay = UserInfo.getDay();
+        String newTime = UserInfo.getTime();
+        String newDate = UserInfo.getDate();
+
+        // add them and their song index to their appropriate arraylist
+        indices.add(extras.getIntegerArrayList("indices").get(index));
+        newLatitudes.add("" + newLocation[0]);
+        newLongitudes.add("" + newLocation[1]);
+        newDays.add(newDay);
+        newTimes.add(newTime);
+        newDates.add(newDate);
+    }
+
+    private void sendDataBack() {
+        // put new location, day, and time in extras to send back to main activity
+        Intent newData = new Intent();
+        newData.putExtra("newLatitudes", newLatitudes);
+        newData.putExtra("newLongitudes", newLongitudes);
+        newData.putExtra("newTimes", newTimes);
+        newData.putExtra("newDays", newDays);
+        newData.putExtra("newDates", newDates);
+        newData.putExtra("indices", indices);
+        setResult(Activity.RESULT_OK, newData);
     }
 }
+
