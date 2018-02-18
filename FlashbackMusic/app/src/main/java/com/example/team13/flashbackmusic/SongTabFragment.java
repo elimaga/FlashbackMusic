@@ -3,6 +3,7 @@ package com.example.team13.flashbackmusic;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,13 +35,23 @@ public class SongTabFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 Song song = (Song) adapterView.getItemAtPosition(position);
-                ArrayList<Song> songs = new ArrayList<>();
-                songs.add(song);
+                ArrayList<Song> songToPlay = new ArrayList<>();
 
-                Intent intent = new Intent(main, SongActivity.class);
-                SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songs);
-                songActivityPrepper.sendInfo();
-                main.startActivityForResult(intent, 0);
+                // Only play the song if it's not disliked
+                if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
+                    songToPlay.add(song);
+                }
+                else {
+                    Log.d("Disliked Song", "Skipping");
+                }
+
+                // Only play the song if it's not disliked
+                if(!songToPlay.isEmpty()) {
+                    Intent intent = new Intent(main, SongActivity.class);
+                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songToPlay);
+                    songActivityPrepper.sendInfo(false);
+                    main.startActivityForResult(intent, 0);
+                }
 
             }
         });

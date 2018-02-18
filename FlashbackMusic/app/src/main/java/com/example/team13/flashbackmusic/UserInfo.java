@@ -105,27 +105,24 @@ public class UserInfo extends AppCompatActivity{
         };
 
         if  (ActivityCompat.checkSelfPermission ( activity , Manifest.permission.ACCESS_FINE_LOCATION )
-                != PackageManager.PERMISSION_GRANTED  && ActivityCompat.checkSelfPermission ( activity ,
-                Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+                == PackageManager.PERMISSION_GRANTED  || ActivityCompat.checkSelfPermission ( activity ,
+                Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
 
-            ActivityCompat.requestPermissions ( activity ,
-                    new  String[]{Manifest.permission.ACCESS_FINE_LOCATION },  REQUEST_LOCATION );
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null)
+            {
+                double[] newLocation = {location.getLatitude(), location.getLongitude()};
+                Log.d("UserInfo", Double.toString(newLocation[0]) + ", " +
+                        Double.toString(newLocation[0]));
+                return newLocation;
+            }
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (location != null)
-        {
-            double[] newLocation = {location.getLatitude(), location.getLongitude()};
-            Log.d("UserInfo", Double.toString(newLocation[0]) + ", " +
-                    Double.toString(newLocation[0]));
-            return newLocation;
-        }
-        else {
-            double[] newLocation = {INVALID_COORDINATE, INVALID_COORDINATE};
-            Log.d("UserInfo", Double.toString(newLocation[0]) + ", " +
-                    Double.toString(newLocation[0]));
-            return newLocation;
-        }
+
+        double[] newLocation = {INVALID_COORDINATE, INVALID_COORDINATE};
+        Log.d("UserInfo", Double.toString(newLocation[0]) + ", " + Double.toString(newLocation[0]));
+        return newLocation;
+
     }
 
     @Override
