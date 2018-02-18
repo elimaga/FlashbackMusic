@@ -33,6 +33,8 @@ import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
 
+    ImageButton flashBackButton;
+
     private ArrayList<Song> songs;
     private ArrayList<Album> albums;
 
@@ -81,33 +83,32 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
         // Flashback button
         final Context context = getApplicationContext();
-        ImageButton flashBackButton = findViewById(R.id.flashback_button);
+        flashBackButton = findViewById(R.id.flashback_button);
         flashBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                Intent intent = new Intent(MainActivity.this, FlashbackActivity.class);
-                startActivity(intent);
-
-
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                double[] userLocation = getLocation();
-                String userTime = getTime();
-                String userDay = getDay();
+                double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
+                String userTime = UserInfo.getTime();
+                String userDay = UserInfo.getDay();
+                String userDate = UserInfo.getDate();
 
-                // Create playlist object
+                // Generate the Flashback Playlist
+                FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
+                        userDay, userTime, userDate);
+                ArrayList<Song> playlist = flashbackPlaylist.getPlaylist();
 
-                // Play the playlist
-
-                //Song song = new Song("America Religious", "unknown", "Love Is Everywhere",
-                //        "albums/loveiseverywhere/america-religious.mp3", "01/10", 0);
-                //song.setData(0.0, 0.0, "Monday", "1:48");
-                //playSong(song);
-
+                // Only activate flashback mode if there are songs to play
+                if(!playlist.isEmpty()) {
+                    // Play the playlist
+                    Intent intent = new Intent(MainActivity.this, SongActivity.class);
+                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
+                    songActivityPrepper.sendInfo(true);
+                    startActivityForResult(intent, 1);
+                }
                 Log.d("Flashback Button", "Flashback button is pressed from main activity");
 
             }
@@ -175,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
                 boolean needNewAlbum = true;
 
+
                 for (Album album : albums) {
                     if(album.getAlbumName().equals(albumName)) {
                         album.addSong(song);
@@ -217,113 +219,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
-    private String getDay()
-    {
-        Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_WEEK);
-
-        switch(day)
-        {
-            case Calendar.SUNDAY:
-                return "Sunday";
-            case Calendar.MONDAY:
-                return "Monday";
-            case Calendar.TUESDAY:
-                return "Tuesday";
-            case Calendar.WEDNESDAY:
-                return "Wednesday";
-            case Calendar.THURSDAY:
-                return "Thursday";
-            case Calendar.FRIDAY:
-                return "Friday";
-            case Calendar.SATURDAY:
-                return "Saturday";
-        }
-
-        return "";
-    }
-
-    private String getTime()
-    {
-        int hours = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);//currentTime.getHours();
-        int mins = Calendar.getInstance().get(Calendar.MINUTE);//currentTime.getMinutes();
-
-        return hours + ":" + mins;
-    }
-
-    private double[] getLocation()
-    {
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
-        };
-
-        if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
-                == PackageManager.PERMISSION_GRANTED  || ActivityCompat.checkSelfPermission ( this ,
-                Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
-
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-            // TODO: in addtion to checking null, the check for whether location service is on is needed here
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (location != null)
-            {
-                double[] newLocation = {location.getLatitude(), location.getLongitude()};
-                return newLocation;
-            }
-
-        }
-        return new double[] {INVALID_COORDINATE, INVALID_COORDINATE};
-
-
-    }
-
-
-    public void playSong(Song song)
-    {
-        Intent intent = new Intent(this, SongActivity.class);
-        String title = song.getTitle();
-        String artist = song.getArtist();
-        String album = song.getAlbumName();
-        double latitude = song.getLastLatitude();
-        double longitude = song.getLastLongitude();
-        String time = song.getLastTime();
-        String day = song.getLastDay();
-        int resId = song.getResId();
-        int index = song.getIndex();
-        intent.putExtra("title", title);
-        intent.putExtra("artist", artist);
-        intent.putExtra("album", album);
-        intent.putExtra("latitude", latitude);
-        intent.putExtra("longitude", longitude);
-        intent.putExtra("time", time);
-        intent.putExtra("day", day);
-        intent.putExtra("resId", resId);
-        intent.putExtra("index", index);
-
-        startActivityForResult(intent, 0);
-
-    }
-
-    /*
+    /**
      * When our song activity finishes, this method is called and stores all the new data for the
      * song in the shared preferences. This data has to be retrieved to store in the Song object
      * after playSong() finishes.
@@ -331,52 +227,90 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Bundle extras = data.getExtras();
 
-        if (requestCode == 0 && resultCode == RESULT_OK && data != null) {
-            Bundle extras = data.getExtras();
-
-            int index = (int) extras.getInt("index");
-            String title = songs.get(index).getTitle();
-            double newLatitude = (double) extras.getDouble("newLatitude");
-            double newLongitude = (double) extras.getDouble("newLongitude");
-            String newDay = (String) extras.getString("newDay");
-            String newTime = (String) extras.getString("newTime");
-
-            // Save the info in the SharedPreferences
-            SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-
-            editor.putString(title + "_latitude", "" + newLatitude);
-            editor.putString(title + "_longitude", "" + newLongitude);
-            editor.putString(title + "_day", newDay);
-            editor.putString(title + "_time", newTime);
-
-            editor.apply();
-
-            songs.get(index).setData(newLatitude, newLongitude, newDay, newTime);
-
+        // If the songs ended normally or back was pressed while in default mode then simply update
+        // the info of the songs.
+        if (requestCode == 0 && (resultCode == RESULT_OK || resultCode == RESULT_CANCELED) && data != null) {
+            updateSongs(extras);
+        }
+        // Else if back button was pressed in Flashback Mode then update the songs that were played,
+        // but do not restart Flashback Mode
+        else if (requestCode == 1 && resultCode == RESULT_CANCELED && data != null) {
+            updateSongs(extras);
+        }
+        // Else if the songs ended normally in Flashback Mode then update the songs and restart
+        // flashback mode
+        else if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            updateSongs(extras);
+            flashBackButton.performClick();
         }
     }
 
-    /*
+    /**
      * Method to retrieve the prior info of the song from the SharedPreferences and then set the
      * data in the Song object.
+     * @param song - the song to retrieve the info for
      */
-    private void retrieveInfo(Song song) {
+    public void retrieveInfo(Song song) {
 
         String title = song.getTitle();
 
         //Get the info from the new info from the shared preferences
         SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
-        double newLatitude = Double.parseDouble(sharedPreferences.getString(title + "_latitude", "" + INVALID_COORDINATE));
-        double newLongitude = Double.parseDouble(sharedPreferences.getString(title + "_longitude", "" + INVALID_COORDINATE));
-        String newDay = sharedPreferences.getString(title + "_day", "");
-        String newTime = sharedPreferences.getString(title + "_time", "");
+        double latitude = Double.parseDouble(sharedPreferences.getString(title + "_latitude", "" + INVALID_COORDINATE));
+        double longitude = Double.parseDouble(sharedPreferences.getString(title + "_longitude", "" + INVALID_COORDINATE));
+        String day = sharedPreferences.getString(title + "_day", "");
+        String time = sharedPreferences.getString(title + "_time", "");
+        String date = sharedPreferences.getString(title + "_date", "");
+        Song.FavoriteStatus favoriteStatus = Song.FavoriteStatus.valueOf(sharedPreferences.getString(title + "_favStatus", "NEUTRAL"));
+
 
         // Update the data in the Song object
-        song.setData(newLatitude, newLongitude, newDay, newTime);
+        song.setData(latitude, longitude, day, time, date);
+        song.setFavoriteStatus(favoriteStatus);
 
     }
+
+    /**
+     * Method to update the new location, date, and time info for the songs that have been played
+     * @param extras - contains the new data for the songs
+     */
+    private void updateSongs(Bundle extras) {
+        // Save the info in the SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        ArrayList<Integer> indices = extras.getIntegerArrayList("indices");
+        ArrayList<String> newLatitudes = extras.getStringArrayList("newLatitudes");
+        ArrayList<String> newLongitudes = extras.getStringArrayList("newLongitudes");
+        ArrayList<String> newTimes = extras.getStringArrayList("newTimes");
+        ArrayList<String> newDays = extras.getStringArrayList("newDays");
+        ArrayList<String> newDates = extras.getStringArrayList("newDates");
+
+        for (int index = 0; index < indices.size(); index++) {
+
+            String title = songs.get(indices.get(index)).getTitle();
+            double newLatitude = Double.parseDouble(newLatitudes.get(index));
+            double newLongitude = Double.parseDouble(newLongitudes.get(index));
+            String newDay = newDays.get(index);
+            String newTime = newTimes.get(index);
+            String newDate = newDates.get(index);
+
+            editor.putString(title + "_latitude", "" + newLatitude);
+            editor.putString(title + "_longitude", "" + newLongitude);
+            editor.putString(title + "_day", newDay);
+            editor.putString(title + "_date", newDate);
+            editor.putString(title + "_time", newTime);
+
+            editor.apply();
+
+            songs.get(indices.get(index)).setData(newLatitude, newLongitude, newDay, newTime, newDate);
+
+        }
+    }
+
+
 
 
 }

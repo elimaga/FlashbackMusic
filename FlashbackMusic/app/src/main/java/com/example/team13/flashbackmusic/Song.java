@@ -4,15 +4,19 @@ package com.example.team13.flashbackmusic;
  * Created by rolandkong and luzannebatoon on 2/6/18.
  */
 
-import android.content.SharedPreferences;
 
 public class Song {
-    private String title, artist, albumName, lastDay, lastTime, setting;
+
+    private String title, artist, albumName, lastDay, lastTime, setting, lastDate;
     private double lastLatitude, lastLongitude;
     private int resId;
     private int track;
     private int index; // index in the ArrayList of Songs
-    private int liked; // neutral = 0, dislike = -1, like = 1
+    private FavoriteStatus favoriteStatus; // neutral = 0, like = 1, dislike = 2
+
+    public enum FavoriteStatus {
+        NEUTRAL, LIKED, DISLIKED;
+    }
 
     public Song(String title, String artist, String albumName,
                 int id, String track, int index) {
@@ -22,7 +26,6 @@ public class Song {
         this.resId = id;
         this.track = Integer.parseInt(track.substring(0, track.indexOf("/")));
         this.index = index;
-        this.liked = 0;
     }
 
     public Song()
@@ -33,7 +36,6 @@ public class Song {
         this.resId = 0;
         this.track = 0;
         this.index = 0;
-        this.liked = 0;
     }
 
     public String getTitle() {
@@ -56,12 +58,12 @@ public class Song {
 
     public int getIndex() { return this.index; }
 
-    public void likeSong(int like) {
-        this.liked = like;
+    public void setFavoriteStatus(FavoriteStatus status) {
+        this.favoriteStatus = status;
     }
 
-    public boolean isLiked() {
-        return this.liked == 1;
+    public FavoriteStatus getFavoriteStatus() {
+        return this.favoriteStatus;
     }
 
     public double getLastLatitude() {
@@ -76,6 +78,11 @@ public class Song {
         return this.lastDay;
     }
 
+    public String getLastDate() {
+        return this.lastDate;
+    }
+
+
     public String getLastTime() {
         return this.lastTime;
     }
@@ -86,11 +93,12 @@ public class Song {
 
 
     public void setData(double lastLatitude, double lastLongitude,
-                         String day, String time) {
+                         String day, String time, String date) {
         this.lastDay = day;
         this.lastTime = time;
         this.lastLatitude = lastLatitude;
         this.lastLongitude = lastLongitude;
+        this.lastDate = date;
         setTimeOfDay(time);
     }
 

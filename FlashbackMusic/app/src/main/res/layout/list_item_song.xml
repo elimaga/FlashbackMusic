@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:padding="5dp"
+    android:descendantFocusability="blocksDescendants">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Song Title"
+        android:textStyle="bold"
+        android:textSize="17sp"
+        android:maxWidth="350dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/artist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Artist"
+        android:maxLines="1"
+        android:textSize="15sp"
+        android:maxWidth="280dp"
+        android:layout_below="@+id/title"
+        android:layout_alignStart="@id/title"
+        android:layout_marginBottom="10dp"
+        android:ellipsize="end"/>
+
+    <TextView
+        android:id="@+id/separator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:text=""
+        android:layout_toEndOf="@id/artist"
+        android:layout_alignBaseline="@id/artist"
+        />
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:text=""
+        android:layout_below="@+id/title"
+        android:layout_toEndOf="@id/separator"
+        />
+
+    <com.example.team13.flashbackmusic.FavoriteStatusImageButton
+        android:id="@+id/favoriteSymbol"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:scaleType="fitCenter"
+        android:background="#FFFFFF"
+        android:src="@drawable/neutral"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="15dp"
+        />
+
+
+
+
+</RelativeLayout>

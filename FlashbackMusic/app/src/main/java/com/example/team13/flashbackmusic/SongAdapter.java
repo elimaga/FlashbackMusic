@@ -42,24 +42,55 @@ public class SongAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
-        View rowView = mInflater.inflate(R.layout.list_item, parent, false);
 
-        TextView titleTextView = rowView.findViewById(R.id.title);
-
-        TextView artistTextView = rowView.findViewById(R.id.artist);
-
-        TextView durationTextView = rowView.findViewById(R.id.info);
-        TextView seperator = rowView.findViewById(R.id.separator);
+        ViewHolder holder;
 
         Song song = (Song) getItem(position);
 
-        titleTextView.setText(song.getTitle());
-        artistTextView.setText(song.getArtist());
-        // TODO: needs to be replaced with song.getDuration()
-        durationTextView.setText("");
-        seperator.setText("");
+        if (convertView == null) {
+            convertView = mInflater.inflate(R.layout.list_item_song, null);
 
-        return rowView;
+            holder = new ViewHolder();
+
+            holder.titleTextView = convertView.findViewById(R.id.title);
+            holder.artistTextView = convertView.findViewById(R.id.artist);
+            holder.infoTextView = convertView.findViewById(R.id.info);
+            holder.separatorTextView = convertView.findViewById(R.id.separator);
+            holder.favoriteStatusImageButton = (FavoriteStatusImageButton) convertView.findViewById(R.id.favoriteSymbol);
+
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
+
+        holder.titleTextView.setText(song.getTitle());
+        holder.artistTextView.setText(song.getArtist());
+
+
+        holder.favoriteStatusImageButton.setSong(song);
+
+        holder.favoriteStatusImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                    FavoriteStatusImageButton button = (FavoriteStatusImageButton) view;
+                    button.updateStatus(mContext);
+                    button.updateImage();
+            }
+        });
+
+
+        return convertView;
+
+
+    }
+
+    static class ViewHolder
+    {
+        TextView titleTextView;
+        TextView artistTextView;
+        TextView infoTextView;
+        TextView separatorTextView;
+        FavoriteStatusImageButton favoriteStatusImageButton;
     }
 
 
