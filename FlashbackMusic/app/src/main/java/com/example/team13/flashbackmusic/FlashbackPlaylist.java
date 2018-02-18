@@ -61,6 +61,9 @@ public class FlashbackPlaylist {
                         numMatches.add(THREE_MATCHES);
                     }
                 }
+                else {
+                    Log.d("Disliked Song", "Skipping");
+                }
 
             }
             // Else check if it matches 2 of the requirements
@@ -81,6 +84,10 @@ public class FlashbackPlaylist {
                         numMatches.add(TWO_MATCHES);
                     }
                 }
+                else {
+                    Log.d("Disliked Song", "Skipping");
+                }
+
             }
             // Else check if it matches 1 of the requirements
             else if(matchesLocation(location[0], location[1], song.getLastLatitude(), song.getLastLongitude())
@@ -99,6 +106,10 @@ public class FlashbackPlaylist {
                         numMatches.add(ONE_MATCH);
                     }
                 }
+                else {
+                    Log.d("Disliked Song", "Skipping");
+                }
+
             }
         }
 
@@ -119,6 +130,9 @@ public class FlashbackPlaylist {
                         } else {
                             numMatches.add(ONE_MATCH);
                         }
+                    }
+                    else {
+                        Log.d("Disliked Song", "Skipping");
                     }
                 }
             }

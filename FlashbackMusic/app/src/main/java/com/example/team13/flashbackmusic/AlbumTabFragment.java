@@ -3,6 +3,7 @@ package com.example.team13.flashbackmusic;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,9 @@ public class AlbumTabFragment extends Fragment {
                 for(Song song : songsInAlbum) {
                     if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
                         songsToPlay.add(song);
+                    }
+                    else {
+                        Log.d("Disliked Song", "Skipping");
                     }
                 }
 

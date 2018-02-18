@@ -3,6 +3,7 @@ package com.example.team13.flashbackmusic;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,9 @@ public class SongTabFragment extends Fragment {
                 // Only play the song if it's not disliked
                 if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
                     songToPlay.add(song);
+                }
+                else {
+                    Log.d("Disliked Song", "Skipping");
                 }
 
                 // Only play the song if it's not disliked
