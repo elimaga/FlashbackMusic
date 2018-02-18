@@ -44,7 +44,7 @@ public class SongTabFragment extends Fragment {
                 // Only play the song if it's not disliked
                 if(!songToPlay.isEmpty()) {
                     Intent intent = new Intent(main, SongActivity.class);
-                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songsToPlay);
+                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songToPlay);
                     songActivityPrepper.sendInfo();
                     main.startActivityForResult(intent, 0);
                 }
