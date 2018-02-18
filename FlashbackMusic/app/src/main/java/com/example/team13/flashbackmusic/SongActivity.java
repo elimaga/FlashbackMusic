@@ -74,10 +74,14 @@ public class SongActivity extends AppCompatActivity {
             flashbackMode.setText("Flashback Mode");
         }
 
+        // Update the screen for the first song, load the first song to play, and update the Arraylists
+        // of new data since the song is playing.
         updateScreen();
         loadMedia(resIds.get(index));
         updateNewData();
 
+
+        // Play the song when it is prepared
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
@@ -94,6 +98,7 @@ public class SongActivity extends AppCompatActivity {
             }
         });
 
+        // Play the next song if there is one, otherwise finish the activity
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
@@ -188,7 +193,7 @@ public class SongActivity extends AppCompatActivity {
     }
 
     /**
-     * Method to update the screen so the user know what song is playing
+     * Method to update the screen so the user knows what song is playing
      */
     private void updateScreen() {
 
@@ -239,6 +244,9 @@ public class SongActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Method to update the new data ArrayLists to send back to the MainActivity.
+     */
     private void updateNewData() {
 
         //get new location, day, and time
@@ -258,6 +266,11 @@ public class SongActivity extends AppCompatActivity {
         newDates.add(newDate);
     }
 
+    /**
+     * Method to send data back to the MainActivity
+     * @param backPressed - tells whether the back button was pressed to cancel playback or the song(s)
+     *                    finished on their own
+     */
     private void sendDataBack(boolean backPressed) {
         // put new location, day, and time in extras to send back to main activity
         Intent newData = new Intent();
