@@ -207,7 +207,7 @@ public class FlashbackPlaylist {
      * Helper method for the constructor to check if the location of the song is close to the location
      * of the user.
      */
-    private boolean matchesLocation(double curLatitude, double curLongitude, double prevLatitude, double prevLongitude) {
+    public boolean matchesLocation(double curLatitude, double curLongitude, double prevLatitude, double prevLongitude) {
 
         // First check to make sure that each longitude and latitude is a valid coordinate
         if(curLatitude >= -90 && curLatitude <= 90 && curLongitude >= -180 && curLongitude <= 180 &&
@@ -238,7 +238,7 @@ public class FlashbackPlaylist {
      * Helper method for the constructor to check if the current day of the user is the same as
      * the last time a song was played.
      */
-    private boolean matchesDay(String curDay, String prevDay) {
+    public boolean matchesDay(String curDay, String prevDay) {
         if(curDay.equals(prevDay)) {
             return true;
         }
@@ -251,7 +251,7 @@ public class FlashbackPlaylist {
      * Helper method for the constructor to check if the current time of day of the user is the same
      * as the last time a song was played.
      */
-    private boolean matchesTimeOfDay(String curTime, String prevTimeOfDay) {
+    public boolean matchesTimeOfDay(String curTime, String prevTimeOfDay) {
 
         // Get the current time of day of the user
         String curTimeOfDay = "";
