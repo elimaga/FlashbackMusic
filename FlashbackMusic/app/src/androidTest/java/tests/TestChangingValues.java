@@ -3,6 +3,7 @@ package tests;
 import android.content.SharedPreferences;
 import android.media.MediaMetadataRetriever;
 import android.support.test.rule.ActivityTestRule;
+import android.util.Log;
 
 import com.example.team13.flashbackmusic.MainActivity;
 import com.example.team13.flashbackmusic.R;
@@ -30,8 +31,7 @@ public class TestChangingValues {
     public void setUp()
     {
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-        int[] resourceIds = {R.raw._123_go, R.raw.america_religious, R.raw.beautiful_pain,
-                R.raw.cant_you_be_mine, R.raw.i_will_not_be_afraid, R.raw.stomp_jump_boogie};
+        int[] resourceIds = {R.raw._123_go, R.raw.america_religious, R.raw.cant_you_be_mine, R.raw.i_will_not_be_afraid, R.raw.stomp_jump_boogie};
         mainActivity.getActivity().loadLibrary(mediaMetadataRetriever, resourceIds);
     }
     @Test
@@ -42,6 +42,9 @@ public class TestChangingValues {
         for(int i = 0; i<songArrayListTester.size(); i++){
             Song.FavoriteStatus favoriteStatus = songArrayListTester.get(i).getFavoriteStatus();
 
+            String status = songArrayListTester.get(i).getFavoriteStatus().toString();
+
+            Log.d("Stats",status);
             assertEquals(favoriteStatus, Song.FavoriteStatus.NEUTRAL);
         }
     }
