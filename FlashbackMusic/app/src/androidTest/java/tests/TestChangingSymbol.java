@@ -1,13 +1,17 @@
-package com.example.team13.flashbackmusic;
+package tests;
 
 
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+
+import com.example.team13.flashbackmusic.MainActivity;
+import com.example.team13.flashbackmusic.R;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -36,7 +40,7 @@ public class TestChangingSymbol {
     @Test
     public void testChangeSymbol() {
         ViewInteraction favoriteStatusImageButton = onView(
-                allOf(withId(R.id.favoriteSymbol),
+                allOf(ViewMatchers.withId(R.id.favoriteSymbol),
                         childAtPosition(
                                 withParent(withId(R.id.song_list_view)),
                                 4),hasSibling(withText("123 Go")),
