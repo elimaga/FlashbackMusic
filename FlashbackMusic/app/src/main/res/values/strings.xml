@@ -2,4 +2,5 @@
     <string name="app_name">FlashbackMusic</string>
     <string name="title_activity_flashback">FlashbackActivity</string>
     <string name="separator">・</string>
+    <string name="title_activity_download">DownloadActivity</string>
 </resources>
