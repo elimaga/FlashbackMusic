@@ -13,15 +13,9 @@ import com.google.firebase.database.FirebaseDatabase;
  */
 
 public class DatabaseCommunicator {
-    private FirebaseDatabase firebaseDatabase;
-    private DatabaseReference databaseReference;
-    private GeoFire geoFire;
 
     public DatabaseCommunicator()
     {
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference();
-        geoFire = new GeoFire(databaseReference);
     }
 
     /**
@@ -33,6 +27,11 @@ public class DatabaseCommunicator {
         String username = "usr1";
         String url = "";
         String databaseKey = username + "-" + song.getTitle() + "-" + song.getArtist();
+
+
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference databaseReference = firebaseDatabase.getReference();
+        GeoFire geoFire = new GeoFire(databaseReference);
 
         DatabaseEntry databaseEntry = new DatabaseEntry(song, url, username);
 
