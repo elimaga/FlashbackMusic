@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class DatabaseCommunicator {
 
     final float KILOMETERS_IN_THOUSAND_FEET = 0.3048f;
+    String test;
 
     public DatabaseCommunicator()
     {
@@ -58,11 +59,9 @@ public class DatabaseCommunicator {
     }
 
     public void retrieve(GeoLocation currentLocation) {
-        String username = "usr1";
-        String url = "";
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = firebaseDatabase.getReference();
+        final DatabaseReference databaseReference = firebaseDatabase.getReference();
         GeoFire geoFire = new GeoFire(databaseReference);
 
         GeoQuery geoQuery = geoFire.queryAtLocation(currentLocation, KILOMETERS_IN_THOUSAND_FEET );
@@ -71,6 +70,8 @@ public class DatabaseCommunicator {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
                 System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
+                test = key.substring(0,key.indexOf("-"));
+                databaseReference.child(test).child("trackNumber").setValue(1);
             }
 
             @Override
@@ -93,5 +94,6 @@ public class DatabaseCommunicator {
                 System.err.println("There was an error with this query: " + error);
             }
         });
+
     }
 }
