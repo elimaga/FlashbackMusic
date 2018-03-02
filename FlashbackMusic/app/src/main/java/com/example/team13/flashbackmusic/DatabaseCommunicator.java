@@ -30,15 +30,15 @@ public class DatabaseCommunicator {
 
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = firebaseDatabase.getReference().child(databaseKey);
+        DatabaseReference databaseReference = firebaseDatabase.getReference();
         GeoFire geoFire = new GeoFire(databaseReference);
 
         DatabaseEntry databaseEntry = new DatabaseEntry(song, url, username);
 
-        databaseReference.setValue(databaseEntry);
+        databaseReference.child(databaseKey).setValue(databaseEntry);
         //geoFire.setLocation(databaseKey, new GeoLocation(song.getLastLatitude(), song.getLastLongitude()));
 
-        geoFire.setLocation("location", new GeoLocation(song.getLastLatitude(), song.getLastLongitude()),
+        geoFire.setLocation(databaseKey + "-location", new GeoLocation(song.getLastLatitude(), song.getLastLongitude()),
                 new GeoFire.CompletionListener() {
             @Override
             public void onComplete(String key, DatabaseError error) {
