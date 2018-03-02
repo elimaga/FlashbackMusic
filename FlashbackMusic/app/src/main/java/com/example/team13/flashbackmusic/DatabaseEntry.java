@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by andrewyu on 3/1/18.
+ * Created by Andrew Yu and Elijah Magallanes on 3/1/18.
  */
 
 public class DatabaseEntry {
@@ -26,6 +26,7 @@ public class DatabaseEntry {
 
     public DatabaseEntry()
     {
+
         this.title = DEFAULT_TITLE;
         this.artist = DEFAULT_ARTIST;
         this.albumName = DEFAULT_ALBUM;
@@ -38,25 +39,9 @@ public class DatabaseEntry {
         this.lastLocation.add(DEFAULT_LOCATION);
         this.track = DEFAULT_TRACK;
         this.username = DEFAULT_USERNAME;
+
     }
 
-    public DatabaseEntry(String title, String artist, String albumName, String lastDay, String lastTime,
-                         String lastDate, String url, double lastLatitude, double lastLongitude,
-                         int track, String username)
-    {
-        this.title = title;
-        this.artist = artist;
-        this.albumName = albumName;
-        this.lastDay = lastDay;
-        this.lastTime = lastTime;
-        this.lastDate = lastDate;
-        this.url = url;
-        this.lastLocation = new ArrayList<>();
-        this.lastLocation.add(lastLatitude);
-        this.lastLocation.add(lastLongitude);
-        this.track = track;
-        this.username = username;
-    }
 
     public DatabaseEntry(Song song, String url, String username)
     {

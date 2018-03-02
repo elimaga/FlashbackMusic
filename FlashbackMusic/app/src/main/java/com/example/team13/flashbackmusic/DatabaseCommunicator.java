@@ -9,7 +9,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 /**
- * Created by andrewyu on 3/1/18.
+ * Created by Andrew Yu and Elijah Magallanes on 3/1/18.
  */
 
 public class DatabaseCommunicator {
@@ -26,19 +26,19 @@ public class DatabaseCommunicator {
     {
         String username = "usr1";
         String url = "";
-        String databaseKey = username + "-" + song.getTitle() + "-" + song.getArtist();
+        String databaseKey = username + "_" + song.getTitle() + "_" + song.getArtist();
 
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = firebaseDatabase.getReference();
+        DatabaseReference databaseReference = firebaseDatabase.getReference().child(databaseKey);
         GeoFire geoFire = new GeoFire(databaseReference);
 
         DatabaseEntry databaseEntry = new DatabaseEntry(song, url, username);
 
-        databaseReference.child(databaseKey).setValue(databaseEntry);
+        databaseReference.setValue(databaseEntry);
         //geoFire.setLocation(databaseKey, new GeoLocation(song.getLastLatitude(), song.getLastLongitude()));
 
-        geoFire.setLocation(databaseKey + "-location", new GeoLocation(song.getLastLatitude(), song.getLastLongitude()),
+        geoFire.setLocation("location", new GeoLocation(song.getLastLatitude(), song.getLastLongitude()),
                 new GeoFire.CompletionListener() {
             @Override
             public void onComplete(String key, DatabaseError error) {

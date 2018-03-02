@@ -11,7 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Created by andrewyu on 3/1/18.
+ * Created by Andrew Yu and Elijah Magallanes on 3/1/18.
  */
 
 public class TestDatabaseSend {
@@ -26,8 +26,8 @@ public class TestDatabaseSend {
     @Test
     public void testSend()
     {
-        Song song = new Song("Killer Queen", "Queen", "Killer Queen (album)", 0, "0/0",0);
-        song.setData(60.0, 100.0, "Monday", "11:15", "3/1/18");
+        Song song = new Song("3005", "Childish Gambino", "Unknown", 0, "0/0",0);
+        song.setData(69.0, -80.0, "Monday", "10:50", "4/6/18");
         DatabaseCommunicator dc = new DatabaseCommunicator();
         dc.send(song);
 
