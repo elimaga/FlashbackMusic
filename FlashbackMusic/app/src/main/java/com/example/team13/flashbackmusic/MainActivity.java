@@ -99,7 +99,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         // set item as selected to persist highlight
-                        menuItem.setChecked(true);
+                        int id = menuItem.getItemId();
+                        if(id == R.id.signout){
+                            //signout Activity
+                        }
+                        else if (id == R.id.download){
+                            //Bring up downloadActivity
+
+                        }
+//                        menuItem.setChecked(true);
                         // close drawer when item is tapped
                         mDrawerLayout.closeDrawers();
 

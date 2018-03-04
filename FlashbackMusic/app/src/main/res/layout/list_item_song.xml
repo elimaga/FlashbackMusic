@@ -54,7 +54,7 @@
         android:layout_width="15dp"
         android:layout_height="15dp"
         android:scaleType="fitCenter"
-        android:background="#FFFFFF"
+        android:background="@null"
         android:src="@drawable/neutral"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
