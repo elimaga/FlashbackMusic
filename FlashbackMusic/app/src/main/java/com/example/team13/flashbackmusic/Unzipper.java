@@ -2,11 +2,17 @@ package com.example.team13.flashbackmusic;
 
 import android.app.IntentService;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.content.MimeTypeFilter;
+import android.webkit.MimeTypeMap;
+import android.widget.Toast;
 
+import com.example.team13.flashbackmusic.interfaces.DownloadObserver;
 import com.example.team13.flashbackmusic.interfaces.Subject;
 import com.example.team13.flashbackmusic.interfaces.UnzipperObserver;
 
@@ -26,7 +32,7 @@ import java.util.zip.ZipInputStream;
  * Created by Kazutaka on 3/3/18.
  */
 
-public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Subject<UnzipperObserver> {
+public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Subject<UnzipperObserver>, DownloadObserver {
 
     ArrayList<UnzipperObserver> observers;
 
@@ -108,5 +114,21 @@ public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Sub
         for (UnzipperObserver observer : observers) {
             observer.onUnzip();
         }
+    }
+
+    @Override
+    public void onCompleteDownload(Context context, Uri uri, String mime) {
+
+        if (MimeTypeFilter.matches(mime, new String[]{"audio/mpeg3","audio/x-mpeg-3","video/mpeg","video/x-mpeg"})!= null){
+            notifyObservers();
+        } else if (MimeTypeFilter.matches(mime,
+                new String[]{"application/x-compressed", "application/x-zip-compressed","application/zip","multipart/x-zip"})!= null) {
+            String path = uri.getPath();
+            String zipname = uri.getLastPathSegment();
+            unpackZip(path, zipname);
+        } else {
+            Toast.makeText(context, "invalid file format", Toast.LENGTH_SHORT).show();
+        }
+
     }
 }

@@ -1,21 +1,20 @@
 package com.example.team13.flashbackmusic;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.team13.flashbackmusic.interfaces.DownloadObserver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,7 +23,7 @@ public class DownloadActivity extends AppCompatActivity {
 
     MusicFileDownloader musicFileDownloader;
     long downloadReference;
-    BroadcastReceiver broadcastReceiver;
+    Unzipper unzipper;
     Button downloadButton;
 
     @Override
@@ -34,13 +33,7 @@ public class DownloadActivity extends AppCompatActivity {
         downloadButton = findViewById(R.id.downloadButton);
 
         musicFileDownloader = new MusicFileDownloader(DownloadActivity.this);
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Toast.makeText(context, "finished downloading", Toast.LENGTH_SHORT).show();
-                downloadButton.setEnabled(true);
-            }
-        };
+        unzipper = new Unzipper();
 
         if(ContextCompat.checkSelfPermission(DownloadActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             != PackageManager.PERMISSION_GRANTED ||
@@ -74,12 +67,11 @@ public class DownloadActivity extends AppCompatActivity {
                 return;
             }
 
-            musicFileDownloader.registerReceiver(broadcastReceiver);
-            downloadReference = musicFileDownloader.downloadMusicFile(url);
+            musicFileDownloader.registerReceiver(unzipper);
+            musicFileDownloader.downloadMusicFile(url);
 
             //disable the button
             downloadButton.setEnabled(false);
-
 
         }
         else{
@@ -92,6 +84,6 @@ public class DownloadActivity extends AppCompatActivity {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        musicFileDownloader.unRegisterReceiver(broadcastReceiver);
+        musicFileDownloader.unregisterReceiver(unzipper);
     }
 }

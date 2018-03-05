@@ -3,22 +3,22 @@ package com.example.team13.flashbackmusic;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Environment;
-import android.util.Log;
-import android.webkit.URLUtil;
+import android.support.v4.content.MimeTypeFilter;
+import android.webkit.MimeTypeMap;
+import android.widget.Toast;
 
-import com.example.team13.flashbackmusic.interfaces.MusicFileDownloaderObserver;
-import com.example.team13.flashbackmusic.interfaces.Subject;
+import com.example.team13.flashbackmusic.interfaces.DownloadObserver;
 
-import java.io.File;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
+
 
 /**
  * Created by Kazutaka on 3/3/18.
@@ -26,11 +26,12 @@ import static android.content.Context.DOWNLOAD_SERVICE;
 
 public class MusicFileDownloader {
 
-    ArrayList<MusicFileDownloaderObserver> observers;
+    DownloadObserver observer;
+    Long downloadReference;
 
     private Context mContext;
     private DownloadManager downloadManager;
-    private ArrayList<MusicFileDownloaderObserver> musicFileManagerObservers;
+    private ArrayList<DownloadObserver> musicFileManagerObservers;
     private BroadcastReceiver broadcastReceiver;
 
     public MusicFileDownloader(Context context) {
@@ -38,7 +39,7 @@ public class MusicFileDownloader {
         this.mContext = context;
     }
 
-    public long downloadMusicFile (URL url) {
+    public void downloadMusicFile (URL url) {
 
         Uri uri = null;
         try{
@@ -47,8 +48,6 @@ public class MusicFileDownloader {
             e.printStackTrace();
         }
 
-        long downloadReference;
-
         // Create request for android download manager
         DownloadManager.Request request = new DownloadManager.Request(uri);
 
@@ -56,22 +55,40 @@ public class MusicFileDownloader {
         request.setDescription("Downloading a music file");
 
 
-        //String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath();
-        //Log.d("dir",dir);
-        //request.setDestinationInExternalPublicDir( dir, URLUtil.guessFileName(url.toString(),null,null));
-        request.setDestinationInExternalFilesDir(mContext, Environment.DIRECTORY_MUSIC, URLUtil.guessFileName(url.toString(),null,null));
+        String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath();
+        request.setDestinationInExternalPublicDir( dir, "unprocessed_file");
 
-        //Enqueue download and save into referenceId
-        downloadReference = downloadManager.enqueue(request);
+        final long dr = downloadManager.enqueue(request);
 
-        return downloadReference;
+        downloadReference = dr;
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                onComplete();
+            }
+
+
+        };
     }
 
-    public void registerReceiver(BroadcastReceiver broadcastReceiver) {
+    public void registerReceiver(DownloadObserver observer) {
         IntentFilter filter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
         mContext.registerReceiver(broadcastReceiver, filter);
+        this.observer = observer;
     }
-    public void unRegisterReceiver(BroadcastReceiver broadcastReceiver){
+    public void unregisterReceiver(DownloadObserver observer){
         mContext.unregisterReceiver(broadcastReceiver);
+        broadcastReceiver = null;
+        if(this.observer.equals(observer)) observer = null;
+    }
+
+    public void onComplete() {
+        Uri uri = downloadManager.getUriForDownloadedFile(downloadReference);
+        String mime = downloadManager.getMimeTypeForDownloadedFile(downloadReference);
+        observer.onCompleteDownload(mContext, uri, mime);
+
+
+
     }
 }
