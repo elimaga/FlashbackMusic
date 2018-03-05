@@ -8,16 +8,8 @@ import java.util.List;
  */
 
 public class DatabaseEntry {
-    private static final String DEFAULT_TITLE = "";
-    private static final String DEFAULT_ARTIST = "";
-    private static final String DEFAULT_ALBUM = "";
-    private static final String DEFAULT_DAY = "Monday";
-    private static final String DEFAULT_TIME = "12:00";
-    private static final String DEFAULT_DATE = "1/1/1970";
-    private static final String DEFAULT_URL = "https://www.google.com/";
-    private static final int DEFAULT_TRACK = 0;
-    private static final String DEFAULT_USERNAME = "usr1";
-    private static final double DEFAULT_LOCATION = 200.0;
+
+    private static final double INVALID_LOCATION = 200.0;
 
     private String title, artist, albumName, lastDay, lastTime, lastDate, url;
     private List<Double> lastLocation;
@@ -27,18 +19,18 @@ public class DatabaseEntry {
     public DatabaseEntry()
     {
 
-        this.title = DEFAULT_TITLE;
-        this.artist = DEFAULT_ARTIST;
-        this.albumName = DEFAULT_ALBUM;
-        this.lastDay = DEFAULT_DAY;
-        this.lastTime = DEFAULT_TIME;
-        this.lastDate = DEFAULT_DATE;
-        this.url = DEFAULT_URL;
+        this.title = "";
+        this.artist = "";
+        this.albumName = "";
+        this.lastDay = "";
+        this.lastTime = "";
+        this.lastDate = "";
+        this.url = "";
         this.lastLocation = new ArrayList<>();
-        this.lastLocation.add(DEFAULT_LOCATION);
-        this.lastLocation.add(DEFAULT_LOCATION);
-        this.track = DEFAULT_TRACK;
-        this.username = DEFAULT_USERNAME;
+        this.lastLocation.add(INVALID_LOCATION);
+        this.lastLocation.add(INVALID_LOCATION);
+        this.track = 0;
+        this.username = "";
 
     }
 

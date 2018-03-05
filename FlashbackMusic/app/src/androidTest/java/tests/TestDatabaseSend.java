@@ -26,8 +26,8 @@ public class TestDatabaseSend {
     @Test
     public void testSend()
     {
-        Song song = new Song("3005", "Childish Gambino", "Unknown", 0, "0/0",0);
-        song.setData(69.0, -80.0, "Monday", "10:50", "4/6/18");
+        Song song = new Song("Title", "Artist", "Album", 0, "0/0",0);
+        song.setData(74.0, -42.0, "Tuesday", "15:49", "10/4/15");
         DatabaseCommunicator dc = new DatabaseCommunicator();
         dc.send(song);
 
