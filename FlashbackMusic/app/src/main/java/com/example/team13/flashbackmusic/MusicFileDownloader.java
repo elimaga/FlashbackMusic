@@ -5,10 +5,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.os.Environment;
+import android.util.Log;
+import android.webkit.URLUtil;
 
 import com.example.team13.flashbackmusic.interfaces.MusicFileDownloaderObserver;
 import com.example.team13.flashbackmusic.interfaces.Subject;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
@@ -27,10 +34,18 @@ public class MusicFileDownloader {
     private BroadcastReceiver broadcastReceiver;
 
     public MusicFileDownloader(Context context) {
-        downloadManager = (DownloadManager) context.getSystemService(DOWNLOAD_SERVICE);
+        this.downloadManager = (DownloadManager) context.getSystemService(DOWNLOAD_SERVICE);
+        this.mContext = context;
     }
 
-    private long DownloadMusicFile (Uri uri) {
+    public long downloadMusicFile (URL url) {
+
+        Uri uri = null;
+        try{
+            uri = Uri.parse(url.toURI().toString());
+        }catch(URISyntaxException e){
+            e.printStackTrace();
+        }
 
         long downloadReference;
 
@@ -40,7 +55,11 @@ public class MusicFileDownloader {
         //Setting description of request
         request.setDescription("Downloading a music file");
 
-        request.setDestinationInExternalFilesDir(mContext, null,"newFile");
+
+        //String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath();
+        //Log.d("dir",dir);
+        //request.setDestinationInExternalPublicDir( dir, URLUtil.guessFileName(url.toString(),null,null));
+        request.setDestinationInExternalFilesDir(mContext, Environment.DIRECTORY_MUSIC, URLUtil.guessFileName(url.toString(),null,null));
 
         //Enqueue download and save into referenceId
         downloadReference = downloadManager.enqueue(request);
@@ -51,5 +70,8 @@ public class MusicFileDownloader {
     public void registerReceiver(BroadcastReceiver broadcastReceiver) {
         IntentFilter filter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
         mContext.registerReceiver(broadcastReceiver, filter);
+    }
+    public void unRegisterReceiver(BroadcastReceiver broadcastReceiver){
+        mContext.unregisterReceiver(broadcastReceiver);
     }
 }

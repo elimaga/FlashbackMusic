@@ -105,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                         else if (id == R.id.download){
                             //Bring up downloadActivity
+                            Intent intent = new Intent(MainActivity.this, DownloadActivity.class);
+                            startActivity(intent);
 
                         }
 //                        menuItem.setChecked(true);
