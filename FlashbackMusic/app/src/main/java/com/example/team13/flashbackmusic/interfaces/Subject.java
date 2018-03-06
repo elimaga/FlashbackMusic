@@ -1,5 +1,7 @@
 package com.example.team13.flashbackmusic.interfaces;
 
+import com.example.team13.flashbackmusic.Unzipper;
+
 /**
  * Created by Kazutaka on 2/28/18.
  */
@@ -7,6 +9,6 @@ package com.example.team13.flashbackmusic.interfaces;
 public interface Subject<T> {
     void registerObserver(T observer);
     void removeObserver(T observer);
-    void notifyObservers();
+    void notifyObservers(Unzipper.Result result);
 }
 

@@ -4,10 +4,14 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.MimeTypeFilter;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.Button;
@@ -15,14 +19,17 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.team13.flashbackmusic.interfaces.DownloadObserver;
+import com.example.team13.flashbackmusic.interfaces.UnzipperObserver;
 
+import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
-public class DownloadActivity extends AppCompatActivity {
+public class DownloadActivity extends AppCompatActivity implements UnzipperObserver, DownloadObserver {
 
     MusicFileDownloader musicFileDownloader;
-    long downloadReference;
     Unzipper unzipper;
     Button downloadButton;
 
@@ -34,18 +41,23 @@ public class DownloadActivity extends AppCompatActivity {
 
         musicFileDownloader = new MusicFileDownloader(DownloadActivity.this);
         unzipper = new Unzipper();
+        unzipper.registerObserver(this);
 
-        if(ContextCompat.checkSelfPermission(DownloadActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(DownloadActivity.this,Manifest.permission.READ_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED){
+        if (!hasStoragePermission()) {
 
             //permission not granted
-            ActivityCompat.requestPermissions ( this ,
-                    new  String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE }, 1 );
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
         }
+    }
+
+    public boolean hasStoragePermission() {
+        return ContextCompat.checkSelfPermission(DownloadActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(DownloadActivity.this,Manifest.permission.READ_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED;
     }
 
     public void close(View view) {
@@ -56,34 +68,66 @@ public class DownloadActivity extends AppCompatActivity {
         EditText editText = findViewById(R.id.editText);
         String urlString = editText.getText().toString();
 
+        if (hasStoragePermission()) {
+            if (URLUtil.isValidUrl(urlString)) {
 
-        if (URLUtil.isValidUrl(urlString)){
+                URL url;
+                try {
+                    url = new URL(urlString);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                    return;
+                }
 
-            URL url;
-            try{
-                url = new URL(urlString);
-            }catch(MalformedURLException e){
-                e.printStackTrace();
+                musicFileDownloader.registerReceiver(this);
+                musicFileDownloader.downloadMusicFile(url);
+
+                //disable the button
+                downloadButton.setEnabled(false);
+
+            } else {
+                Toast.makeText(DownloadActivity.this, "URL is not valid", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            musicFileDownloader.registerReceiver(unzipper);
-            musicFileDownloader.downloadMusicFile(url);
-
-            //disable the button
-            downloadButton.setEnabled(false);
-
+        } else {
+            Toast.makeText(DownloadActivity.this, "Permission Required", Toast.LENGTH_SHORT).show();
         }
-        else{
-            Toast.makeText(DownloadActivity.this,"URL is not valid", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
-        musicFileDownloader.unregisterReceiver(unzipper);
+        musicFileDownloader.unregisterReceiver(this);
     }
+
+    // DownloadObserver
+    @Override
+    public void onCompleteDownload(Context context, Intent intent) {
+        String mime = intent.getStringExtra("mime");
+        if (MimeTypeFilter.matches(mime, new String[]{"audio/mpeg","audio/mpeg3","audio/x-mpeg-3","video/mpeg","video/x-mpeg"})!= null){
+            downloadButton.setEnabled(true);
+        } else if (MimeTypeFilter.matches(mime,
+                new String[]{"application/x-compressed", "application/x-zip-compressed","application/zip","multipart/x-zip"})!= null) {
+            String zipName = intent.getStringExtra("filename");
+            String directoryPath = intent.getStringExtra("directoryPath");
+            unzipper.doInBackground(directoryPath, zipName);
+        } else {
+            Toast.makeText(context, "invalid file format", Toast.LENGTH_SHORT).show();
+            downloadButton.setEnabled(true);
+        }
+    }
+
+    // Unzipper Observer
+    @Override
+    public void onUnzipSuccess() {
+        // TODO: update library
+        return;
+    }
+
+    @Override
+    public void onUnzipFailure() {
+        downloadButton.setEnabled(true);
+        Log.d("unzip", "unzipping failed");
+    }
+
 }

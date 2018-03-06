@@ -32,18 +32,26 @@ import java.util.zip.ZipInputStream;
  * Created by Kazutaka on 3/3/18.
  */
 
-public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Subject<UnzipperObserver>, DownloadObserver {
+public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Subject<UnzipperObserver> {
 
     ArrayList<UnzipperObserver> observers;
 
-    private Boolean unpackZip(String path, String zipname)
+    public enum Result {
+        INVALID_FORMAT, SUCCESS, ERROR
+    }
+
+    public Unzipper() {
+        this.observers = new ArrayList<>();
+    }
+
+    private Boolean unpackZip(String directoryPath, String zipName)
     {
         InputStream is;
         ZipInputStream zis;
         try
         {
             String filename;
-            is = new FileInputStream(path + zipname);
+            is = new FileInputStream(directoryPath+zipName);
             zis = new ZipInputStream(new BufferedInputStream(is));
             ZipEntry ze;
             byte[] buffer = new byte[1024];
@@ -57,12 +65,13 @@ public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Sub
                 // Need to create directories if not exists, or
                 // it will generate an Exception...
                 if (ze.isDirectory()) {
-                    File fmd = new File(path + filename);
+                    File fmd = new File(directoryPath + "unzipped_" + filename);
                     fmd.mkdirs();
                     continue;
                 }
 
-                FileOutputStream fout = new FileOutputStream(path + filename);
+                FileOutputStream fout = new FileOutputStream(directoryPath + "unzipped_" +filename );
+
 
                 // cteni zipu a zapis
                 while ((count = zis.read(buffer)) != -1)
@@ -87,14 +96,14 @@ public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Sub
 
     // doInBackground(String path, String zipname)
     @Override
-    protected Boolean doInBackground(String... pathAndZipname) {
-        return unpackZip(pathAndZipname[0], pathAndZipname[1]);
+    protected Boolean doInBackground(String... path) {
+        return unpackZip(path[0], path[1]);
     }
 
     @Override
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
-        notifyObservers();
+        notifyObservers(Result.SUCCESS);
 
     }
 
@@ -110,25 +119,16 @@ public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Sub
     }
 
     @Override
-    public void notifyObservers() {
-        for (UnzipperObserver observer : observers) {
-            observer.onUnzip();
+    public void notifyObservers(Result result) {
+        if (result == Result.SUCCESS) {
+            for (UnzipperObserver observer : observers) {
+                observer.onUnzipSuccess();
+            }
+        } else if (result == Result.ERROR || result == Result.INVALID_FORMAT) {
+            for (UnzipperObserver observer : observers) {
+                observer.onUnzipFailure();
+            }
         }
     }
 
-    @Override
-    public void onCompleteDownload(Context context, Uri uri, String mime) {
-
-        if (MimeTypeFilter.matches(mime, new String[]{"audio/mpeg3","audio/x-mpeg-3","video/mpeg","video/x-mpeg"})!= null){
-            notifyObservers();
-        } else if (MimeTypeFilter.matches(mime,
-                new String[]{"application/x-compressed", "application/x-zip-compressed","application/zip","multipart/x-zip"})!= null) {
-            String path = uri.getPath();
-            String zipname = uri.getLastPathSegment();
-            unpackZip(path, zipname);
-        } else {
-            Toast.makeText(context, "invalid file format", Toast.LENGTH_SHORT).show();
-        }
-
-    }
 }

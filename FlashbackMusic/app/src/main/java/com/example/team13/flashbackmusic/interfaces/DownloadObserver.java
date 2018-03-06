@@ -1,6 +1,7 @@
 package com.example.team13.flashbackmusic.interfaces;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
 
@@ -9,5 +10,5 @@ import android.webkit.MimeTypeMap;
  */
 
 public interface DownloadObserver {
-    void onCompleteDownload(Context context, Uri uri, String mime);
+    void onCompleteDownload(Context context, Intent intent);
 }

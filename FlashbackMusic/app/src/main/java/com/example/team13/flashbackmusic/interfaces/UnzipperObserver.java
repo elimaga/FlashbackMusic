@@ -5,5 +5,6 @@ package com.example.team13.flashbackmusic.interfaces;
  */
 
 public interface UnzipperObserver {
-    void onUnzip();
+    void onUnzipSuccess();
+    void onUnzipFailure();
 }
