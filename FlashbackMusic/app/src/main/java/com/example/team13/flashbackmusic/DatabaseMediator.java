@@ -12,18 +12,23 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 /**
- * Created by andrewyu on 3/1/18.
+ * Created by Andrew Yu and Elijah Magallanes on 3/1/18.
  */
 
-public class DatabaseCommunicator {
+public class DatabaseMediator {
 
     final float KILOMETERS_IN_THOUSAND_FEET = 0.3048f;
-    String test;
+    ArrayList<String> queriedSongs;
 
-    public DatabaseCommunicator()
+    public DatabaseMediator()
     {
+        queriedSongs = new ArrayList<>();
     }
 
     /**
@@ -58,20 +63,23 @@ public class DatabaseCommunicator {
                 });
     }
 
-    public void retrieve(GeoLocation currentLocation) {
+    /**
+     * Method to retrieve all songs that are within 1000 feet of the user's location
+     * @param currentLocation - the user's current location
+     */
+    public void retrieveLocation(GeoLocation currentLocation) {
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         final DatabaseReference databaseReference = firebaseDatabase.getReference();
         GeoFire geoFire = new GeoFire(databaseReference);
 
-        GeoQuery geoQuery = geoFire.queryAtLocation(currentLocation, KILOMETERS_IN_THOUSAND_FEET );
+        GeoQuery geoQuery = geoFire.queryAtLocation(currentLocation, KILOMETERS_IN_THOUSAND_FEET);
 
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
-                System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
-                test = key.substring(0,key.indexOf("-"));
-                databaseReference.child(test).child("trackNumber").setValue(1);
+                System.out.println(String.format("Key %s is within 1000 feet at [%f,%f]", key, location.latitude, location.longitude));
+                // queriedSongs.add(key.substring(0,key.indexOf("-")));
             }
 
             @Override
@@ -91,9 +99,57 @@ public class DatabaseCommunicator {
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
-                System.err.println("There was an error with this query: " + error);
+                System.err.println("Error: " + error);
             }
         });
 
     }
+
+    /**
+     * Method to retrieve all songs that within a week of today
+     * @param curDate - the current date
+     */
+    public void retrieveDate(String curDate) {
+
+        int firstSlash = curDate.indexOf("/");
+        int secondSlash = curDate.lastIndexOf("/");
+        int curMonth = Integer.parseInt(curDate.substring(0, firstSlash));
+        int curDay = Integer.parseInt(curDate.substring(firstSlash + 1, secondSlash));
+        int curYear = Integer.parseInt(curDate.substring(secondSlash + 1, curDate.length()));
+
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        final DatabaseReference databaseReference = firebaseDatabase.getReference();
+
+        int minDay = curDay - 6;
+
+        String startDate = curMonth + "/" + minDay + "/" + curYear;
+        //String endDate = curMonth + "/" + curDay + "/" + curYear;
+
+        Query queryRef = databaseReference.orderByChild("lastDate").equalTo(startDate);
+
+        queryRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String data = dataSnapshot.getValue(String.class);
+                System.out.println(data);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        //TODO: loop through rest of dates
+
+    }
+
+    /**
+     * Getter for the list of queried songs
+     * @return the list of queried songs
+     */
+    public ArrayList<String> getQueriedSongs() {
+        return this.queriedSongs;
+    }
+
 }

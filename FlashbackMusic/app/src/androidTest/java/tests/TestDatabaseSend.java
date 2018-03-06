@@ -2,7 +2,7 @@ package tests;
 
 import android.support.test.rule.ActivityTestRule;
 
-import com.example.team13.flashbackmusic.DatabaseCommunicator;
+import com.example.team13.flashbackmusic.DatabaseMediator;
 import com.example.team13.flashbackmusic.MainActivity;
 import com.example.team13.flashbackmusic.Song;
 
@@ -28,8 +28,8 @@ public class TestDatabaseSend {
     {
         Song song = new Song("Killer Queen", "Queen", "Killer Queen (album)", 0, "0/0",0);
         song.setData(60.0, 100.0, "Monday", "11:15", "3/1/18");
-        DatabaseCommunicator dc = new DatabaseCommunicator();
-        dc.send(song);
+        DatabaseMediator databaseMediator = new DatabaseMediator();
+        databaseMediator.send(song);
 
         assert true;
     }
