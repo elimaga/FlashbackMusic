@@ -8,9 +8,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by Andrew Yu and Elijah Magallanes on 3/1/18.
  */
@@ -22,8 +19,8 @@ public class DatabaseCommunicator {
     }
 
     /**
-     *
-     * @param song
+     * Sends Song/Location data to Google Firebase database
+     * @param song - Song object containing the data we want to send
      */
     public void send(Song song)
     {
@@ -47,15 +44,6 @@ public class DatabaseCommunicator {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = firebaseDatabase.getReference();
         GeoFire geoFire = new GeoFire(databaseReference);
-
-        /*
-        Map<String, Object> entryMap = new HashMap<>();
-        entryMap.put(databaseKey, databaseEntry);
-
-        databaseReference.updateChildren(entryMap);
-        */
-
-        Log.d("SEND METHOD", "BEFORE WRITE");
 
         databaseReference.child(databaseKey).setValue(databaseEntry, new DatabaseReference.CompletionListener() {
             public void onComplete(DatabaseError error, DatabaseReference ref) {
