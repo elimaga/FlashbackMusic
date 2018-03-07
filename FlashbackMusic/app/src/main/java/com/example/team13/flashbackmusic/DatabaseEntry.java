@@ -1,8 +1,5 @@
 package com.example.team13.flashbackmusic;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Andrew Yu and Elijah Magallanes on 3/1/18.
  */
@@ -12,13 +9,12 @@ public class DatabaseEntry {
     private static final double INVALID_LOCATION = 200.0;
 
     private String title, artist, albumName, lastDay, lastTime, lastDate, url;
-    private List<Double> lastLocation;
+    private double lastLatitude, lastLongitude;
     private int track;
     private String username;
 
     public DatabaseEntry()
     {
-
         this.title = "";
         this.artist = "";
         this.albumName = "";
@@ -26,12 +22,11 @@ public class DatabaseEntry {
         this.lastTime = "";
         this.lastDate = "";
         this.url = "";
-        this.lastLocation = new ArrayList<>();
-        this.lastLocation.add(INVALID_LOCATION);
-        this.lastLocation.add(INVALID_LOCATION);
+        //this.lastLocation = new ArrayList<>();
+        this.lastLatitude = INVALID_LOCATION;
+        this.lastLongitude = INVALID_LOCATION;
         this.track = 0;
         this.username = "";
-
     }
 
 
@@ -44,9 +39,9 @@ public class DatabaseEntry {
         this.lastTime = song.getLastTime();
         this.lastDate = song.getLastDate();
         this.url = url;
-        this.lastLocation = new ArrayList<>();
-        this.lastLocation.add(song.getLastLatitude());
-        this.lastLocation.add(song.getLastLongitude());
+        //this.lastLocation = new ArrayList<>();
+        this.lastLatitude = song.getLastLatitude();
+        this.lastLongitude = song.getLastLongitude();
         this.track = song.getTrack();
         this.username = username;
     }
@@ -59,7 +54,8 @@ public class DatabaseEntry {
     public String getLastTime() { return lastTime; }
     public String getLastDate() { return lastDate; }
     public String getURL() { return url; }
-    public List<Double> getLastLocation() { return lastLocation; }
+    public double getLastLatitude() { return lastLatitude; }
+    public double getLastLongitude() { return lastLongitude; }
     public int getTrackNumber() { return track; }
     public String getUsername() { return username; }
 
@@ -71,7 +67,8 @@ public class DatabaseEntry {
     public void setLastTime(String newLastTime) { this.lastTime = newLastTime; }
     public void setLastDate(String newLastDate) { this.lastDate = newLastDate; }
     public void setURL(String newURL) { this.url = newURL; }
-    public void setLastLocation(List<Double> newLocation) { this.lastLocation = newLocation; }
+    public void setLastLatitude(double newLatitude) { this.lastLatitude = newLatitude; }
+    public void setLastLongitude(double newLongitude) { this.lastLongitude = newLongitude; }
     public void setTrackNumber(int newTrack) { this.track = newTrack; }
     public void setUsername(String newUsername) { this.username = newUsername; }
 }
