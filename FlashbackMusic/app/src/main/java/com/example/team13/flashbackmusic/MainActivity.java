@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Song> songs;
     private ArrayList<Album> albums;
+    private MusicLibrary musicLibrary;
 
     LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
@@ -59,10 +60,14 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
+        // TODO:
+        musicLibrary = MusicLibrary.getInstance();
+        songs = musicLibrary.getSongs();
+        albums = musicLibrary.getAlbums();
+
+
         // Load the songs and albums into the ArrayLists
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-        final int[] resourceIds = this.listRaw();
-        loadLibrary(mediaMetadataRetriever, resourceIds);
 
         //Tab layout
         TabLayout tabLayout = findViewById(R.id.tab_layout);
@@ -185,86 +190,6 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<Song> getSongs() {return songs;}
 
     public ArrayList<Album> getAlbums() {return albums;}
-
-
-    /**
-     * loadLibrary() reads the mp3 files in the raw folder and returns a
-     * fully constructed list of Songs and Albums
-     * @param mmr - MediaMetadataRetriever that will retrieve various metadata from an mp3 file
-     * @param resourceIds - the ids for the mp3 files in the raw folder
-     */
-    public void loadLibrary(MediaMetadataRetriever mmr, int[] resourceIds)
-    {
-        // initialize songs and albums lists
-        songs = new ArrayList<>();
-        albums = new ArrayList<>();
-
-        // loop through each mp3 file
-        for (int i = 0; i < resourceIds.length; i++)
-        {
-            // get the metadata from the files
-            AssetFileDescriptor afd = this.getResources().openRawResourceFd(resourceIds[i]);
-            mmr.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-            String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST);
-            String albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-            String trackNumber = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER);
-
-            Song song = new Song(title, artist, albumName, resourceIds[i], trackNumber, i);
-            retrieveInfo(song);
-            songs.add(song);
-
-
-            if(albums.isEmpty()) {
-                Album album = new Album(albumName, artist, trackNumber);
-                album.addSong(song);
-                albums.add(album);
-            }
-            else {
-
-                boolean needNewAlbum = true;
-
-
-                for (Album album : albums) {
-                    if(album.getAlbumName().equals(albumName)) {
-                        album.addSong(song);
-                        needNewAlbum = false;
-                        break;
-                    }
-                }
-
-                if(needNewAlbum) {
-                    Album album = new Album(albumName, artist, trackNumber);
-                    album.addSong(song);
-                    albums.add(album);
-                }
-            }
-        }
-    }
-
-    /**
-     * Helper method to get the resource ids for all the raw files.
-     * @return int[] - the array holding all the resource ids for the mp3 files in raw folder
-     */
-    private int[] listRaw()
-    {
-        Field[] fields = R.raw.class.getFields();
-        int[] resourceIds = new int[fields.length];
-        for (int i = 0; i < fields.length; i++)
-        {
-            try
-            {
-                resourceIds[i] = fields[i].getInt(fields[i]);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-        return resourceIds;
-    }
-
 
 
     /**

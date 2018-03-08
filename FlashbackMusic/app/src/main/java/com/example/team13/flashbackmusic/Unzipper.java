@@ -35,9 +35,34 @@ import java.util.zip.ZipInputStream;
 public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Subject<UnzipperObserver> {
 
     ArrayList<UnzipperObserver> observers;
+    ArrayList<String> paths;
 
     public enum Result {
-        INVALID_FORMAT, SUCCESS, ERROR
+        INVALID_FORMAT, SUCCESS, ERROR;
+
+        public static Result fromInteger(int x) {
+            switch(x) {
+                case 0:
+                    return INVALID_FORMAT;
+                case 1:
+                    return SUCCESS;
+                case 2:
+                    return ERROR;
+            }
+            return null;
+        }
+
+        public Integer toInt() {
+            switch(this) {
+                case INVALID_FORMAT:
+                    return 0;
+                case SUCCESS:
+                    return 1;
+                case ERROR:
+                    return 2;
+            }
+            return null;
+        }
     }
 
     public Unzipper() {
@@ -48,6 +73,7 @@ public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Sub
     {
         InputStream is;
         ZipInputStream zis;
+        paths = new ArrayList<>();
         try
         {
             String filename;
@@ -59,27 +85,26 @@ public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Sub
 
             while ((ze = zis.getNextEntry()) != null)
             {
-                // zapis do souboru
                 filename = ze.getName();
 
                 // Need to create directories if not exists, or
                 // it will generate an Exception...
                 if (ze.isDirectory()) {
-                    File fmd = new File(directoryPath + "unzipped_" + filename);
+                    File fmd = new File(directoryPath + filename);
                     fmd.mkdirs();
                     continue;
+                } else {
+                    paths.add(directoryPath+filename);
                 }
+                if (!(new File(directoryPath+filename).exists())) {
+                    FileOutputStream fout = new FileOutputStream(directoryPath + filename);
 
-                FileOutputStream fout = new FileOutputStream(directoryPath + "unzipped_" +filename );
+                    while ((count = zis.read(buffer)) != -1) {
+                        fout.write(buffer, 0, count);
+                    }
 
-
-                // cteni zipu a zapis
-                while ((count = zis.read(buffer)) != -1)
-                {
-                    fout.write(buffer, 0, count);
+                    fout.close();
                 }
-
-                fout.close();
                 zis.closeEntry();
             }
 
@@ -97,14 +122,23 @@ public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Sub
     // doInBackground(String path, String zipname)
     @Override
     protected Boolean doInBackground(String... path) {
-        return unpackZip(path[0], path[1]);
+        String directoryPath = path[0];
+        String zipName = path[1];
+        boolean isSuccessful = unpackZip(directoryPath, zipName);
+        if (isSuccessful) {
+            File zipFile = new File(directoryPath+zipName);
+            zipFile.delete();
+        }
+        return isSuccessful;
     }
 
     @Override
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
-        notifyObservers(Result.SUCCESS);
-
+        Intent intent = new Intent();
+        intent.putExtra("result", Result.SUCCESS.toInt());
+        intent.putExtra("paths", paths);
+        notifyObservers(intent);
     }
 
     @Override
@@ -119,10 +153,11 @@ public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Sub
     }
 
     @Override
-    public void notifyObservers(Result result) {
+    public void notifyObservers(Intent intent) {
+        Result result = Result.fromInteger(intent.getIntExtra("result", Result.ERROR.toInt()));
         if (result == Result.SUCCESS) {
             for (UnzipperObserver observer : observers) {
-                observer.onUnzipSuccess();
+                observer.onUnzipSuccess(intent.getStringArrayListExtra("paths"));
             }
         } else if (result == Result.ERROR || result == Result.INVALID_FORMAT) {
             for (UnzipperObserver observer : observers) {

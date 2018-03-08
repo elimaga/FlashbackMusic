@@ -2,6 +2,7 @@ package com.example.team13.flashbackmusic;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -10,15 +11,18 @@ import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.MimeTypeFilter;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.team13.flashbackmusic.interfaces.DownloadObserver;
+import com.example.team13.flashbackmusic.interfaces.MusicLibraryObserver;
 import com.example.team13.flashbackmusic.interfaces.UnzipperObserver;
 
 import java.io.File;
@@ -26,22 +30,49 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 
-public class DownloadActivity extends AppCompatActivity implements UnzipperObserver, DownloadObserver {
+public class DownloadActivity extends AppCompatActivity implements UnzipperObserver, DownloadObserver, MusicLibraryObserver {
 
     MusicFileDownloader musicFileDownloader;
     Unzipper unzipper;
     Button downloadButton;
+    TextView textView;
+    private boolean isAidle;
+    AlertDialog.Builder builder;
+    MusicLibrary musicLibrary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
         downloadButton = findViewById(R.id.downloadButton);
-
+        textView = findViewById(R.id.textView);
         musicFileDownloader = new MusicFileDownloader(DownloadActivity.this);
         unzipper = new Unzipper();
         unzipper.registerObserver(this);
+        isAidle = true;
+        musicLibrary = MusicLibrary.getInstance();
+        musicLibrary.registerObserver(this);
+
+
+        builder = new AlertDialog.Builder(DownloadActivity.this, android.R.style.Theme_Material_Dialog_Alert);
+        builder.setTitle("Exit download")
+                .setMessage("Songs have not been added to library. Do you want to exit?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // exit
+                        DownloadActivity.super.onBackPressed();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert);
+
+
 
         if (!hasStoragePermission()) {
 
@@ -58,10 +89,6 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
                 == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(DownloadActivity.this,Manifest.permission.READ_EXTERNAL_STORAGE)
                         == PackageManager.PERMISSION_GRANTED;
-    }
-
-    public void close(View view) {
-        finish();
     }
 
     public void downloadPressed(View view) {
@@ -84,7 +111,8 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
 
                 //disable the button
                 downloadButton.setEnabled(false);
-
+                textView.setText("Downloading...");
+                isAidle = false;
             } else {
                 Toast.makeText(DownloadActivity.this, "URL is not valid", Toast.LENGTH_SHORT).show();
                 return;
@@ -92,6 +120,19 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
         } else {
             Toast.makeText(DownloadActivity.this, "Permission Required", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isAidle) {
+            super.onBackPressed();
+        } else {
+            builder.show();
+        }
+    }
+
+    public void close(View view) {
+        onBackPressed();
     }
 
     @Override
@@ -110,18 +151,22 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
                 new String[]{"application/x-compressed", "application/x-zip-compressed","application/zip","multipart/x-zip"})!= null) {
             String zipName = intent.getStringExtra("filename");
             String directoryPath = intent.getStringExtra("directoryPath");
-            unzipper.doInBackground(directoryPath, zipName);
+            textView.setText("Unzipping...");
+            unzipper.execute(directoryPath, zipName);
+
         } else {
             Toast.makeText(context, "invalid file format", Toast.LENGTH_SHORT).show();
             downloadButton.setEnabled(true);
+            textView.setText("");
         }
     }
 
     // Unzipper Observer
     @Override
-    public void onUnzipSuccess() {
-        // TODO: update library
-        return;
+    public void onUnzipSuccess(ArrayList<String> paths) {
+        textView.setText("Loading files into library...");
+        // calling addSongsIntoLibraryFromPath internally
+        musicLibrary.execute((String[])paths.toArray());
     }
 
     @Override
@@ -130,4 +175,9 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
         Log.d("unzip", "unzipping failed");
     }
 
+    @Override
+    public void onCompleteUpdate() {
+        textView.setText("Library got updated!");
+        downloadButton.setEnabled(true);
+    }
 }

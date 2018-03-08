@@ -1,5 +1,7 @@
 package com.example.team13.flashbackmusic.interfaces;
 
+import android.content.Intent;
+
 import com.example.team13.flashbackmusic.Unzipper;
 
 /**
@@ -9,6 +11,6 @@ import com.example.team13.flashbackmusic.Unzipper;
 public interface Subject<T> {
     void registerObserver(T observer);
     void removeObserver(T observer);
-    void notifyObservers(Unzipper.Result result);
+    void notifyObservers(Intent intent);
 }
 
