@@ -220,6 +220,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
     /**
      * Method to retrieve the prior info of the song from the SharedPreferences and then set the
      * data in the Song object.

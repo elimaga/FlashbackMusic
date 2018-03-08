@@ -10,6 +10,7 @@ import com.example.team13.flashbackmusic.interfaces.Subject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Kazutaka on 3/6/18.
@@ -39,8 +40,11 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
     }
 
     @Override
-    protected Boolean doInBackground(String... paths) {
-        addSongsIntoLibraryFromPath(new ArrayList<>(Arrays.asList(paths)));
+    protected Boolean doInBackground(String ... args) {
+        List<String> argList = Arrays.asList(args);
+        ArrayList<String> paths = new ArrayList<>(argList.subList(0,argList.size()-2));
+        String url = argList.get(argList.size() - 1);
+        addSongsIntoLibraryFromPath(paths, url);
         return true;
     }
 
@@ -61,7 +65,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
 
     ArrayList<Album> getAlbums() { return albums; }
 
-    void addSongsIntoLibraryFromPath(ArrayList<String> paths) {
+    void addSongsIntoLibraryFromPath(ArrayList<String> paths, String url) {
         for (String path : paths) {
             HashMap<String, String> songMetadata = retrieveSongMetadata(path);
             if (!(songMetadataSet.contains(songMetadata))) {
@@ -79,9 +83,11 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
                 }
                 Song song = new Song(songMetadata.get("title"),
                         songMetadata.get("artist"),
-                        album,
                         songMetadata.get("track"),
-                        songs.size());
+                        url,
+                        songs.size(),
+                        album);
+                song.setPath(path);
                 songs.add(song);
                 album.addSong(song);
                 songMetadataSet.add(songMetadata);
@@ -109,7 +115,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         mmr.setDataSource(path);
         map.put("title", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
-        map.put("artist", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+        map.put("artist", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST));
         map.put("albumName", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
         map.put("track", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER));
         return map;

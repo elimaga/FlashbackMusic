@@ -26,6 +26,7 @@ import com.example.team13.flashbackmusic.interfaces.MusicLibraryObserver;
 import com.example.team13.flashbackmusic.interfaces.UnzipperObserver;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,9 +39,11 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
     Unzipper unzipper;
     Button downloadButton;
     TextView textView;
+    EditText urlEditText;
     private boolean isAidle;
     AlertDialog.Builder builder;
     MusicLibrary musicLibrary;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,7 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
         setContentView(R.layout.activity_download);
         downloadButton = findViewById(R.id.downloadButton);
         textView = findViewById(R.id.textView);
+        urlEditText = findViewById(R.id.editText);
         musicFileDownloader = new MusicFileDownloader(DownloadActivity.this);
         unzipper = new Unzipper();
         unzipper.registerObserver(this);
@@ -92,8 +96,7 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
     }
 
     public void downloadPressed(View view) {
-        EditText editText = findViewById(R.id.editText);
-        String urlString = editText.getText().toString();
+        String urlString = urlEditText.getText().toString();
 
         if (hasStoragePermission()) {
             if (URLUtil.isValidUrl(urlString)) {
@@ -145,19 +148,25 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
     @Override
     public void onCompleteDownload(Context context, Intent intent) {
         String mime = intent.getStringExtra("mime");
+        String filename = intent.getStringExtra("filename");
+        String directoryPath = intent.getStringExtra("directoryPath");
         if (MimeTypeFilter.matches(mime, new String[]{"audio/mpeg","audio/mpeg3","audio/x-mpeg-3","video/mpeg","video/x-mpeg"})!= null){
-            downloadButton.setEnabled(true);
+            ArrayList<String> argArrayList = new ArrayList<>();
+            argArrayList.add(directoryPath+filename);
+            String url = urlEditText.getText().toString();
+            argArrayList.add(url);
+            musicLibrary.execute(argArrayList.toArray(new String[0]));
+            reset();
         } else if (MimeTypeFilter.matches(mime,
                 new String[]{"application/x-compressed", "application/x-zip-compressed","application/zip","multipart/x-zip"})!= null) {
-            String zipName = intent.getStringExtra("filename");
-            String directoryPath = intent.getStringExtra("directoryPath");
+
             textView.setText("Unzipping...");
-            unzipper.execute(directoryPath, zipName);
+            unzipper.execute(directoryPath, filename);
 
         } else {
             Toast.makeText(context, "invalid file format", Toast.LENGTH_SHORT).show();
             downloadButton.setEnabled(true);
-            textView.setText("");
+            reset();
         }
     }
 
@@ -166,18 +175,27 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
     public void onUnzipSuccess(ArrayList<String> paths) {
         textView.setText("Loading files into library...");
         // calling addSongsIntoLibraryFromPath internally
-        musicLibrary.execute((String[])paths.toArray(new String[0]));
+        ArrayList<String> argArrayList = paths;
+        String url = urlEditText.getText().toString();
+        argArrayList.add(url);
+        musicLibrary.execute(argArrayList.toArray(new String[0]));
     }
 
     @Override
     public void onUnzipFailure() {
         downloadButton.setEnabled(true);
         Log.d("unzip", "unzipping failed");
+        reset();
     }
 
     @Override
     public void onCompleteUpdate() {
         textView.setText("Library got updated!");
+        reset();
+    }
+
+    void reset() {
+        isAidle = true;
         downloadButton.setEnabled(true);
     }
 }
