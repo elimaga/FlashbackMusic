@@ -166,7 +166,7 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
     public void onUnzipSuccess(ArrayList<String> paths) {
         textView.setText("Loading files into library...");
         // calling addSongsIntoLibraryFromPath internally
-        musicLibrary.execute((String[])paths.toArray());
+        musicLibrary.execute((String[])paths.toArray(new String[0]));
     }
 
     @Override
