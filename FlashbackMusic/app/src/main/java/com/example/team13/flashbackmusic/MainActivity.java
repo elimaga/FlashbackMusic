@@ -26,6 +26,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.firebase.geofire.GeoLocation;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -122,6 +124,19 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions ( this ,
                     new  String[]{Manifest.permission.ACCESS_FINE_LOCATION },  REQUEST_LOCATION );
         }
+
+        /*
+        //TESTING DATABASE SEND AND RETRIEVE
+        Song song = new Song("Killer Queen", "Queen", "Hereafter", 0, "0/0",0);
+        song.setData(49.0, 25.0, "Monday", "11:15", "3/1/18");
+
+        DatabaseMediator databaseMediator = new DatabaseMediator();
+        databaseMediator.send(song);
+        databaseMediator.retrieveLocation(49.0, 25.0);
+        */
+
+        DatabaseMediator databaseMediator = new DatabaseMediator();
+        databaseMediator.retrieveDate("3/6/18");
     }
 
     public Song getSong(int index)

@@ -18,19 +18,20 @@ public class TestDatabaseSend {
 
     @Rule
     public ActivityTestRule<MainActivity> mainActivity = new ActivityTestRule<MainActivity>(MainActivity.class);
+    DatabaseMediator databaseMediator;
+    Song song;
 
     @Before
     public void setUp() {
+        song = new Song("Killer Queen", "Queen", "Hereafter", 0, "0/0",0);
+        song.setData(49.0, 25.0, "Monday", "11:15", "3/1/18");
+        databaseMediator = new DatabaseMediator();
     }
 
     @Test
     public void testSend()
     {
-        Song song = new Song("Killer Queen", "Queen", "Killer Queen (album)", 0, "0/0",0);
-        song.setData(60.0, 100.0, "Monday", "11:15", "3/1/18");
-        DatabaseMediator databaseMediator = new DatabaseMediator();
         databaseMediator.send(song);
-
         assert true;
     }
 }

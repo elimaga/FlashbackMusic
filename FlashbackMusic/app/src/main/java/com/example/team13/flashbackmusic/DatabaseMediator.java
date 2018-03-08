@@ -8,6 +8,7 @@ import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryDataEventListener;
 import com.firebase.geofire.GeoQueryEventListener;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -16,6 +17,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by Andrew Yu and Elijah Magallanes on 3/1/18.
@@ -23,7 +26,8 @@ import java.util.ArrayList;
 
 public class DatabaseMediator {
 
-    final float KILOMETERS_IN_THOUSAND_FEET = 0.3048f;
+    final double KILOMETERS_IN_THOUSAND_FEET = 0.3048;
+    final int DAYS_IN_WEEK = 7;
     ArrayList<String> queriedSongs;
 
     public DatabaseMediator()
@@ -32,32 +36,51 @@ public class DatabaseMediator {
     }
 
     /**
-     *
-     * @param song
+     * Sends Song/Location data to Google Firebase database
+     * @param song - Song object containing the data we want to send
      */
-    public void send(Song song) {
+    public void send(Song song)
+    {
         String username = "usr1";
         String url = "";
-        String databaseKey = username + "-" + song.getTitle() + "-" + song.getArtist();
+        String databaseKey = username + "_" + song.getTitle() + "_" + song.getArtist();
 
+        DatabaseEntry databaseEntry = new DatabaseEntry();
+        databaseEntry.setTitle(song.getTitle());
+        databaseEntry.setArtist(song.getArtist());
+        databaseEntry.setAlbumName(song.getAlbumName());
+        databaseEntry.setLastDay(song.getLastDay());
+        databaseEntry.setLastTime(song.getLastTime());
+        databaseEntry.setLastDate(song.getLastDate());
+        databaseEntry.setURL(url);
+
+        List<Double> locList = new ArrayList<Double>();
+        locList.add(song.getLastLatitude());
+        locList.add(song.getLastLongitude());
+
+        databaseEntry.setLastLocation(locList);
+        databaseEntry.setTrackNumber(song.getTrack());
+        databaseEntry.setUsername(username);
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = firebaseDatabase.getReference();
-        GeoFire geoFire = new GeoFire(databaseReference);
+        DatabaseReference songReference = firebaseDatabase.getReference("Songs");
+        DatabaseReference locationReference = firebaseDatabase.getReference("Locations");
+        GeoFire geoFire = new GeoFire(locationReference);
 
-        DatabaseEntry databaseEntry = new DatabaseEntry(song, url, username);
+        songReference.child(databaseKey).setValue(databaseEntry, new DatabaseReference.CompletionListener() {
+            public void onComplete(DatabaseError error, DatabaseReference ref) {
+                Log.d("Send GeoLocation","Value was set. Error = "+error);
+            }
+        });
 
-        databaseReference.child(databaseKey).setValue(databaseEntry);
-        //geoFire.setLocation(databaseKey, new GeoLocation(song.getLastLatitude(), song.getLastLongitude()));
-
-        geoFire.setLocation("location", new GeoLocation(song.getLastLatitude(), song.getLastLongitude()),
+        geoFire.setLocation(databaseKey + "-location", new GeoLocation(song.getLastLatitude(), song.getLastLongitude()),
                 new GeoFire.CompletionListener() {
                     @Override
                     public void onComplete(String key, DatabaseError error) {
                         if (error != null) {
-                            System.out.println("There was an error saving the location to GeoFire: " + error);
+                            Log.d("Send GeoLocation", "There was an error saving the location to GeoFire: " + error);
                         } else {
-                            System.out.println("Location saved on server successfully!");
+                            Log.d("Send GeoLocation","Location saved on server successfully!");
                         }
                     }
                 });
@@ -65,44 +88,45 @@ public class DatabaseMediator {
 
     /**
      * Method to retrieve all songs that are within 1000 feet of the user's location
-     * @param currentLocation - the user's current location
+     * @param latitude - the user's current latitude
+     * @param longitude - the user's current latitude
      */
-    public void retrieveLocation(GeoLocation currentLocation) {
+    public void retrieveLocation(double latitude, double longitude) {
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        final DatabaseReference databaseReference = firebaseDatabase.getReference();
-        GeoFire geoFire = new GeoFire(databaseReference);
+        final DatabaseReference locationReference = firebaseDatabase.getReference("Locations");
+        GeoFire geoFire = new GeoFire(locationReference);
 
-        GeoQuery geoQuery = geoFire.queryAtLocation(currentLocation, KILOMETERS_IN_THOUSAND_FEET);
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), KILOMETERS_IN_THOUSAND_FEET);
 
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
-                System.out.println(String.format("Key %s is within 1000 feet at [%f,%f]", key, location.latitude, location.longitude));
-                // queriedSongs.add(key.substring(0,key.indexOf("-")));
+                Log.d("Retrive GeoLocation", String.format("Key %s is within 1000 feet at [%f,%f]", key, location.latitude, location.longitude));
+                queriedSongs.add(key);
             }
 
             @Override
             public void onKeyExited(String key) {
-                System.out.println(String.format("Key %s is no longer in the search area", key));
+                Log.d("Retrive GeoLocation", String.format("Key %s is no longer in the search area", key));
             }
 
             @Override
             public void onKeyMoved(String key, GeoLocation location) {
-                System.out.println(String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
+                Log.d("Retrive GeoLocation", String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
             }
 
             @Override
             public void onGeoQueryReady() {
-                System.out.println("All initial data has been loaded and events have been fired!");
+                Log.d("Retrive GeoLocation", "All initial data has been loaded and events have been fired!");
             }
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
-                System.err.println("Error: " + error);
+                Log.d("Retrive GeoLocation", "Error: " + error);
             }
         });
-
     }
 
     /**
@@ -118,30 +142,50 @@ public class DatabaseMediator {
         int curYear = Integer.parseInt(curDate.substring(secondSlash + 1, curDate.length()));
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        final DatabaseReference databaseReference = firebaseDatabase.getReference();
+        final DatabaseReference songReference = firebaseDatabase.getReference("Songs");
 
-        int minDay = curDay - 6;
+        for (int i = 0; i < DAYS_IN_WEEK; i++) {
 
-        String startDate = curMonth + "/" + minDay + "/" + curYear;
-        //String endDate = curMonth + "/" + curDay + "/" + curYear;
+            String queryDate = curMonth + "/" + curDay + "/" + curYear;
+            System.out.println(queryDate);
 
-        Query queryRef = databaseReference.orderByChild("lastDate").equalTo(startDate);
 
-        queryRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String data = dataSnapshot.getValue(String.class);
-                System.out.println(data);
-            }
+            Query queryRef = songReference.orderByChild("lastDate").equalTo(queryDate);
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+            queryRef.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    System.out.println(dataSnapshot.getValue(DatabaseEntry.class).getTitle());
+                }
 
-            }
-        });
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                }
 
-        //TODO: loop through rest of dates
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                }
 
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+
+            Calendar cal = Calendar.getInstance();
+            cal.set(curYear, curMonth, curDay);
+            cal.add(Calendar.DAY_OF_MONTH, -1);
+            curDay = cal.get(Calendar.DATE);
+            curMonth = cal.get(Calendar.MONTH) + 1;
+            curYear = cal.get(Calendar.YEAR);
+
+            System.out.println(queryDate);
+
+
+        }
     }
 
     /**
