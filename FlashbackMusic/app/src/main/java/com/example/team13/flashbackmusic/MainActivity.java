@@ -188,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
 
             // Add mediators to each song to listen for changes in the songs
             DatabaseMediator mediator = new DatabaseMediator(song);
-            song.registerObserver(mediator);
             mediators.add(mediator);
 
 

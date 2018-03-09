@@ -28,12 +28,13 @@ public class DatabaseMediator implements SongObserver{
 
     final double KILOMETERS_IN_THOUSAND_FEET = 0.3048;
     final int DAYS_IN_WEEK = 7;
-    ArrayList<String> queriedSongs;
     Song song;
+    ArrayList<String> queriedSongs;
 
     public DatabaseMediator(Song song)
     {
         this.song = song;
+        song.registerObserver(this);
         queriedSongs = new ArrayList<>();
     }
 
