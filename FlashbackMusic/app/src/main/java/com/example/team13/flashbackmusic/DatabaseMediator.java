@@ -79,7 +79,7 @@ public class DatabaseMediator implements SongObserver{
 
         songReference.child(databaseKey).setValue(databaseEntry, new DatabaseReference.CompletionListener() {
             public void onComplete(DatabaseError error, DatabaseReference ref) {
-                Log.d("Send GeoLocation","Value was set. Error = "+error);
+                Log.d("Send Song Data","Values were set for song: " + song.getTitle());
             }
         });
 
@@ -113,7 +113,7 @@ public class DatabaseMediator implements SongObserver{
 
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
-                Log.d("Retrieve GeoLocation", String.format("Key %s is within 1000 feet at [%f,%f]", key, location.latitude, location.longitude));
+                Log.d("Retrieve Songs by Location", String.format("Key %s is within 1000 feet at [%f,%f]", key, location.latitude, location.longitude));
 
                 // Add the songKey to the ArrayList of queried songs
                 String songKey = key.substring(0, key.indexOf("-"));
@@ -122,22 +122,22 @@ public class DatabaseMediator implements SongObserver{
 
             @Override
             public void onKeyExited(String key) {
-                Log.d("Retrive GeoLocation", String.format("Key %s is no longer in the search area", key));
+                Log.d("Retrieve Songs by Location", String.format("Key %s is no longer in the search area", key));
             }
 
             @Override
             public void onKeyMoved(String key, GeoLocation location) {
-                Log.d("Retrive GeoLocation", String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
+                Log.d("Retrieve Songs by Location", String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
             }
 
             @Override
             public void onGeoQueryReady() {
-                Log.d("Retrive GeoLocation", "All initial data has been loaded and events have been fired!");
+                Log.d("Retrieve Songs by Location", "All initial data has been loaded and events have been fired!");
             }
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
-                Log.d("Retrive GeoLocation", "Error: " + error);
+                Log.d("Retrieve Songs by Location", "Error: " + error);
             }
         });
 
@@ -168,14 +168,12 @@ public class DatabaseMediator implements SongObserver{
             queryRef.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
                     // Add the song key to the Arraylist of queried songs
                     DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
                     String songKey = data.getUsername() + "_" + data.getTitle() +"_" + data.getArtist();
                     queriedSongs.add(songKey);
 
-                    System.out.println(songKey);
-
+                    Log.d("Retrieve Songs By Date", "Retrieved song titled " + data.getTitle());
                 }
 
                 @Override
@@ -223,14 +221,12 @@ public class DatabaseMediator implements SongObserver{
             queryRef.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
                     // Add the song key to the Arraylist of queried songs
                     DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
                     String songKey = data.getUsername() + "_" + data.getTitle() + "_" + data.getArtist();
                     queriedSongs.add(songKey);
 
-                    System.out.println(songKey);
-
+                    Log.d("Retrieve Songs By Friends", "Retrieved song titled " + data.getTitle());
                 }
 
                 @Override
