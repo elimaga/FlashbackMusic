@@ -1,62 +1,34 @@
 package com.example.team13.flashbackmusic;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Created by andrewyu on 3/1/18.
+ * Created by Andrew Yu and Elijah Magallanes on 3/1/18.
  */
 
 public class DatabaseEntry {
-    private static final String DEFAULT_TITLE = "";
-    private static final String DEFAULT_ARTIST = "";
-    private static final String DEFAULT_ALBUM = "";
-    private static final String DEFAULT_DAY = "Monday";
-    private static final String DEFAULT_TIME = "12:00";
-    private static final String DEFAULT_DATE = "1/1/1970";
-    private static final String DEFAULT_URL = "https://www.google.com/";
-    private static final int DEFAULT_TRACK = 0;
-    private static final String DEFAULT_USERNAME = "usr1";
-    private static final double DEFAULT_LOCATION = 200.0;
+
+    private static final double INVALID_LOCATION = 200.0;
 
     private String title, artist, albumName, lastDay, lastTime, lastDate, url;
-    private List<Double> lastLocation;
+    private double lastLatitude, lastLongitude;
     private int track;
     private String username;
 
     public DatabaseEntry()
     {
-        this.title = DEFAULT_TITLE;
-        this.artist = DEFAULT_ARTIST;
-        this.albumName = DEFAULT_ALBUM;
-        this.lastDay = DEFAULT_DAY;
-        this.lastTime = DEFAULT_TIME;
-        this.lastDate = DEFAULT_DATE;
-        this.url = DEFAULT_URL;
-        this.lastLocation = new ArrayList<>();
-        this.lastLocation.add(DEFAULT_LOCATION);
-        this.lastLocation.add(DEFAULT_LOCATION);
-        this.track = DEFAULT_TRACK;
-        this.username = DEFAULT_USERNAME;
+        this.title = "";
+        this.artist = "";
+        this.albumName = "";
+        this.lastDay = "";
+        this.lastTime = "";
+        this.lastDate = "";
+        this.url = "";
+        //this.lastLocation = new ArrayList<>();
+        this.lastLatitude = INVALID_LOCATION;
+        this.lastLongitude = INVALID_LOCATION;
+        this.track = 0;
+        this.username = "";
     }
 
-    public DatabaseEntry(String title, String artist, String albumName, String lastDay, String lastTime,
-                         String lastDate, String url, double lastLatitude, double lastLongitude,
-                         int track, String username)
-    {
-        this.title = title;
-        this.artist = artist;
-        this.albumName = albumName;
-        this.lastDay = lastDay;
-        this.lastTime = lastTime;
-        this.lastDate = lastDate;
-        this.url = url;
-        this.lastLocation = new ArrayList<>();
-        this.lastLocation.add(lastLatitude);
-        this.lastLocation.add(lastLongitude);
-        this.track = track;
-        this.username = username;
-    }
 
     public DatabaseEntry(Song song, String url, String username)
     {
@@ -67,9 +39,9 @@ public class DatabaseEntry {
         this.lastTime = song.getLastTime();
         this.lastDate = song.getLastDate();
         this.url = url;
-        this.lastLocation = new ArrayList<>();
-        this.lastLocation.add(song.getLastLatitude());
-        this.lastLocation.add(song.getLastLongitude());
+        //this.lastLocation = new ArrayList<>();
+        this.lastLatitude = song.getLastLatitude();
+        this.lastLongitude = song.getLastLongitude();
         this.track = song.getTrack();
         this.username = username;
     }
@@ -82,7 +54,8 @@ public class DatabaseEntry {
     public String getLastTime() { return lastTime; }
     public String getLastDate() { return lastDate; }
     public String getURL() { return url; }
-    public List<Double> getLastLocation() { return lastLocation; }
+    public double getLastLatitude() { return lastLatitude; }
+    public double getLastLongitude() { return lastLongitude; }
     public int getTrackNumber() { return track; }
     public String getUsername() { return username; }
 
@@ -94,7 +67,8 @@ public class DatabaseEntry {
     public void setLastTime(String newLastTime) { this.lastTime = newLastTime; }
     public void setLastDate(String newLastDate) { this.lastDate = newLastDate; }
     public void setURL(String newURL) { this.url = newURL; }
-    public void setLastLocation(List<Double> newLocation) { this.lastLocation = newLocation; }
+    public void setLastLatitude(double newLatitude) { this.lastLatitude = newLatitude; }
+    public void setLastLongitude(double newLongitude) { this.lastLongitude = newLongitude; }
     public void setTrackNumber(int newTrack) { this.track = newTrack; }
     public void setUsername(String newUsername) { this.username = newUsername; }
 }
