@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Song> songs;
     private ArrayList<Album> albums;
+    private ArrayList<DatabaseMediator> mediators;
 
     LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
@@ -168,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
         // initialize songs and albums lists
         songs = new ArrayList<>();
         albums = new ArrayList<>();
+        mediators = new ArrayList<>();
 
         // loop through each mp3 file
         for (int i = 0; i < resourceIds.length; i++)
@@ -183,6 +185,12 @@ public class MainActivity extends AppCompatActivity {
             Song song = new Song(title, artist, albumName, resourceIds[i], trackNumber, i);
             retrieveInfo(song);
             songs.add(song);
+
+            // Add mediators to each song to listen for changes in the songs
+            DatabaseMediator mediator = new DatabaseMediator(song);
+            song.registerObserver(mediator);
+            mediators.add(mediator);
+
 
 
             if(albums.isEmpty()) {

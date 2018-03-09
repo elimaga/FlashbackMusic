@@ -63,7 +63,7 @@ public class DatabaseMediator implements SongObserver{
         databaseEntry.setLastDate(song.getLastDate());
         databaseEntry.setURL(url);
 
-        List<Double> locList = new ArrayList<Double>();
+        List<Double> locList = new ArrayList<>();
         locList.add(song.getLastLatitude());
         locList.add(song.getLastLongitude());
 
