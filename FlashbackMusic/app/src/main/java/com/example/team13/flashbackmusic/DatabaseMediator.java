@@ -24,22 +24,31 @@ import java.util.List;
  * Created by Andrew Yu and Elijah Magallanes on 3/1/18.
  */
 
-public class DatabaseMediator {
+public class DatabaseMediator implements SongObserver{
 
     final double KILOMETERS_IN_THOUSAND_FEET = 0.3048;
     final int DAYS_IN_WEEK = 7;
     ArrayList<String> queriedSongs;
+    Song song;
 
-    public DatabaseMediator()
+    public DatabaseMediator(Song song)
     {
+        this.song = song;
         queriedSongs = new ArrayList<>();
     }
 
     /**
-     * Sends Song/Location data to Google Firebase database
-     * @param song - Song object containing the data we want to send
+     * Method that gets called when the data changes in the song object. Delegates to the send
+     * method.
      */
-    public void send(Song song)
+    public void update() {
+        send();
+    }
+
+    /**
+     * Sends Song/Location data to Google Firebase database
+     */
+    private void send()
     {
         String username = "usr1";
         String url = "";
@@ -91,7 +100,7 @@ public class DatabaseMediator {
      * @param latitude - the user's current latitude
      * @param longitude - the user's current latitude
      */
-    public void retrieveLocation(double latitude, double longitude) {
+    public void retrieveSongsByLocation(double latitude, double longitude) {
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         final DatabaseReference locationReference = firebaseDatabase.getReference("Locations");
@@ -137,7 +146,7 @@ public class DatabaseMediator {
      * Method to retrieve all songs that within a week of today
      * @param curDate - the current date
      */
-    public void retrieveDate(String curDate) {
+    public void retrieveSongsByDate(String curDate) {
 
         int firstSlash = curDate.indexOf("/");
         int secondSlash = curDate.lastIndexOf("/");
@@ -193,6 +202,52 @@ public class DatabaseMediator {
             curMonth = cal.get(Calendar.MONTH) + 1;
             curYear = cal.get(Calendar.YEAR);
 
+        }
+    }
+
+    /**
+     * Method to query the database for all songs that have been played by friends
+     * @param friends - the list of the user's friends
+     */
+    public void retrieveSongsByFriend(ArrayList<String> friends) {
+
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        final DatabaseReference songReference = firebaseDatabase.getReference("Songs");
+
+        // Loop through the list of all friends
+        for (String friend : friends) {
+
+            Query queryRef = songReference.orderByChild("username").equalTo(friend);
+
+            queryRef.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                    // Add the song key to the Arraylist of queried songs
+                    DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
+                    String songKey = data.getUsername() + "_" + data.getTitle() + "_" + data.getArtist();
+                    queriedSongs.add(songKey);
+
+                    System.out.println(songKey);
+
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
         }
     }
 

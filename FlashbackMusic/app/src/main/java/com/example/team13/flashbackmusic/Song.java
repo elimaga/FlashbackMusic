@@ -4,8 +4,9 @@ package com.example.team13.flashbackmusic;
  * Created by rolandkong and luzannebatoon on 2/6/18.
  */
 
+import java.util.ArrayList;
 
-public class Song {
+public class Song implements SongSubject{
 
     private String title, artist, albumName, lastDay, lastTime, setting, lastDate;
     private double lastLatitude, lastLongitude;
@@ -13,6 +14,7 @@ public class Song {
     private int track;
     private int index; // index in the ArrayList of Songs
     private FavoriteStatus favoriteStatus; // neutral = 0, like = 1, dislike = 2
+    private ArrayList<SongObserver> observers;
 
     public enum FavoriteStatus {
         NEUTRAL, LIKED, DISLIKED;
@@ -26,6 +28,7 @@ public class Song {
         this.resId = id;
         this.track = Integer.parseInt(track.substring(0, track.indexOf("/")));
         this.index = index;
+        this.observers = new ArrayList<>();
     }
 
     public Song()
@@ -36,6 +39,7 @@ public class Song {
         this.resId = 0;
         this.track = 0;
         this.index = 0;
+        this.observers = new ArrayList<>();
     }
 
     public String getTitle() {
@@ -92,6 +96,15 @@ public class Song {
     }
 
 
+    /**
+     * Method to set the location, date, and time data for the song. Calls notifyObservers() since
+     * the data is being changed.
+     * @param lastLatitude - the latitude that the song was played at
+     * @param lastLongitude - the longitude the song was played at
+     * @param day - the day of the week the song was played on
+     * @param time - the time the song was played at
+     * @param date - the date the song was played on
+     */
     public void setData(double lastLatitude, double lastLongitude,
                          String day, String time, String date) {
         this.lastDay = day;
@@ -100,8 +113,14 @@ public class Song {
         this.lastLongitude = lastLongitude;
         this.lastDate = date;
         setTimeOfDay(time);
+        notifyObservers();
     }
 
+
+    /**
+     * Method to get the time of day (Morning, Afternoon, or Evening)
+     * @param time - the time the song was played
+     */
     private void setTimeOfDay(String time) {
         if(!time.equals("")) {
 
@@ -117,6 +136,23 @@ public class Song {
         }
         else {
             this.setting = "";
+        }
+    }
+
+    /**
+     * Method to add observers to the song object
+     * @param observer - the observer to add
+     */
+    public void registerObserver(SongObserver observer) {
+        this.observers.add(observer);
+    }
+
+    /**
+     * Method to notify the observers that the data in the song has been changed.
+     */
+    public void notifyObservers() {
+        for(SongObserver observer : observers) {
+            observer.update();
         }
     }
 

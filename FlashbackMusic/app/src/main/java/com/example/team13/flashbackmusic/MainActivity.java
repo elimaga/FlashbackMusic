@@ -125,18 +125,18 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         }
 
-        /*
-        //TESTING DATABASE SEND AND RETRIEVE
-        Song song = new Song("Killer Queen", "Queen", "Hereafter", 0, "0/0",0);
-        song.setData(49.0, 25.0, "Monday", "11:15", "3/1/18");
-*/
-        DatabaseMediator databaseMediator = new DatabaseMediator();
-        //databaseMediator.send(song);
-        databaseMediator.retrieveLocation(49.0, 25.0);
-        databaseMediator.retrieveDate("3/6/18");
+        // Testing retrieve methods
+        Song song = new Song();
+        DatabaseMediator databaseMediator = new DatabaseMediator(song);
+        databaseMediator.retrieveSongsByLocation(49.0, 25.0);
+        databaseMediator.retrieveSongsByDate("3/6/18");
 
+        ArrayList<String> friends = new ArrayList<>();
+        friends.add("usr1");
+        databaseMediator.retrieveSongsByFriend(friends);
+
+        // TODO: Fix this so we can actually get the list of queried songs
         ArrayList<String> data = databaseMediator.getQueriedSongs();
-
         for (String d : data){
             System.out.println(d);
         }
