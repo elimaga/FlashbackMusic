@@ -103,8 +103,11 @@ public class DatabaseMediator {
 
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
-                Log.d("Retrive GeoLocation", String.format("Key %s is within 1000 feet at [%f,%f]", key, location.latitude, location.longitude));
-                queriedSongs.add(key);
+                Log.d("Retrieve GeoLocation", String.format("Key %s is within 1000 feet at [%f,%f]", key, location.latitude, location.longitude));
+
+                // Add the songKey to the ArrayList of queried songs
+                String songKey = key.substring(0, key.indexOf("-"));
+                queriedSongs.add(songKey);
             }
 
             @Override
@@ -127,6 +130,7 @@ public class DatabaseMediator {
                 Log.d("Retrive GeoLocation", "Error: " + error);
             }
         });
+
     }
 
     /**
@@ -144,18 +148,24 @@ public class DatabaseMediator {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         final DatabaseReference songReference = firebaseDatabase.getReference("Songs");
 
-        for (int i = 0; i < DAYS_IN_WEEK; i++) {
+        // Loop 7 times through the days in the past week
+        for (int i = 1; i < DAYS_IN_WEEK; i++) {
 
             String queryDate = curMonth + "/" + curDay + "/" + curYear;
-            System.out.println(queryDate);
-
 
             Query queryRef = songReference.orderByChild("lastDate").equalTo(queryDate);
 
             queryRef.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    System.out.println(dataSnapshot.getValue(DatabaseEntry.class).getTitle());
+
+                    // Add the song key to the Arraylist of queried songs
+                    DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
+                    String songKey = data.getUsername() + "_" + data.getTitle() +"_" + data.getArtist();
+                    queriedSongs.add(songKey);
+
+                    System.out.println(songKey);
+
                 }
 
                 @Override
@@ -175,15 +185,13 @@ public class DatabaseMediator {
                 }
             });
 
+            // Rolls the date back one day, might move this to UserInfo later
             Calendar cal = Calendar.getInstance();
-            cal.set(curYear, curMonth, curDay);
-            cal.add(Calendar.DAY_OF_MONTH, -1);
+            cal.set(curYear, curMonth - 1, curDay);
+            cal.add(Calendar.DAY_OF_YEAR, -1);
             curDay = cal.get(Calendar.DATE);
             curMonth = cal.get(Calendar.MONTH) + 1;
             curYear = cal.get(Calendar.YEAR);
-
-            System.out.println(queryDate);
-
 
         }
     }
@@ -192,8 +200,6 @@ public class DatabaseMediator {
      * Getter for the list of queried songs
      * @return the list of queried songs
      */
-    public ArrayList<String> getQueriedSongs() {
-        return this.queriedSongs;
-    }
+    public ArrayList<String> getQueriedSongs() { return queriedSongs; }
 
 }
