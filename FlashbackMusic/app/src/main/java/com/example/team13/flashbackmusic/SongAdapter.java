@@ -65,8 +65,6 @@ public class SongAdapter extends BaseAdapter {
 
         holder.titleTextView.setText(song.getTitle());
         holder.artistTextView.setText(song.getArtist());
-
-
         holder.favoriteStatusImageButton.setSong(song);
 
         holder.favoriteStatusImageButton.setOnClickListener(new View.OnClickListener() {

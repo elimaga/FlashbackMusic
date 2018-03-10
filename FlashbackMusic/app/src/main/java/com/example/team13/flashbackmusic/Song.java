@@ -5,37 +5,86 @@ package com.example.team13.flashbackmusic;
  */
 
 
-public class Song {
+import android.os.Parcel;
+import android.os.Parcelable;
 
-    private String title, artist, albumName, lastDay, lastTime, setting, lastDate;
+public class Song implements Parcelable {
+
+    private String title, artist, lastDay, lastTime, setting, lastDate, path, url;
     private double lastLatitude, lastLongitude;
-    private int resId;
     private int track;
     private int index; // index in the ArrayList of Songs
     private FavoriteStatus favoriteStatus; // neutral = 0, like = 1, dislike = 2
+    private Album album;
+
 
     public enum FavoriteStatus {
         NEUTRAL, LIKED, DISLIKED;
+        public Integer toInt() {
+            switch(this) {
+                case NEUTRAL:
+                    return 0;
+                case LIKED:
+                    return 1;
+                case DISLIKED:
+                    return 2;
+                default:
+                    return 0;
+            }
+        }
+
+        static public FavoriteStatus fromInt(int i) {
+            switch(i) {
+                case 0:
+                    return NEUTRAL;
+                case 1:
+                    return LIKED;
+                case 2:
+                    return DISLIKED;
+                default:
+                    return NEUTRAL;
+            }
+        }
     }
 
-    public Song(String title, String artist, String albumName,
-                int id, String track, int index) {
+    public Song(String title, String artist, String track, String url, int index, Album album) {
         this.title = title;
         this.artist = artist;
-        this.albumName = albumName;
-        this.resId = id;
         this.track = Integer.parseInt(track.substring(0, track.indexOf("/")));
+        this.url = url;
         this.index = index;
+        this.path = "";
+        this.album = album;
+        album.addSong(this);
+
     }
 
     public Song()
     {
         this.title = "";
         this.artist = "";
-        this.albumName = "";
-        this.resId = 0;
         this.track = 0;
+        this.url = "";
         this.index = 0;
+        this.path = "";
+        this.album = null;
+    }
+
+    protected Song(Parcel in) {
+        title = in.readString();
+        artist = in.readString();
+        track = in.readInt();
+        url = in.readString();
+        index = in.readInt();
+        album = in.readParcelable(Album.class.getClassLoader());
+        lastLatitude = in.readDouble();
+        lastLongitude = in.readDouble();
+        lastDay = in.readString();
+        lastTime = in.readString();
+        lastDate = in.readString();
+        path = in.readString();
+        favoriteStatus = FavoriteStatus.fromInt(in.readInt());
+
     }
 
     public String getTitle() {
@@ -46,21 +95,13 @@ public class Song {
         return this.artist;
     }
 
-    public String getAlbumName() {
-        return this.albumName;
-    }
-
-    public int getResId() {
-        return this.resId;
-    }
-
     public int getTrack() { return this.track; }
+
+    public String getUrl() { return this.url; }
 
     public int getIndex() { return this.index; }
 
-    public void setFavoriteStatus(FavoriteStatus status) {
-        this.favoriteStatus = status;
-    }
+    public Album getAlbum() { return this.album; }
 
     public FavoriteStatus getFavoriteStatus() {
         return this.favoriteStatus;
@@ -82,7 +123,6 @@ public class Song {
         return this.lastDate;
     }
 
-
     public String getLastTime() {
         return this.lastTime;
     }
@@ -91,6 +131,20 @@ public class Song {
         return this.setting;
     }
 
+    public String getPath() { return this.path; }
+
+    public void setFavoriteStatus(FavoriteStatus status) {
+        this.favoriteStatus = status;
+    }
+
+
+    public boolean isDownloaded() { return !(this.path.equals("")); }
+
+    public void setPath(String path) { this.path = path; }
+
+    public void setAlbum(Album album) {
+        this.album = album;
+    }
 
     public void setData(double lastLatitude, double lastLongitude,
                          String day, String time, String date) {
@@ -119,5 +173,42 @@ public class Song {
             this.setting = "";
         }
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        dest.writeString(title);
+        dest.writeString(artist);
+        dest.writeInt(track);
+        dest.writeString(url);
+        dest.writeInt(index);
+        dest.writeParcelable(album, 0);
+        dest.writeDouble(lastLatitude);
+        dest.writeDouble(lastLongitude);
+        dest.writeString(lastDay);
+        dest.writeString(lastTime);
+        dest.writeString(lastDate);
+        dest.writeString(path);
+        dest.writeInt(favoriteStatus.toInt());
+    }
+
+    public static final Creator<Song> CREATOR = new Creator<Song>() {
+//        public Song(String title, String artist, Album album, String track, int index) {
+            @Override
+        public Song createFromParcel(Parcel in) {
+            return new Song(in);
+        }
+
+        @Override
+        public Song[] newArray(int size) {
+            return new Song[size];
+        }
+    };
 
 }

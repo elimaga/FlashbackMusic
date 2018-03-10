@@ -21,10 +21,12 @@ public class AlbumTabFragment extends Fragment {
     MainActivity main;
 
     private ListView albumListView;
+    private MusicLibrary musicLibrary;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         main = (MainActivity) getActivity();
+        musicLibrary = MusicLibrary.getInstance();
 
         View rootView =  inflater.inflate(R.layout.album_tab_fragment, container, false);
 
@@ -60,11 +62,17 @@ public class AlbumTabFragment extends Fragment {
         });
 
 
-        AlbumAdapter albumAdapter = new AlbumAdapter(main, main.getAlbums());
+        AlbumAdapter albumAdapter = new AlbumAdapter(main, musicLibrary.getAlbums());
 
         albumListView.setAdapter(albumAdapter);
 
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        albumListView.setAdapter(new AlbumAdapter(main, musicLibrary.getAlbums()));
     }
 }

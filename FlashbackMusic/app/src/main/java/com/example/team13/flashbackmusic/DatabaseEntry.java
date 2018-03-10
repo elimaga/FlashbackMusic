@@ -34,7 +34,7 @@ public class DatabaseEntry {
     {
         this.title = song.getTitle();
         this.artist = song.getArtist();
-        this.albumName = song.getAlbumName();
+        this.albumName = song.getAlbum().getAlbumName();
         this.lastDay = song.getLastDay();
         this.lastTime = song.getLastTime();
         this.lastDate = song.getLastDate();
