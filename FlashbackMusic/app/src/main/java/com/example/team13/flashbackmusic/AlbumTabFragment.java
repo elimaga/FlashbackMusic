@@ -26,7 +26,7 @@ public class AlbumTabFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         main = (MainActivity) getActivity();
-        musicLibrary = MusicLibrary.getInstance();
+        musicLibrary = MusicLibrary.getInstance(main);
 
         View rootView =  inflater.inflate(R.layout.album_tab_fragment, container, false);
 

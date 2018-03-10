@@ -43,6 +43,7 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
     private boolean isAidle;
     AlertDialog.Builder builder;
     MusicLibrary musicLibrary;
+    String urlString;
 
 
     @Override
@@ -56,7 +57,7 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
         unzipper = new Unzipper();
         unzipper.registerObserver(this);
         isAidle = true;
-        musicLibrary = MusicLibrary.getInstance();
+        musicLibrary = MusicLibrary.getInstance(DownloadActivity.this);
         musicLibrary.registerObserver(this);
 
 
@@ -96,7 +97,7 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
     }
 
     public void downloadPressed(View view) {
-        String urlString = urlEditText.getText().toString();
+        urlString = urlEditText.getText().toString();
 
         if (hasStoragePermission()) {
             if (URLUtil.isValidUrl(urlString)) {
@@ -141,7 +142,13 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
     @Override
     public void onDestroy(){
         super.onDestroy();
-        musicFileDownloader.unregisterReceiver(this);
+        try {
+            musicFileDownloader.unregisterReceiver(this);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        unzipper.removeObserver(this);
+        musicLibrary.removeObserver(this);
     }
 
     // DownloadObserver
@@ -153,8 +160,7 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
         if (MimeTypeFilter.matches(mime, new String[]{"audio/mpeg","audio/mpeg3","audio/x-mpeg-3","video/mpeg","video/x-mpeg"})!= null){
             ArrayList<String> argArrayList = new ArrayList<>();
             argArrayList.add(directoryPath+filename);
-            String url = urlEditText.getText().toString();
-            argArrayList.add(url);
+            argArrayList.add(urlString);
             musicLibrary.execute(argArrayList.toArray(new String[0]));
             reset();
         } else if (MimeTypeFilter.matches(mime,
@@ -175,10 +181,8 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
     public void onUnzipSuccess(ArrayList<String> paths) {
         textView.setText("Loading files into library...");
         // calling addSongsIntoLibraryFromPath internally
-        ArrayList<String> argArrayList = paths;
         String url = urlEditText.getText().toString();
-        argArrayList.add(url);
-        musicLibrary.execute(argArrayList.toArray(new String[0]));
+        musicLibrary.updateLibraryInBackground(paths, url);
     }
 
     @Override
@@ -197,5 +201,6 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
     void reset() {
         isAidle = true;
         downloadButton.setEnabled(true);
+        urlString = "";
     }
 }

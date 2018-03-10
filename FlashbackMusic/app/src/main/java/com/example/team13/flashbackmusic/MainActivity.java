@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
         // TODO:
-        musicLibrary = MusicLibrary.getInstance();
+        musicLibrary = MusicLibrary.getInstance(MainActivity.this);
         songs = musicLibrary.getSongs();
         albums = musicLibrary.getAlbums();
 

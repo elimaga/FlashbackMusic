@@ -8,14 +8,13 @@ package com.example.team13.flashbackmusic;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Song implements Parcelable {
+public class Song {
 
-    private String title, artist, lastDay, lastTime, setting, lastDate, path, url;
+    private String title, artist, albumName, lastDay, lastTime, setting, lastDate, path, url;
     private double lastLatitude, lastLongitude;
     private int track;
     private int index; // index in the ArrayList of Songs
     private FavoriteStatus favoriteStatus; // neutral = 0, like = 1, dislike = 2
-    private Album album;
 
 
     public enum FavoriteStatus {
@@ -47,16 +46,14 @@ public class Song implements Parcelable {
         }
     }
 
-    public Song(String title, String artist, String track, String url, int index, Album album) {
+    public Song(String title, String artist, String track, String url, int index, String albumName) {
         this.title = title;
         this.artist = artist;
         this.track = Integer.parseInt(track.substring(0, track.indexOf("/")));
         this.url = url;
         this.index = index;
         this.path = "";
-        this.album = album;
-        album.addSong(this);
-
+        this.albumName = albumName;
     }
 
     public Song()
@@ -67,24 +64,7 @@ public class Song implements Parcelable {
         this.url = "";
         this.index = 0;
         this.path = "";
-        this.album = null;
-    }
-
-    protected Song(Parcel in) {
-        title = in.readString();
-        artist = in.readString();
-        track = in.readInt();
-        url = in.readString();
-        index = in.readInt();
-        album = in.readParcelable(Album.class.getClassLoader());
-        lastLatitude = in.readDouble();
-        lastLongitude = in.readDouble();
-        lastDay = in.readString();
-        lastTime = in.readString();
-        lastDate = in.readString();
-        path = in.readString();
-        favoriteStatus = FavoriteStatus.fromInt(in.readInt());
-
+        this.albumName = "";
     }
 
     public String getTitle() {
@@ -101,7 +81,7 @@ public class Song implements Parcelable {
 
     public int getIndex() { return this.index; }
 
-    public Album getAlbum() { return this.album; }
+    public String getAlbumName() { return this.albumName; }
 
     public FavoriteStatus getFavoriteStatus() {
         return this.favoriteStatus;
@@ -142,8 +122,8 @@ public class Song implements Parcelable {
 
     public void setPath(String path) { this.path = path; }
 
-    public void setAlbum(Album album) {
-        this.album = album;
+    public void setAlbumName(String albumName) {
+        this.albumName = albumName;
     }
 
     public void setData(double lastLatitude, double lastLongitude,
@@ -173,42 +153,5 @@ public class Song implements Parcelable {
             this.setting = "";
         }
     }
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-
-        dest.writeString(title);
-        dest.writeString(artist);
-        dest.writeInt(track);
-        dest.writeString(url);
-        dest.writeInt(index);
-        dest.writeParcelable(album, 0);
-        dest.writeDouble(lastLatitude);
-        dest.writeDouble(lastLongitude);
-        dest.writeString(lastDay);
-        dest.writeString(lastTime);
-        dest.writeString(lastDate);
-        dest.writeString(path);
-        dest.writeInt(favoriteStatus.toInt());
-    }
-
-    public static final Creator<Song> CREATOR = new Creator<Song>() {
-//        public Song(String title, String artist, Album album, String track, int index) {
-            @Override
-        public Song createFromParcel(Parcel in) {
-            return new Song(in);
-        }
-
-        @Override
-        public Song[] newArray(int size) {
-            return new Song[size];
-        }
-    };
 
 }
