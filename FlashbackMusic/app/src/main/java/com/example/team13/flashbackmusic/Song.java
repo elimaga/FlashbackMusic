@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.example.team13.flashbackmusic.interfaces.SongObserver;
+import com.example.team13.flashbackmusic.interfaces.SongSubject;
+
 
 public class Song implements Parcelable, SongSubject {
 

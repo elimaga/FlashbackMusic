@@ -1,12 +1,11 @@
 package com.example.team13.flashbackmusic;
 
-import android.location.Location;
 import android.util.Log;
 
+import com.example.team13.flashbackmusic.interfaces.SongObserver;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
-import com.firebase.geofire.GeoQueryDataEventListener;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -14,17 +13,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 /**
  * Created by Andrew Yu and Elijah Magallanes on 3/1/18.
  */
 
-public class DatabaseMediator implements SongObserver{
+public class DatabaseMediator implements SongObserver {
 
     final double KILOMETERS_IN_THOUSAND_FEET = 0.3048;
     final int DAYS_IN_WEEK = 7;
@@ -52,19 +49,18 @@ public class DatabaseMediator implements SongObserver{
     private void send()
     {
         String username = "usr1";
-        String url = "";
         String databaseKey = username + "_" + song.getTitle() + "_" + song.getArtist();
 
         DatabaseEntry databaseEntry = new DatabaseEntry();
         databaseEntry.setTitle(song.getTitle());
         databaseEntry.setArtist(song.getArtist());
-        databaseEntry.setAlbumName(song.getAlbumName());
+        databaseEntry.setAlbumName(song.getAlbum().getAlbumName());
         databaseEntry.setLastDay(song.getLastDay());
         databaseEntry.setLastTime(song.getLastTime());
         databaseEntry.setLastDate(song.getLastDate());
         databaseEntry.setLastLatitude(song.getLastLatitude());
         databaseEntry.setLastLongitude(song.getLastLongitude());
-        databaseEntry.setURL(url);
+        databaseEntry.setURL(song.getUrl());
         databaseEntry.setTrackNumber(song.getTrack());
         databaseEntry.setUsername(username);
 

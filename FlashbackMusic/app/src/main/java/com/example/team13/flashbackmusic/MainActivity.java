@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Song> songs;
     private ArrayList<Album> albums;
-    private ArrayList<DatabaseMediator> mediators;
+    //private ArrayList<DatabaseMediator> mediators;
     private MusicLibrary musicLibrary;
 
     LocationManager locationManager;
