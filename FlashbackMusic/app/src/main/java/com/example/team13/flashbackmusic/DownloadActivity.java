@@ -200,6 +200,7 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
 
     void reset() {
         isAidle = true;
+        textView.setText("");
         downloadButton.setEnabled(true);
         urlString = "";
     }
