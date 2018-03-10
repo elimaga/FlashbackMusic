@@ -18,7 +18,7 @@ public class SongActivityPrepper {
         this.songs = s;
     }
 
-    public void sendInfo(boolean flashbackModeOn)
+    public void sendInfo(boolean vibeModeOn)
     {
 
         ArrayList<String> titles = new ArrayList<>();
@@ -57,7 +57,7 @@ public class SongActivityPrepper {
         intent.putExtra("dates", dates);
         intent.putExtra("paths", paths);
         intent.putExtra("indices", indices);
-        intent.putExtra("flashbackModeOn", flashbackModeOn);
+        intent.putExtra("vibeModeOn", vibeModeOn);
 
     }
 }

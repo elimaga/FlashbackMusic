@@ -31,6 +31,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.firebase.geofire.GeoLocation;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Song> songs;
     private ArrayList<Album> albums;
+    //private ArrayList<DatabaseMediator> mediators;
     private MusicLibrary musicLibrary;
 
     LocationManager locationManager;
@@ -145,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<Song> playlist = flashbackPlaylist.getPlaylist();
 
                 // Only activate flashback mode if there are songs to play
-                if(!playlist.isEmpty()) {
+                if (!playlist.isEmpty()) {
                     // Play the playlist
                     Intent intent = new Intent(MainActivity.this, SongActivity.class);
                     SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
@@ -158,12 +161,28 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Requesting location permission
-        if  (ActivityCompat.checkSelfPermission ( this , Manifest.permission.ACCESS_FINE_LOCATION )
-                != PackageManager.PERMISSION_GRANTED  && ActivityCompat.checkSelfPermission ( this ,
-                Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions ( this ,
-                    new  String[]{Manifest.permission.ACCESS_FINE_LOCATION },  REQUEST_LOCATION );
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+        }
+
+        // Testing retrieve methods
+        Song song = new Song();
+        DatabaseMediator databaseMediator = new DatabaseMediator(song);
+        databaseMediator.retrieveSongsByLocation(49.0, 25.0);
+        databaseMediator.retrieveSongsByDate("3/6/18");
+
+        ArrayList<String> friends = new ArrayList<>();
+        friends.add("usr1");
+        databaseMediator.retrieveSongsByFriend(friends);
+
+        // TODO: Fix this so we can actually get the list of queried songs
+        ArrayList<String> data = databaseMediator.getQueriedSongs();
+        for (String d : data){
+            System.out.println(d);
         }
     }
 

@@ -29,23 +29,7 @@ public class DatabaseEntry {
         this.username = "";
     }
 
-
-    public DatabaseEntry(Song song, String url, String username)
-    {
-        this.title = song.getTitle();
-        this.artist = song.getArtist();
-        this.albumName = song.getAlbum().getAlbumName();
-        this.lastDay = song.getLastDay();
-        this.lastTime = song.getLastTime();
-        this.lastDate = song.getLastDate();
-        this.url = url;
-        //this.lastLocation = new ArrayList<>();
-        this.lastLatitude = song.getLastLatitude();
-        this.lastLongitude = song.getLastLongitude();
-        this.track = song.getTrack();
-        this.username = username;
-    }
-
+  
     //Public getters
     public String getTitle() { return title; }
     public String getArtist() { return artist; }

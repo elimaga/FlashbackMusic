@@ -21,6 +21,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
     private static MusicLibrary instance = null;
     private ArrayList<Album> albums = null;
     private ArrayList<Song> songs = null;
+    private ArrayList<DatabaseMediator> mediators = null;
 
     // these sets store metadata to check if a object is made from the file already.
     private ArrayList<HashMap<String, String>> songMetadataSet = null;
@@ -32,6 +33,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
     private MusicLibrary() {
         albums = new ArrayList<>();
         songs = new ArrayList<>();
+        mediators = new ArrayList<>();
         songMetadataSet = new ArrayList<>();
         albumMetadataSet = new ArrayList<>();
         observers = new ArrayList<>();
@@ -89,6 +91,8 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
                         album);
                 song.setPath(path);
                 songs.add(song);
+                DatabaseMediator mediator = new DatabaseMediator(song);
+                mediators.add(mediator);
                 album.addSong(song);
                 songMetadataSet.add(songMetadata);
             }
