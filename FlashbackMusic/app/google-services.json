@@ -1,0 +1,79 @@
+{
+  "project_info": {
+    "project_number": "487097348986",
+    "firebase_url": "https://flashbackmusic-4ae78.firebaseio.com",
+    "project_id": "flashbackmusic-4ae78",
+    "storage_bucket": "flashbackmusic-4ae78.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:487097348986:android:131acaae0929a46e",
+        "android_client_info": {
+          "package_name": "com.example.team13.flashbackmusic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "487097348986-2i7c693h32nhvrr7naqrrddag9m92ei2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.team13.flashbackmusic",
+            "certificate_hash": "6d161df332e9fb1e88d0ca97eaab67f8e26513a8"
+          }
+        },
+        {
+          "client_id": "487097348986-uqkq1a62gob8kd5eo3pqq7kqe5gr75k6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.team13.flashbackmusic",
+            "certificate_hash": "af78180db765e248cd9fd54954ef9af2ebb74a0b"
+          }
+        },
+        {
+          "client_id": "487097348986-lj4hoj97eh2bs6v8clpg7ten1fng9ko6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.team13.flashbackmusic",
+            "certificate_hash": "bb8dcc6d1bb021c29d7d62df08955f1e77ecce5b"
+          }
+        },
+        {
+          "client_id": "487097348986-ar6bn61m9d9nc200rp8f6echtmv10c4q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.team13.flashbackmusic",
+            "certificate_hash": "19e262bffabcf15910818a6f884dea80a7ffca29"
+          }
+        },
+        {
+          "client_id": "487097348986-q5ogibt021sgjtk1jcpe3mo4g48r2h2b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWwzf0ZZCTu8sMrhnJozjVptxSt7fIz48"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "487097348986-q5ogibt021sgjtk1jcpe3mo4g48r2h2b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
