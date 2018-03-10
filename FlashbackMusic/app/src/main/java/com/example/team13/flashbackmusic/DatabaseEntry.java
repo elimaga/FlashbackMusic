@@ -29,7 +29,7 @@ public class DatabaseEntry {
         this.username = "";
     }
 
-
+  
     //Public getters
     public String getTitle() { return title; }
     public String getArtist() { return artist; }

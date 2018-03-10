@@ -15,14 +15,19 @@ import android.location.LocationManager;
 import android.support.annotation.NonNull;
 
 import android.content.Intent;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -36,10 +41,12 @@ import java.lang.reflect.Field;
 public class MainActivity extends AppCompatActivity {
 
     ImageButton flashBackButton;
+    private DrawerLayout mDrawerLayout;
 
     private ArrayList<Song> songs;
     private ArrayList<Album> albums;
     private ArrayList<DatabaseMediator> mediators;
+    private MusicLibrary musicLibrary;
 
     LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
@@ -52,11 +59,18 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+
+        // TODO:
+        musicLibrary = MusicLibrary.getInstance();
+        songs = musicLibrary.getSongs();
+        albums = musicLibrary.getAlbums();
+
 
         // Load the songs and albums into the ArrayLists
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-        final int[] resourceIds = this.listRaw();
-        loadLibrary(mediaMetadataRetriever, resourceIds);
 
         //Tab layout
         TabLayout tabLayout = findViewById(R.id.tab_layout);
@@ -84,6 +98,35 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // set item as selected to persist highlight
+                        int id = menuItem.getItemId();
+                        if(id == R.id.signout){
+                            //signout Activity
+                        }
+                        else if (id == R.id.download){
+                            //Bring up downloadActivity
+                            Intent intent = new Intent(MainActivity.this, DownloadActivity.class);
+                            startActivity(intent);
+
+                        }
+//                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
+
+                        // Add code here to update the UI based on the item selected
+                        // For example, swap UI fragments here
+
+                        return true;
+                    }
+                });
 
 
         // Flashback button
@@ -143,6 +186,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public Song getSong(int index)
     {
         return songs.get(index);
@@ -156,92 +209,6 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<Song> getSongs() {return songs;}
 
     public ArrayList<Album> getAlbums() {return albums;}
-
-
-    /**
-     * loadLibrary() reads the mp3 files in the raw folder and returns a
-     * fully constructed list of Songs and Albums
-     * @param mmr - MediaMetadataRetriever that will retrieve various metadata from an mp3 file
-     * @param resourceIds - the ids for the mp3 files in the raw folder
-     */
-    public void loadLibrary(MediaMetadataRetriever mmr, int[] resourceIds)
-    {
-        // initialize songs and albums lists
-        songs = new ArrayList<>();
-        albums = new ArrayList<>();
-        mediators = new ArrayList<>();
-
-        // loop through each mp3 file
-        for (int i = 0; i < resourceIds.length; i++)
-        {
-            // get the metadata from the files
-            AssetFileDescriptor afd = this.getResources().openRawResourceFd(resourceIds[i]);
-            mmr.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-            String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST);
-            String albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-            String trackNumber = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER);
-
-            Song song = new Song(title, artist, albumName, resourceIds[i], trackNumber, i);
-            retrieveInfo(song);
-            songs.add(song);
-
-            // Add mediators to each song to listen for changes in the songs
-            DatabaseMediator mediator = new DatabaseMediator(song);
-            mediators.add(mediator);
-
-
-
-            if(albums.isEmpty()) {
-                Album album = new Album(albumName, artist, trackNumber);
-                album.addSong(song);
-                albums.add(album);
-            }
-            else {
-
-                boolean needNewAlbum = true;
-
-
-                for (Album album : albums) {
-                    if(album.getAlbumName().equals(albumName)) {
-                        album.addSong(song);
-                        needNewAlbum = false;
-                        break;
-                    }
-                }
-
-                if(needNewAlbum) {
-                    Album album = new Album(albumName, artist, trackNumber);
-                    album.addSong(song);
-                    albums.add(album);
-                }
-            }
-        }
-    }
-
-    /**
-     * Helper method to get the resource ids for all the raw files.
-     * @return int[] - the array holding all the resource ids for the mp3 files in raw folder
-     */
-    private int[] listRaw()
-    {
-        Field[] fields = R.raw.class.getFields();
-        int[] resourceIds = new int[fields.length];
-        for (int i = 0; i < fields.length; i++)
-        {
-            try
-            {
-                resourceIds[i] = fields[i].getInt(fields[i]);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-        return resourceIds;
-    }
-
 
 
     /**
@@ -270,6 +237,12 @@ public class MainActivity extends AppCompatActivity {
             updateSongs(extras);
             flashBackButton.performClick();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     /**

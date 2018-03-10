@@ -31,7 +31,7 @@ public class DatabaseCommunicator {
         DatabaseEntry databaseEntry = new DatabaseEntry();
         databaseEntry.setTitle(song.getTitle());
         databaseEntry.setArtist(song.getArtist());
-        databaseEntry.setAlbumName(song.getAlbumName());
+        databaseEntry.setAlbumName(song.getAlbum().getAlbumName());
         databaseEntry.setLastDay(song.getLastDay());
         databaseEntry.setLastTime(song.getLastTime());
         databaseEntry.setLastDate(song.getLastDate());

@@ -22,12 +22,14 @@ public class SongTabFragment extends Fragment {
 
     private MainActivity main;
     private ListView songListView;
+    private MusicLibrary musicLibrary;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         main = (MainActivity) getActivity();
         View rootView = inflater.inflate(R.layout.song_tab_fragment, container, false);
+        musicLibrary = MusicLibrary.getInstance();
 
         songListView = rootView.findViewById(R.id.song_list_view);
         songListView.setOnItemClickListener(new ListView.OnItemClickListener() {
@@ -57,11 +59,17 @@ public class SongTabFragment extends Fragment {
         });
 
 
-        SongAdapter songAdapter = new SongAdapter(main, main.getSongs());
+        SongAdapter songAdapter = new SongAdapter(main, musicLibrary.getSongs());
         songListView.setAdapter(songAdapter);
 
 
         return rootView;
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        songListView.setAdapter(new SongAdapter(main, musicLibrary.getSongs()));
     }
 }
