@@ -35,7 +35,6 @@ public class SongActivity extends AppCompatActivity {
 
     private MediaPlayer mediaPlayer;
     private LocationManager locationManager;
-    static final int REQUEST_LOCATION = 1;
     final int INVALID_COORDINATE = 200;
     int index = 0;
     Bundle extras;
@@ -61,17 +60,17 @@ public class SongActivity extends AppCompatActivity {
         newTimes = new ArrayList<>();
         newDays = new ArrayList<>();
         newDates = new ArrayList<>();
-        boolean flashbackModeOn = false;
+        boolean vibeModeOn = false;
 
         if(extras != null) {
             resIds = extras.getIntegerArrayList("resIds");
-            flashbackModeOn = extras.getBoolean("flashbackModeOn");
+            vibeModeOn = extras.getBoolean("vibeModeOn");
         }
 
         // If Flashback Mode is on, display it to the user so they know they are in flashback mode
-        TextView flashbackMode = (TextView) findViewById(R.id.flashback_mode);
-        if(flashbackModeOn) {
-            flashbackMode.setText("Flashback Mode");
+        TextView VibeMode = (TextView) findViewById(R.id.vibe_mode);
+        if(vibeModeOn) {
+            VibeMode.setText("Vibe Mode");
         }
 
         // Update the screen for the first song, load the first song to play, and update the Arraylists
