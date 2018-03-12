@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by Luzanne on 2/11/18.
  */
 
-public class Album implements Parcelable {
+public class Album {
     private String albumName, artist;
     private int index;
     private ArrayList<Song> songs;
@@ -25,26 +25,6 @@ public class Album implements Parcelable {
             songs.add(new Song());
         }
     }
-
-    protected Album(Parcel in) {
-        albumName = in.readString();
-        artist = in.readString();
-        index = in.readInt();
-        songs = in.createTypedArrayList(Song.CREATOR);
-    }
-
-    public static final Creator<Album> CREATOR = new Creator<Album>() {
-        @Override
-        public Album createFromParcel(Parcel in) {
-            return new Album(in);
-
-            }
-
-        @Override
-        public Album[] newArray(int size) {
-            return new Album[size];
-        }
-    };
 
     public String getAlbumName() {
         return this.albumName;
@@ -65,17 +45,4 @@ public class Album implements Parcelable {
         songs.set(s.getTrack() - 1, s);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(albumName);
-        dest.writeString(artist);
-        dest.writeInt(index);
-        dest.writeTypedList(songs);
-
-    }
 }

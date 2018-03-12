@@ -25,13 +25,10 @@ public class DatabaseMediator implements SongObserver {
 
     final double KILOMETERS_IN_THOUSAND_FEET = 0.3048;
     final int DAYS_IN_WEEK = 7;
-    Song song;
     ArrayList<String> queriedSongs;
 
-    public DatabaseMediator(Song song)
+    public DatabaseMediator()
     {
-        this.song = song;
-        song.registerObserver(this);
         queriedSongs = new ArrayList<>();
     }
 
@@ -39,22 +36,22 @@ public class DatabaseMediator implements SongObserver {
      * Method that gets called when the data changes in the song object. Delegates to the send
      * method.
      */
-    public void update() {
-        send();
+    public void update(Song song) {
+        send(song);
     }
 
     /**
      * Sends Song/Location data to Google Firebase database
      */
-    private void send()
+    private void send(Song song)
     {
         String username = "usr1";
-        String databaseKey = username + "_" + song.getTitle() + "_" + song.getArtist();
+        final String databaseKey = username + "_" + song.getTitle() + "_" + song.getArtist();
 
         DatabaseEntry databaseEntry = new DatabaseEntry();
         databaseEntry.setTitle(song.getTitle());
         databaseEntry.setArtist(song.getArtist());
-        databaseEntry.setAlbumName(song.getAlbum().getAlbumName());
+        databaseEntry.setAlbumName(song.getAlbumName());
         databaseEntry.setLastDay(song.getLastDay());
         databaseEntry.setLastTime(song.getLastTime());
         databaseEntry.setLastDate(song.getLastDate());
@@ -71,7 +68,7 @@ public class DatabaseMediator implements SongObserver {
 
         songReference.child(databaseKey).setValue(databaseEntry, new DatabaseReference.CompletionListener() {
             public void onComplete(DatabaseError error, DatabaseReference ref) {
-                Log.d("Send Song Data","Values were set for song: " + song.getTitle());
+                Log.d("Send Song Data","Values were set for: " + databaseKey);
             }
         });
 

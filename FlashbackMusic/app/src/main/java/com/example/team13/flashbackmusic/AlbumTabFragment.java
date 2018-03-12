@@ -26,7 +26,7 @@ public class AlbumTabFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         main = (MainActivity) getActivity();
-        musicLibrary = MusicLibrary.getInstance();
+        musicLibrary = MusicLibrary.getInstance(main);
 
         View rootView =  inflater.inflate(R.layout.album_tab_fragment, container, false);
 
@@ -37,23 +37,23 @@ public class AlbumTabFragment extends Fragment {
 
                 Album album = (Album) adapterView.getItemAtPosition(position);
                 ArrayList<Song> songsInAlbum = album.getSongs();
-                ArrayList<Song> songsToPlay = new ArrayList<>();
+                ArrayList<Integer> indexOfSong = new ArrayList<>();
 
                 // Only play the songs that are not disliked
                 for(Song song : songsInAlbum) {
                     if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
-                        songsToPlay.add(song);
+                        indexOfSong.add(song.getIndex());
                     }
                     else {
                         Log.d("Disliked Song", "Skipping");
                     }
                 }
 
-                // Only play the songs that are not disliked
-                if(!songsToPlay.isEmpty()) {
+                // Only play the songs that are not empty
+                if(!indexOfSong.isEmpty()) {
                     Intent intent = new Intent(main, SongActivity.class);
-                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songsToPlay);
-                    songActivityPrepper.sendInfo(false);
+                    intent.putExtra("songIndices",indexOfSong);
+                    intent.putExtra("vibeModeOn",false);
                     main.startActivityForResult(intent, 0);
                 }
 
