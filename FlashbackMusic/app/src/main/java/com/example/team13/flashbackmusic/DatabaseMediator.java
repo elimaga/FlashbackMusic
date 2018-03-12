@@ -27,12 +27,14 @@ public class DatabaseMediator implements SongObserver {
     final int DAYS_IN_WEEK = 7;
     Song song;
     ArrayList<String> queriedSongs;
+    Callback callback;
 
     public DatabaseMediator(Song song)
     {
         this.song = song;
         song.registerObserver(this);
         queriedSongs = new ArrayList<>();
+        callback = new Callback();
     }
 
     /**
