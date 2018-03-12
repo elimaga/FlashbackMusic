@@ -197,6 +197,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
             Album album = gson.fromJson(json, Album.class);
             albums.add(album);
             for (Song song : album.getSongs()) {
+                song.registerObserver(songMediator);
                 songs.add(song);
             }
         }
