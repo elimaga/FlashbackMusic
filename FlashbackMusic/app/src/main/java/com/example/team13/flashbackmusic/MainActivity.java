@@ -1,14 +1,18 @@
 package com.example.team13.flashbackmusic;
 
 
-import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
 import android.media.MediaMetadataRetriever;
 
 import android.Manifest;
 import android.content.Context;
 
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.support.annotation.NonNull;
 
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
@@ -27,7 +31,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.firebase.geofire.GeoLocation;
+
 import java.util.ArrayList;
+import java.util.Calendar;
+
+import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -167,21 +176,41 @@ public class MainActivity extends AppCompatActivity {
 
                 // Only activate flashback mode if there are songs to play
                 if (!playlist.isEmpty()) {
-
-                    ArrayList<Integer> songIndices = new ArrayList<>();
-                    for( Song song : playlist){
-                        songIndices.add(song.getIndex());
-                    }
-                    //Play the playlist
+                    // Play the playlist
                     Intent intent = new Intent(MainActivity.this, SongActivity.class);
-                    intent.putExtra("songIndices",songIndices);
-                    intent.putExtra("vibeModeOn",true);
+                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
+                    songActivityPrepper.sendInfo(true);
                     startActivityForResult(intent, 1);
                 }
-                Log.d("videMode Button", "vibeMode button is pressed from main activity");
+                Log.d("Flashback Button", "Flashback button is pressed from main activity");
 
             }
         });
+
+        // Requesting location permission
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+        }
+
+        // Testing retrieve methods
+        Song song = new Song();
+        DatabaseMediator databaseMediator = new DatabaseMediator(song);
+        databaseMediator.retrieveSongsByLocation(49.0, 25.0);
+        databaseMediator.retrieveSongsByDate("3/6/18");
+
+        ArrayList<String> friends = new ArrayList<>();
+        friends.add("usr1");
+        databaseMediator.retrieveSongsByFriend(friends);
+
+        // TODO: Fix this so we can actually get the list of queried songs
+        ArrayList<String> data = databaseMediator.getQueriedSongs();
+        for (String d : data){
+            System.out.println(d);
+        }
     }
 
     @Override
