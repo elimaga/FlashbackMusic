@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Testing retrieve methods
         Song song = new Song();
-        DatabaseMediator databaseMediator = new DatabaseMediator(song);
+        DatabaseMediator databaseMediator = new DatabaseMediator();
         databaseMediator.retrieveSongsByLocation(49.0, 25.0);
         databaseMediator.retrieveSongsByDate("3/6/18");
 
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Testing retrieve methods
         Song song = new Song();
-        DatabaseMediator databaseMediator = new DatabaseMediator(song);
+        DatabaseMediator databaseMediator = new DatabaseMediator();
         databaseMediator.retrieveSongsByLocation(49.0, 25.0);
         databaseMediator.retrieveSongsByDate("3/6/18");
 

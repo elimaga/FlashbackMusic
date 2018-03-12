@@ -171,7 +171,6 @@ public class SongActivity extends AppCompatActivity {
         {
             mediaPlayer = new MediaPlayer();
         }
-
         try {
             File file = new File(song.getPath());
             Uri uri = Uri.fromFile(file);

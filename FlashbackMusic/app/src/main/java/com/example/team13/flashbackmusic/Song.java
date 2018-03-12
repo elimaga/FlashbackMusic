@@ -7,6 +7,7 @@ package com.example.team13.flashbackmusic;
 import java.util.ArrayList;
 import com.example.team13.flashbackmusic.interfaces.SongObserver;
 import com.example.team13.flashbackmusic.interfaces.SongSubject;
+import com.google.gson.annotations.SerializedName;
 
 
 public class Song implements SongSubject {
@@ -16,9 +17,8 @@ public class Song implements SongSubject {
     private int track;
     private int index; // index in the ArrayList of Songs
     private FavoriteStatus favoriteStatus; // neutral = 0, like = 1, dislike = 2
-    private ArrayList<SongObserver> observers;
+    private transient ArrayList<SongObserver> observers;
 
-  
     public enum FavoriteStatus {
         NEUTRAL, LIKED, DISLIKED;
         public Integer toInt() {
