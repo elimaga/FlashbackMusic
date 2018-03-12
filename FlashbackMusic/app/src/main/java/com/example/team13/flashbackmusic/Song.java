@@ -14,7 +14,7 @@ import com.example.team13.flashbackmusic.interfaces.SongSubject;
 
 public class Song implements Parcelable, SongSubject {
 
-    private String title, artist, lastDay, lastTime, setting, lastDate, path, url;
+    private String title, artist, lastDay, lastTime, setting, lastDate, lastUser, path, url;
     private double lastLatitude, lastLongitude;
     private int track;
     private int index; // index in the ArrayList of Songs
@@ -64,6 +64,25 @@ public class Song implements Parcelable, SongSubject {
         album.addSong(this);
 
     }
+
+    public Song(String title, String artist, String album, int track, String url, int index,
+                String lastDay, String lastTime, double lastLatitude, double lastLongitude,
+                String lastUser, String lastDate) {
+        this.title = title;
+        this.artist = artist;
+        this.track = track;
+        this.url = url;
+        this.index = index;
+        this.lastDay = lastDay;
+        this.lastTime = lastTime;
+        this.lastLatitude = lastLatitude;
+        this.lastLongitude = lastLongitude;
+        this.lastUser = lastUser;
+        this.lastDate = lastDate;
+
+        //TODO: set the album by checking if the album is already made or creating a new one
+    }
+
 
     public Song()
     {
@@ -138,6 +157,8 @@ public class Song implements Parcelable, SongSubject {
         return this.setting;
     }
 
+    public String getLastUser() { return this.lastUser; }
+
     public String getPath() { return this.path; }
 
     public void setFavoriteStatus(FavoriteStatus status) {
@@ -168,6 +189,8 @@ public class Song implements Parcelable, SongSubject {
         this.lastLatitude = lastLatitude;
         this.lastLongitude = lastLongitude;
         this.lastDate = date;
+        // TODO: Change this to the actual username when we have that
+        this.lastUser = "you";
         setTimeOfDay(time);
         notifyObservers();
     }
@@ -248,5 +271,18 @@ public class Song implements Parcelable, SongSubject {
             return new Song[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        // If the object is a Song, check if the title and artist match
+        if (o instanceof Song) {
+            // If the title and artist match, return true
+            if(this.getTitle().equals(((Song)o).getTitle()) && this.getArtist().equals(((Song)o).getArtist())) {
+                return true;
+            }
+        }
+        // Return false if o is not a Song or the titles/artists don't match
+        return false;
+    }
 
 }

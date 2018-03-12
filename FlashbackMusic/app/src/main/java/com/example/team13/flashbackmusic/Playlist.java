@@ -20,15 +20,16 @@ public abstract class Playlist {
     final static int TWO_MATCHES = 3;
     final static int LIKED_AND_ONE_MATCH = 2;
     final static int ONE_MATCH = 1;
+    final static int DISLIKED_SONG = 0;
 
 
     public static ArrayList<Song> playlist;      // the songs in the playlist
     public static ArrayList<Integer> numMatches;
 
-    /*
- * Helper method for the constructor to check if the location of the song is close to the location
- * of the user.
- */
+    /**
+     * Helper method for the constructor to check if the location of the song is close to the location
+     * of the user.
+     */
     public boolean matchesLocation(double curLatitude, double curLongitude, double prevLatitude, double prevLongitude) {
 
         // First check to make sure that each longitude and latitude is a valid coordinate

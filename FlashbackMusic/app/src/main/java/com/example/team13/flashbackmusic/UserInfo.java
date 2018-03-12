@@ -80,6 +80,26 @@ public class UserInfo extends AppCompatActivity{
         return month + "/" + day + "/" + year;
     }
 
+    public static int[] getDateValues(String date) {
+        int firstSlash = date.indexOf("/");
+        int secondSlash = date.lastIndexOf("/");
+        int month = Integer.parseInt(date.substring(0, firstSlash));
+        int day = Integer.parseInt(date.substring(firstSlash + 1, secondSlash));
+        int year = Integer.parseInt(date.substring(secondSlash + 1, date.length()));
+
+        int[] returnArray = {month, day, year};
+        return returnArray;
+    }
+
+    public static int[] backOneDay(int month, int day, int year) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month - 1, day);
+        cal.add(Calendar.DAY_OF_YEAR, -1);
+
+        int[] returnArray = {cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DATE), cal.get(Calendar.YEAR)};
+        return returnArray;
+    }
+
     public static double[] getLocation(Activity activity, LocationManager locationManager)
     {
         LocationListener locationListener = new LocationListener() {

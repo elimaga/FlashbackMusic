@@ -160,11 +160,10 @@ public class DatabaseMediator implements SongObserver {
      */
     public void retrieveSongsByDate(String curDate) {
 
-        int firstSlash = curDate.indexOf("/");
-        int secondSlash = curDate.lastIndexOf("/");
-        int curMonth = Integer.parseInt(curDate.substring(0, firstSlash));
-        int curDay = Integer.parseInt(curDate.substring(firstSlash + 1, secondSlash));
-        int curYear = Integer.parseInt(curDate.substring(secondSlash + 1, curDate.length()));
+        int[] curDateValues = UserInfo.getDateValues(curDate);
+        int curMonth = curDateValues[0];
+        int curDay = curDateValues[1];
+        int curYear = curDateValues[2];
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         final DatabaseReference songReference = firebaseDatabase.getReference("Songs");
@@ -173,7 +172,6 @@ public class DatabaseMediator implements SongObserver {
         for (int i = 0; i < DAYS_IN_WEEK; i++) {
 
             String queryDate = curMonth + "/" + curDay + "/" + curYear;
-            Log.d("Dates Queried", queryDate);
 
             Query queryRef = songReference.orderByChild("lastDate").equalTo(queryDate);
 
@@ -204,13 +202,11 @@ public class DatabaseMediator implements SongObserver {
                 }
             });
 
-            // Rolls the date back one day, might move this to UserInfo later
-            Calendar cal = Calendar.getInstance();
-            cal.set(curYear, curMonth - 1, curDay);
-            cal.add(Calendar.DAY_OF_YEAR, -1);
-            curDay = cal.get(Calendar.DATE);
-            curMonth = cal.get(Calendar.MONTH) + 1;
-            curYear = cal.get(Calendar.YEAR);
+            // Rolls the date back one day
+            int[] newDateValues = UserInfo.backOneDay(curMonth, curDay, curYear);
+            curMonth = newDateValues[0];
+            curDay = newDateValues[1];
+            curYear = newDateValues[2];
 
         }
     }
