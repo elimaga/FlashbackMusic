@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class SongActivityPrepper {
     private Intent intent;
-    private ArrayList<Song> songs;
+    private ArrayList<Song> songs; //songs refer to the songToPlay in songTabfragment
 
     public SongActivityPrepper(Intent i, ArrayList<Song> s)
     {

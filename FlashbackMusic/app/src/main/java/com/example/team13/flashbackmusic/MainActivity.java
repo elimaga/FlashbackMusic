@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Song> songs;
     private ArrayList<Album> albums;
-    //private ArrayList<DatabaseMediator> mediators;
+    private ArrayList<DatabaseMediator> mediators;
     private MusicLibrary musicLibrary;
 
     LocationManager locationManager;
@@ -151,8 +151,8 @@ public class MainActivity extends AppCompatActivity {
                 if (!playlist.isEmpty()) {
                     // Play the playlist
                     Intent intent = new Intent(MainActivity.this, SongActivity.class);
-                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
-                    songActivityPrepper.sendInfo(true);
+                    //SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
+                    //songActivityPrepper.sendInfo(true);
                     startActivityForResult(intent, 1);
                 }
                 Log.d("Flashback Button", "Flashback button is pressed from main activity");
