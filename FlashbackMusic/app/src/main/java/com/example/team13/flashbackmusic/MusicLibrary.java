@@ -7,6 +7,7 @@ import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
 
 import com.example.team13.flashbackmusic.interfaces.MusicLibraryObserver;
+import com.example.team13.flashbackmusic.interfaces.SongObserver;
 import com.example.team13.flashbackmusic.interfaces.Subject;
 import com.google.gson.Gson;
 
@@ -31,7 +32,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
     private final String NUM_OF_ALBUMS_KEY = "num_of_albums";
     private final String SONG_METADATA_SET_KEY = "song_metadata_set";
     private final String ALBUM_METADATA_SET_KEY = "album_metadata_set";
-    private ArrayList<DatabaseMediator> mediators = null;
+    private SongObserver songMediator;
 
     // these sets store metadata to check if a object is made from the file already.
     private ArrayList<HashMap<String, String>> songMetadataSet = null;
@@ -44,7 +45,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
         mContext = context;
         albums = new ArrayList<>();
         songs = new ArrayList<>();
-        mediators = new ArrayList<>();
+        songMediator = new DatabaseMediator();
         songMetadataSet = new ArrayList<>();
         albumMetadataSet = new ArrayList<>();
         observers = new ArrayList<>();
@@ -57,7 +58,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
         mContext = musicLibrary.mContext;
         albums = musicLibrary.albums;
         songs = musicLibrary.songs;
-        mediators = musicLibrary.mediators;
+        songMediator = new DatabaseMediator();
         songMetadataSet = musicLibrary.songMetadataSet;
         albumMetadataSet = musicLibrary.albumMetadataSet;
         observers = musicLibrary.observers;
@@ -116,8 +117,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
                         album.getAlbumName());
                 song.setPath(path);
                 songs.add(song);
-//                DatabaseMediator mediator = new DatabaseMediator(song);
-//                mediators.add(mediator);
+                song.registerObserver(songMediator);
                 album.addSong(song);
                 songMetadataSet.add(songMetadata);
             }

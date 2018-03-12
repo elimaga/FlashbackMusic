@@ -9,7 +9,7 @@ import com.example.team13.flashbackmusic.interfaces.SongObserver;
 import com.example.team13.flashbackmusic.interfaces.SongSubject;
 
 
-public class Song implements  SongSubject {
+public class Song implements SongSubject {
 
     private String title, artist, albumName, lastDay, lastTime, setting, lastDate, path, url;
     private double lastLatitude, lastLongitude;
@@ -187,7 +187,7 @@ public class Song implements  SongSubject {
      */
     public void notifyObservers() {
         for(SongObserver observer : observers) {
-            observer.update();
+            observer.update(this);
         }
     }
 

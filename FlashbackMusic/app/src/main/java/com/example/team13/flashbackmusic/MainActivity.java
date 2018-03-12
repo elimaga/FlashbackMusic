@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Song> songs;
     private ArrayList<Album> albums;
-    //private ArrayList<DatabaseMediator> mediators;
     private MusicLibrary musicLibrary;
 
     LocationManager locationManager;
@@ -67,10 +66,6 @@ public class MainActivity extends AppCompatActivity {
         musicLibrary = MusicLibrary.getInstance(MainActivity.this);
         songs = musicLibrary.getSongs();
         albums = musicLibrary.getAlbums();
-
-
-        // Load the songs and albums into the ArrayLists
-        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
 
         //Tab layout
         TabLayout tabLayout = findViewById(R.id.tab_layout);
@@ -170,10 +165,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Testing retrieve methods
-        Song song = new Song();
-        DatabaseMediator databaseMediator = new DatabaseMediator(song);
-        databaseMediator.retrieveSongsByLocation(49.0, 25.0);
-        databaseMediator.retrieveSongsByDate("3/6/18");
+        DatabaseMediator databaseMediator = new DatabaseMediator();
+        databaseMediator.retrieveSongsByLocation(37.42199833333, -122.084000000);
+        databaseMediator.retrieveSongsByDate("3/13/18");
 
         ArrayList<String> friends = new ArrayList<>();
         friends.add("usr1");
