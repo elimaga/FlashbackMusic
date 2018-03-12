@@ -176,10 +176,14 @@ public class MainActivity extends AppCompatActivity {
 
                 // Only activate flashback mode if there are songs to play
                 if (!playlist.isEmpty()) {
-                    // Play the playlist
+                    ArrayList<Integer> songIndices = new ArrayList<>();
+                    for( Song song : playlist){
+                        songIndices.add(song.getIndex());
+                    }
+                    //Play the playlist
                     Intent intent = new Intent(MainActivity.this, SongActivity.class);
-                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
-                    songActivityPrepper.sendInfo(true);
+                    intent.putExtra("songIndices",songIndices);
+                    intent.putExtra("vibeModeOn",true);
                     startActivityForResult(intent, 1);
                 }
                 Log.d("Flashback Button", "Flashback button is pressed from main activity");
