@@ -144,7 +144,6 @@ public class Song implements Parcelable, SongSubject {
         this.favoriteStatus = status;
     }
 
-
     public boolean isDownloaded() { return !(this.path.equals("")); }
 
     public void setPath(String path) { this.path = path; }

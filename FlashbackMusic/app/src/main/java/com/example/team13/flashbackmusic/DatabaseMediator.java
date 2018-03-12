@@ -2,6 +2,7 @@ package com.example.team13.flashbackmusic;
 
 import android.util.Log;
 
+import com.example.team13.flashbackmusic.interfaces.Callback;
 import com.example.team13.flashbackmusic.interfaces.SongObserver;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -13,6 +14,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,16 +28,17 @@ public class DatabaseMediator implements SongObserver {
     final double KILOMETERS_IN_THOUSAND_FEET = 0.3048;
     final int DAYS_IN_WEEK = 7;
     Song song;
-    ArrayList<String> queriedSongs;
-    Callback callback;
+    ArrayList<DatabaseEntry> queriedData;
+    Callback finishedCallback;
 
-    public DatabaseMediator(Song song)
+    public DatabaseMediator(Song song, Callback callback)
     {
         this.song = song;
         song.registerObserver(this);
-        queriedSongs = new ArrayList<>();
-        callback = new Callback();
+        queriedData = new ArrayList<>();
+        finishedCallback = callback;
     }
+
 
     /**
      * Method that gets called when the data changes in the song object. Delegates to the send
@@ -111,7 +114,21 @@ public class DatabaseMediator implements SongObserver {
 
                 // Add the songKey to the ArrayList of queried songs
                 String songKey = key.substring(0, key.indexOf("-"));
-                queriedSongs.add(songKey);
+
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Songs/" + songKey);
+                ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
+                        queriedData.add(data);
+                        Log.d("Adding to Arraylist", data.getTitle());
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
 
             @Override
@@ -153,9 +170,10 @@ public class DatabaseMediator implements SongObserver {
         final DatabaseReference songReference = firebaseDatabase.getReference("Songs");
 
         // Loop 7 times through the days in the past week
-        for (int i = 1; i < DAYS_IN_WEEK; i++) {
+        for (int i = 0; i < DAYS_IN_WEEK; i++) {
 
             String queryDate = curMonth + "/" + curDay + "/" + curYear;
+            Log.d("Dates Queried", queryDate);
 
             Query queryRef = songReference.orderByChild("lastDate").equalTo(queryDate);
 
@@ -164,8 +182,7 @@ public class DatabaseMediator implements SongObserver {
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     // Add the song key to the Arraylist of queried songs
                     DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
-                    String songKey = data.getUsername() + "_" + data.getTitle() +"_" + data.getArtist();
-                    queriedSongs.add(songKey);
+                    queriedData.add(data);
 
                     Log.d("Retrieve Songs By Date", "Retrieved song titled " + data.getTitle());
                 }
@@ -217,8 +234,7 @@ public class DatabaseMediator implements SongObserver {
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     // Add the song key to the Arraylist of queried songs
                     DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
-                    String songKey = data.getUsername() + "_" + data.getTitle() + "_" + data.getArtist();
-                    queriedSongs.add(songKey);
+                    queriedData.add(data);
 
                     Log.d("Retrieve Songs By Friends", "Retrieved song titled " + data.getTitle());
                 }
@@ -242,10 +258,11 @@ public class DatabaseMediator implements SongObserver {
         }
     }
 
+
     /**
      * Getter for the list of queried songs
      * @return the list of queried songs
      */
-    public ArrayList<String> getQueriedSongs() { return queriedSongs; }
+    public ArrayList<DatabaseEntry> getQueriedData() { return queriedData; }
 
 }

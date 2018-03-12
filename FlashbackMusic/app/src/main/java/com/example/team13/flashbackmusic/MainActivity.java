@@ -1,7 +1,6 @@
 package com.example.team13.flashbackmusic;
 
 
-import android.content.res.AssetFileDescriptor;
 import android.media.MediaMetadataRetriever;
 
 import android.Manifest;
@@ -9,10 +8,7 @@ import android.content.Context;
 
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.annotation.NonNull;
 
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
@@ -31,12 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
-import com.firebase.geofire.GeoLocation;
-
 import java.util.ArrayList;
-import java.util.Calendar;
-
-import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -171,18 +162,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Testing retrieve methods
         Song song = new Song();
-        DatabaseMediator databaseMediator = new DatabaseMediator(song);
-        databaseMediator.retrieveSongsByLocation(49.0, 25.0);
-        databaseMediator.retrieveSongsByDate("3/6/18");
+        DatabaseMediator databaseMediator = new DatabaseMediator(song, new SimpleCallback());
+        databaseMediator.retrieveSongsByLocation(37.4219983333, -122.084);
+        databaseMediator.retrieveSongsByDate("3/14/2018");
 
         ArrayList<String> friends = new ArrayList<>();
         friends.add("usr1");
         databaseMediator.retrieveSongsByFriend(friends);
 
-        // TODO: Fix this so we can actually get the list of queried songs
-        ArrayList<String> data = databaseMediator.getQueriedSongs();
-        for (String d : data){
-            System.out.println(d);
+        ArrayList<DatabaseEntry> data = databaseMediator.getQueriedData();
+        for (DatabaseEntry d : data){
+            System.out.println(d.getTitle());
         }
     }
 

@@ -91,7 +91,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
                         album);
                 song.setPath(path);
                 songs.add(song);
-                DatabaseMediator mediator = new DatabaseMediator(song);
+                DatabaseMediator mediator = new DatabaseMediator(song, new SimpleCallback());
                 mediators.add(mediator);
                 album.addSong(song);
                 songMetadataSet.add(songMetadata);
