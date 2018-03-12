@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
-
 /**
  * Created by Kazutaka on 3/6/18.
  */
@@ -88,9 +87,9 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
         return instance;
     }
 
-    ArrayList<Song> getSongs() { return songs; }
+    ArrayList<Song> getSongs() { return new ArrayList<>(songs); }
 
-    ArrayList<Album> getAlbums() { return albums; }
+    ArrayList<Album> getAlbums() { return new ArrayList<>(albums); }
 
     void addSongsIntoLibraryFromPath(ArrayList<String> paths, String url) {
         for (String path : paths) {
@@ -178,6 +177,16 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
         String json = gson.toJson(album);
         editor.putString(Integer.toString(album.getIndex()), json);
         editor.apply();
+    }
+
+    public void persistSong(Song song) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        for (Album album : albums) {
+            if (album.getAlbumName().equals(song.getAlbumName())) {
+                persistAlbum(album);
+                break;
+            }
+        }
     }
 
     private void loadSongObjects() {

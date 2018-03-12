@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 if (!playlist.isEmpty()) {
                     // Play the playlist
                     Intent intent = new Intent(MainActivity.this, SongActivity.class);
-                    //SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
+//                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
                     //songActivityPrepper.sendInfo(true);
                     startActivityForResult(intent, 1);
                 }
@@ -219,22 +219,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Bundle extras = data.getExtras();
 
-        // If the songs ended normally or back was pressed while in default mode then simply update
-        // the info of the songs.
-        if (requestCode == 0 && (resultCode == RESULT_OK || resultCode == RESULT_CANCELED) && data != null) {
-            updateSongs(extras);
-        }
-        // Else if back button was pressed in Flashback Mode then update the songs that were played,
-        // but do not restart Flashback Mode
-        else if (requestCode == 1 && resultCode == RESULT_CANCELED && data != null) {
-            updateSongs(extras);
-        }
-        // Else if the songs ended normally in Flashback Mode then update the songs and restart
+        // if the songs ended normally in Flashback Mode then update the songs and restart
         // flashback mode
-        else if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
-            updateSongs(extras);
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
             flashBackButton.performClick();
         }
     }
@@ -244,72 +232,5 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
     }
-
-    /**
-     * Method to retrieve the prior info of the song from the SharedPreferences and then set the
-     * data in the Song object.
-     * @param song - the song to retrieve the info for
-     */
-    public void retrieveInfo(Song song) {
-
-        String title = song.getTitle();
-
-        //Get the info from the new info from the shared preferences
-        SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
-        double latitude = Double.parseDouble(sharedPreferences.getString(title + "_latitude", "" + INVALID_COORDINATE));
-        double longitude = Double.parseDouble(sharedPreferences.getString(title + "_longitude", "" + INVALID_COORDINATE));
-        String day = sharedPreferences.getString(title + "_day", "");
-        String time = sharedPreferences.getString(title + "_time", "");
-        String date = sharedPreferences.getString(title + "_date", "");
-        Song.FavoriteStatus favoriteStatus = Song.FavoriteStatus.valueOf(sharedPreferences.getString(title + "_favStatus", "NEUTRAL"));
-
-
-        // Update the data in the Song object
-        song.setData(latitude, longitude, day, time, date);
-        song.setFavoriteStatus(favoriteStatus);
-
-    }
-
-    /**
-     * Method to update the new location, date, and time info for the songs that have been played
-     * @param extras - contains the new data for the songs
-     */
-    private void updateSongs(Bundle extras) {
-        // Save the info in the SharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        ArrayList<Integer> indices = extras.getIntegerArrayList("indices");
-        ArrayList<String> newLatitudes = extras.getStringArrayList("newLatitudes");
-        ArrayList<String> newLongitudes = extras.getStringArrayList("newLongitudes");
-        ArrayList<String> newTimes = extras.getStringArrayList("newTimes");
-        ArrayList<String> newDays = extras.getStringArrayList("newDays");
-        ArrayList<String> newDates = extras.getStringArrayList("newDates");
-
-        for (int index = 0; index < indices.size(); index++) {
-
-            String title = songs.get(indices.get(index)).getTitle();
-            double newLatitude = Double.parseDouble(newLatitudes.get(index));
-            double newLongitude = Double.parseDouble(newLongitudes.get(index));
-            String newDay = newDays.get(index);
-            String newTime = newTimes.get(index);
-            String newDate = newDates.get(index);
-
-            editor.putString(title + "_latitude", "" + newLatitude);
-            editor.putString(title + "_longitude", "" + newLongitude);
-            editor.putString(title + "_day", newDay);
-            editor.putString(title + "_date", newDate);
-            editor.putString(title + "_time", newTime);
-
-            editor.apply();
-
-            songs.get(indices.get(index)).setData(newLatitude, newLongitude, newDay, newTime, newDate);
-
-        }
-    }
-
-
-
-
 }
 
