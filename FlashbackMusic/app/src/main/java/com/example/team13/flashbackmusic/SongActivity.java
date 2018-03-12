@@ -81,7 +81,7 @@ public class SongActivity extends AppCompatActivity {
         // need to save whether the app was in vibe mode or not into shared preferences
         SharedPreferences sharedPreferences = getSharedPreferences("vibe_mode", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("vimbeModeOn", vibeModeOn);
+        editor.putBoolean("vibeModeOn", vibeModeOn);
         editor.apply();
     }
 

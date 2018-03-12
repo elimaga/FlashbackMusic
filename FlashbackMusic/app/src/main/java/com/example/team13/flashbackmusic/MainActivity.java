@@ -1,18 +1,14 @@
 package com.example.team13.flashbackmusic;
 
 
-import android.content.res.AssetFileDescriptor;
+import android.content.SharedPreferences;
 import android.media.MediaMetadataRetriever;
 
 import android.Manifest;
 import android.content.Context;
 
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.annotation.NonNull;
 
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
@@ -31,20 +27,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
-import com.firebase.geofire.GeoLocation;
-
 import java.util.ArrayList;
-import java.util.Calendar;
-
-import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
 
-    ImageButton flashBackButton;
+    ImageButton vibeModeButton;
     private DrawerLayout mDrawerLayout;
 
     private ArrayList<Song> songs;
-    private ArrayList<Album> albums;
     private ArrayList<DatabaseMediator> mediators;
     private MusicLibrary musicLibrary;
 
@@ -57,20 +47,48 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        musicLibrary = MusicLibrary.getInstance(MainActivity.this);
+        songs = musicLibrary.getSongs();
+
+        setUpUI();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("vibe_mode",MODE_PRIVATE);
+        if(sharedPreferences.getBoolean("vibeModeOn",false)){
+            vibeModeButton.performClick();
+        }
+
+        // Requesting location permission
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+        }
+
+        // Testing retrieve methods
+        Song song = new Song();
+        DatabaseMediator databaseMediator = new DatabaseMediator(song);
+        databaseMediator.retrieveSongsByLocation(49.0, 25.0);
+        databaseMediator.retrieveSongsByDate("3/6/18");
+
+        ArrayList<String> friends = new ArrayList<>();
+        friends.add("usr1");
+        databaseMediator.retrieveSongsByFriend(friends);
+
+        // TODO: Fix this so we can actually get the list of queried songs
+        ArrayList<String> data = databaseMediator.getQueriedSongs();
+        for (String d : data){
+            System.out.println(d);
+        }
+    }
+
+    private void setUpUI() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
-
-        // TODO:
-        musicLibrary = MusicLibrary.getInstance(MainActivity.this);
-        songs = musicLibrary.getSongs();
-        albums = musicLibrary.getAlbums();
-
-
-        // Load the songs and albums into the ArrayLists
-        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
 
         //Tab layout
         TabLayout tabLayout = findViewById(R.id.tab_layout);
@@ -129,10 +147,10 @@ public class MainActivity extends AppCompatActivity {
                 });
 
 
-        // Flashback button
+        // VibeMode button
         final Context context = getApplicationContext();
-        flashBackButton = findViewById(R.id.flashback_button);
-        flashBackButton.setOnClickListener(new View.OnClickListener() {
+        vibeModeButton = findViewById(R.id.flashback_button);
+        vibeModeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -149,41 +167,21 @@ public class MainActivity extends AppCompatActivity {
 
                 // Only activate flashback mode if there are songs to play
                 if (!playlist.isEmpty()) {
-                    // Play the playlist
+
+                    ArrayList<Integer> songIndices = new ArrayList<>();
+                    for( Song song : playlist){
+                        songIndices.add(song.getIndex());
+                    }
+                    //Play the playlist
                     Intent intent = new Intent(MainActivity.this, SongActivity.class);
-//                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
-                    //songActivityPrepper.sendInfo(true);
+                    intent.putExtra("songIndices",songIndices);
+                    intent.putExtra("vibeModeOn",true);
                     startActivityForResult(intent, 1);
                 }
-                Log.d("Flashback Button", "Flashback button is pressed from main activity");
+                Log.d("videMode Button", "vibeMode button is pressed from main activity");
 
             }
         });
-
-        // Requesting location permission
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
-        }
-
-        // Testing retrieve methods
-        Song song = new Song();
-        DatabaseMediator databaseMediator = new DatabaseMediator(song);
-        databaseMediator.retrieveSongsByLocation(49.0, 25.0);
-        databaseMediator.retrieveSongsByDate("3/6/18");
-
-        ArrayList<String> friends = new ArrayList<>();
-        friends.add("usr1");
-        databaseMediator.retrieveSongsByFriend(friends);
-
-        // TODO: Fix this so we can actually get the list of queried songs
-        ArrayList<String> data = databaseMediator.getQueriedSongs();
-        for (String d : data){
-            System.out.println(d);
-        }
     }
 
     @Override
@@ -196,19 +194,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public Song getSong(int index)
-    {
-        return songs.get(index);
-    }
-
-    public Album getAlbum(int index)
-    {
-        return albums.get(index);
-    }
-
-    public ArrayList<Song> getSongs() {return songs;}
-
-    public ArrayList<Album> getAlbums() {return albums;}
 
 
     /**
@@ -220,17 +205,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        SharedPreferences sharedPreferences = getSharedPreferences("vibe_mode",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("vibeModeOn", false);
+        editor.apply();
+
         // if the songs ended normally in Flashback Mode then update the songs and restart
         // flashback mode
         if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
-            flashBackButton.performClick();
+            vibeModeButton.performClick();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
     }
 }
 

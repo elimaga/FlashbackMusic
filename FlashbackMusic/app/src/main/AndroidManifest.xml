@@ -24,10 +24,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".FlashbackActivity"
-            android:label="@string/title_activity_flashback"
-            android:theme="@style/AppTheme"></activity>
-        <activity
             android:name=".SongActivity"
             android:configChanges="orientation|screenSize">
             <intent-filter>
