@@ -57,6 +57,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
         mContext = musicLibrary.mContext;
         albums = musicLibrary.albums;
         songs = musicLibrary.songs;
+        mediators = musicLibrary.mediators;
         songMetadataSet = musicLibrary.songMetadataSet;
         albumMetadataSet = musicLibrary.albumMetadataSet;
         observers = musicLibrary.observers;
@@ -115,8 +116,8 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
                         album.getAlbumName());
                 song.setPath(path);
                 songs.add(song);
-                DatabaseMediator mediator = new DatabaseMediator(song);
-                mediators.add(mediator);
+//                DatabaseMediator mediator = new DatabaseMediator(song);
+//                mediators.add(mediator);
                 album.addSong(song);
                 songMetadataSet.add(songMetadata);
             }
