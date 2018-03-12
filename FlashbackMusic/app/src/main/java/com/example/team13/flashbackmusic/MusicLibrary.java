@@ -66,7 +66,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
     @Override
     protected Boolean doInBackground(String ... args) {
         List<String> argList = Arrays.asList(args);
-        ArrayList<String> paths = new ArrayList<>(argList.subList(0,argList.size()-2));
+        ArrayList<String> paths = new ArrayList<>(argList.subList(0,argList.size()-1));
         String url = argList.get(argList.size() - 1);
         addSongsIntoLibraryFromPath(paths, url);
         return true;

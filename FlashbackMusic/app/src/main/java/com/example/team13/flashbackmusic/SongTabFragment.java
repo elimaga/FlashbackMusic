@@ -55,7 +55,7 @@ public class SongTabFragment extends Fragment {
                 if(!songToPlay.isEmpty()) {
 
                     Intent intent = new Intent(main, SongActivity.class);
-                    intent.putExtra("songIndexes",indexOfSong);
+                    intent.putExtra("songIndices",indexOfSong);
                     intent.putExtra("vibeModeOn", false);
 
                     main.startActivityForResult(intent, 0);

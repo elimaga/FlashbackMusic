@@ -52,7 +52,7 @@ public class AlbumTabFragment extends Fragment {
                 // Only play the songs that are not empty
                 if(!indexOfSong.isEmpty()) {
                     Intent intent = new Intent(main, SongActivity.class);
-                    intent.putExtra("songIndexes",indexOfSong);
+                    intent.putExtra("songIndices",indexOfSong);
                     intent.putExtra("vibeModeOn",false);
                     main.startActivityForResult(intent, 0);
                 }
