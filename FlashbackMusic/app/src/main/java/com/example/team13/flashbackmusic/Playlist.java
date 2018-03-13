@@ -93,4 +93,8 @@ public abstract class Playlist {
         return diff;
     }
 
+    public ArrayList<Song> getPlaylist() {
+        return this.playlist;
+    }
+
 }

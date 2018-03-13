@@ -130,13 +130,18 @@ public class MainActivity extends AppCompatActivity {
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
                 String userTime = UserInfo.getTime();
-                String userDay = UserInfo.getDay();
+                //String userDay = UserInfo.getDay();
                 String userDate = UserInfo.getDate();
+                ArrayList<String> userFriends = new ArrayList<>();
+                userFriends.add("usr1");
 
                 // Generate the Flashback Playlist
-                FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
-                        userDay, userTime, userDate);
-                ArrayList<Song> playlist = flashbackPlaylist.getPlaylist();
+                //FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
+                //        userDay, userTime, userDate);
+                //ArrayList<Song> playlist = flashbackPlaylist.getPlaylist();
+
+                VibeModePlaylist vibeModePlaylist = new VibeModePlaylist(userLocation, userDate, userFriends);
+                ArrayList<Song> playlist = vibeModePlaylist.getPlaylist();
 
                 // Only activate flashback mode if there are songs to play
                 if (!playlist.isEmpty()) {
@@ -161,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Testing retrieve methods
+        /*
         Song song = new Song();
         DatabaseMediator databaseMediator = new DatabaseMediator(song, new SimpleCallback());
         databaseMediator.retrieveSongsByLocation(37.4219983333, -122.084);
@@ -173,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<DatabaseEntry> data = databaseMediator.getQueriedData();
         for (DatabaseEntry d : data){
             System.out.println(d.getTitle());
-        }
+        }*/
     }
 
     @Override

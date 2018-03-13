@@ -38,6 +38,7 @@ public class DataCallback implements Callback {
         }
 
         if(!songIsDownloaded) {
+            //TODO: Check if the album is already created, if so, just create the song object with that album, if not then create a new album
             Song newSong = new Song(data.getTitle(), data.getArtist(), data.getAlbumName(), data.getTrackNumber(),
                     data.getURL(), allSongs.size(), data.getLastDay(), data.getLastTime(), data.getLastLatitude(),
                     data.getLastLongitude(), data.getUsername(), data.getLastDate());

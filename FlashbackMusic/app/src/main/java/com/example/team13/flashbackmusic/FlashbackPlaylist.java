@@ -244,9 +244,4 @@ public class FlashbackPlaylist extends Playlist {
 
     }
 
-    public ArrayList<Song> getPlaylist() {
-        return this.playlist;
-    }
-
-
 }
