@@ -1,6 +1,7 @@
 package com.example.team13.flashbackmusic;
 
 
+import android.content.res.AssetFileDescriptor;
 import android.media.MediaMetadataRetriever;
 
 import android.Manifest;
@@ -8,7 +9,10 @@ import android.content.Context;
 
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.support.annotation.NonNull;
 
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
@@ -27,16 +31,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.example.team13.flashbackmusic.interfaces.Callback;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    ImageButton flashBackButton;
+    MainActivity instance;
+
+    ImageButton vibeModeButton;
     private DrawerLayout mDrawerLayout;
 
     private ArrayList<Song> songs;
-    private ArrayList<Album> albums;
-    //private ArrayList<DatabaseMediator> mediators;
+    private ArrayList<DatabaseMediator> mediators;
     private MusicLibrary musicLibrary;
 
     LocationManager locationManager;
@@ -48,20 +55,50 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        instance = this;
+
+        musicLibrary = MusicLibrary.getInstance(MainActivity.this);
+        songs = musicLibrary.getSongs();
+
+        setUpUI();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("vibe_mode",MODE_PRIVATE);
+        if(sharedPreferences.getBoolean("vibeModeOn",false)){
+            vibeModeButton.performClick();
+        }
+
+        // Requesting location permission
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+        }
+
+        // Testing retrieve methods
+        /*
+        Song song = new Song();
+        DatabaseMediator databaseMediator = new DatabaseMediator(song, new SimpleCallback());
+        databaseMediator.retrieveSongsByLocation(37.4219983333, -122.084);
+        databaseMediator.retrieveSongsByDate("3/14/2018");
+
+        ArrayList<String> friends = new ArrayList<>();
+        friends.add("usr1");
+        databaseMediator.retrieveSongsByFriend(friends);
+
+        ArrayList<DatabaseEntry> data = databaseMediator.getQueriedData();
+        for (DatabaseEntry d : data){
+            System.out.println(d.getTitle());
+        }*/
+    }
+
+    private void setUpUI() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
-
-        // TODO:
-        musicLibrary = MusicLibrary.getInstance();
-        songs = musicLibrary.getSongs();
-        albums = musicLibrary.getAlbums();
-
-
-        // Load the songs and albums into the ArrayLists
-        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
 
         //Tab layout
         TabLayout tabLayout = findViewById(R.id.tab_layout);
@@ -108,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(intent);
 
                         }
-//                        menuItem.setChecked(true);
+                        //menuItem.setChecked(true);
                         // close drawer when item is tapped
                         mDrawerLayout.closeDrawers();
 
@@ -120,16 +157,16 @@ public class MainActivity extends AppCompatActivity {
                 });
 
 
-        // Flashback button
+        // VibeMode button
         final Context context = getApplicationContext();
-        flashBackButton = findViewById(R.id.flashback_button);
-        flashBackButton.setOnClickListener(new View.OnClickListener() {
+        vibeModeButton = findViewById(R.id.flashback_button);
+        vibeModeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
-                String userTime = UserInfo.getTime();
+                //String userTime = UserInfo.getTime();
                 //String userDay = UserInfo.getDay();
                 String userDate = UserInfo.getDate();
                 ArrayList<String> userFriends = new ArrayList<>();
@@ -138,20 +175,17 @@ public class MainActivity extends AppCompatActivity {
                 // Generate the Flashback Playlist
                 //FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
                 //        userDay, userTime, userDate);
-                //ArrayList<Song> playlist = flashbackPlaylist.getPlaylist();
+                //ArrayList<Song> vibeModePlaylist = flashbackPlaylist.getPlaylist();
 
-                VibeModePlaylist vibeModePlaylist = new VibeModePlaylist(userLocation, userDate, userFriends);
-                ArrayList<Song> playlist = vibeModePlaylist.getPlaylist();
+                VibeModePlaylist vibeModePlaylist = new VibeModePlaylist(userLocation, userDate, userFriends, musicLibrary);
 
-                // Only activate flashback mode if there are songs to play
-                if (!playlist.isEmpty()) {
-                    // Play the playlist
-                    Intent intent = new Intent(MainActivity.this, SongActivity.class);
-                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, playlist);
-                    songActivityPrepper.sendInfo(true);
-                    startActivityForResult(intent, 1);
-                }
-                Log.d("Flashback Button", "Flashback button is pressed from main activity");
+                Callback callback = new DataCallback(songs, vibeModePlaylist, MainActivity.this, instance);
+                DatabaseMediator mediator = new DatabaseMediator(callback);
+                mediator.retrieveSongsByFriend(userFriends);
+                mediator.retrieveSongsByDate(userDate);
+                mediator.retrieveSongsByLocation(userLocation[0], userLocation[1]);
+
+                Log.d("Vibe Mode Button", "Vibe Mode button is pressed from main activity");
 
             }
         });
@@ -165,21 +199,6 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         }
 
-        // Testing retrieve methods
-        /*
-        Song song = new Song();
-        DatabaseMediator databaseMediator = new DatabaseMediator(song, new SimpleCallback());
-        databaseMediator.retrieveSongsByLocation(37.4219983333, -122.084);
-        databaseMediator.retrieveSongsByDate("3/14/2018");
-
-        ArrayList<String> friends = new ArrayList<>();
-        friends.add("usr1");
-        databaseMediator.retrieveSongsByFriend(friends);
-
-        ArrayList<DatabaseEntry> data = databaseMediator.getQueriedData();
-        for (DatabaseEntry d : data){
-            System.out.println(d.getTitle());
-        }*/
     }
 
     @Override
@@ -192,19 +211,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public Song getSong(int index)
-    {
-        return songs.get(index);
-    }
-
-    public Album getAlbum(int index)
-    {
-        return albums.get(index);
-    }
-
-    public ArrayList<Song> getSongs() {return songs;}
-
-    public ArrayList<Album> getAlbums() {return albums;}
 
 
     /**
@@ -215,97 +221,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Bundle extras = data.getExtras();
 
-        // If the songs ended normally or back was pressed while in default mode then simply update
-        // the info of the songs.
-        if (requestCode == 0 && (resultCode == RESULT_OK || resultCode == RESULT_CANCELED) && data != null) {
-            updateSongs(extras);
-        }
-        // Else if back button was pressed in Flashback Mode then update the songs that were played,
-        // but do not restart Flashback Mode
-        else if (requestCode == 1 && resultCode == RESULT_CANCELED && data != null) {
-            updateSongs(extras);
-        }
-        // Else if the songs ended normally in Flashback Mode then update the songs and restart
-        // flashback mode
-        else if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
-            updateSongs(extras);
-            flashBackButton.performClick();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
-
-    /**
-     * Method to retrieve the prior info of the song from the SharedPreferences and then set the
-     * data in the Song object.
-     * @param song - the song to retrieve the info for
-     */
-    public void retrieveInfo(Song song) {
-
-        String title = song.getTitle();
-
-        //Get the info from the new info from the shared preferences
-        SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
-        double latitude = Double.parseDouble(sharedPreferences.getString(title + "_latitude", "" + INVALID_COORDINATE));
-        double longitude = Double.parseDouble(sharedPreferences.getString(title + "_longitude", "" + INVALID_COORDINATE));
-        String day = sharedPreferences.getString(title + "_day", "");
-        String time = sharedPreferences.getString(title + "_time", "");
-        String date = sharedPreferences.getString(title + "_date", "");
-        Song.FavoriteStatus favoriteStatus = Song.FavoriteStatus.valueOf(sharedPreferences.getString(title + "_favStatus", "NEUTRAL"));
-
-
-        // Update the data in the Song object
-        song.setData(latitude, longitude, day, time, date);
-        song.setFavoriteStatus(favoriteStatus);
-
-    }
-
-    /**
-     * Method to update the new location, date, and time info for the songs that have been played
-     * @param extras - contains the new data for the songs
-     */
-    private void updateSongs(Bundle extras) {
-        // Save the info in the SharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences("flashback", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("vibe_mode",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("vibeModeOn", false);
+        editor.apply();
 
-        ArrayList<Integer> indices = extras.getIntegerArrayList("indices");
-        ArrayList<String> newLatitudes = extras.getStringArrayList("newLatitudes");
-        ArrayList<String> newLongitudes = extras.getStringArrayList("newLongitudes");
-        ArrayList<String> newTimes = extras.getStringArrayList("newTimes");
-        ArrayList<String> newDays = extras.getStringArrayList("newDays");
-        ArrayList<String> newDates = extras.getStringArrayList("newDates");
-
-        for (int index = 0; index < indices.size(); index++) {
-
-            String title = songs.get(indices.get(index)).getTitle();
-            double newLatitude = Double.parseDouble(newLatitudes.get(index));
-            double newLongitude = Double.parseDouble(newLongitudes.get(index));
-            String newDay = newDays.get(index);
-            String newTime = newTimes.get(index);
-            String newDate = newDates.get(index);
-
-            editor.putString(title + "_latitude", "" + newLatitude);
-            editor.putString(title + "_longitude", "" + newLongitude);
-            editor.putString(title + "_day", newDay);
-            editor.putString(title + "_date", newDate);
-            editor.putString(title + "_time", newTime);
-
-            editor.apply();
-
-            songs.get(indices.get(index)).setData(newLatitude, newLongitude, newDay, newTime, newDate);
-
+        // if the songs ended normally in Flashback Mode then update the songs and restart
+        // flashback mode
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            vibeModeButton.performClick();
         }
     }
-
-
-
-
 }
 

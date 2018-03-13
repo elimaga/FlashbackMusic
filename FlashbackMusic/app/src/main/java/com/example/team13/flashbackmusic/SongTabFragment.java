@@ -29,7 +29,8 @@ public class SongTabFragment extends Fragment {
 
         main = (MainActivity) getActivity();
         View rootView = inflater.inflate(R.layout.song_tab_fragment, container, false);
-        musicLibrary = MusicLibrary.getInstance();
+        musicLibrary = MusicLibrary.getInstance(main
+        );
 
         songListView = rootView.findViewById(R.id.song_list_view);
         songListView.setOnItemClickListener(new ListView.OnItemClickListener() {
@@ -37,21 +38,26 @@ public class SongTabFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 Song song = (Song) adapterView.getItemAtPosition(position);
+
                 ArrayList<Song> songToPlay = new ArrayList<>();
+                ArrayList<Integer> indexOfSong = new ArrayList<>();
 
                 // Only play the song if it's not disliked
                 if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
                     songToPlay.add(song);
+                    indexOfSong.add(song.getIndex());
                 }
                 else {
                     Log.d("Disliked Song", "Skipping");
                 }
 
-                // Only play the song if it's not disliked
+                // Only play the song if it's not empty
                 if(!songToPlay.isEmpty()) {
+
                     Intent intent = new Intent(main, SongActivity.class);
-                    SongActivityPrepper songActivityPrepper = new SongActivityPrepper(intent, songToPlay);
-                    songActivityPrepper.sendInfo(false);
+                    intent.putExtra("songIndices",indexOfSong);
+                    intent.putExtra("vibeModeOn", false);
+
                     main.startActivityForResult(intent, 0);
                 }
 
@@ -61,7 +67,6 @@ public class SongTabFragment extends Fragment {
 
         SongAdapter songAdapter = new SongAdapter(main, musicLibrary.getSongs());
         songListView.setAdapter(songAdapter);
-
 
         return rootView;
 

@@ -15,45 +15,54 @@ public class VibeModePlaylist extends Playlist {
     double[] location;
     String date;
     ArrayList<String> friends;
+    MusicLibrary musicLibrary;
 
-    public VibeModePlaylist(double[] location, String date, ArrayList<String> friends) {
+    public VibeModePlaylist(double[] location, String date, ArrayList<String> friends, MusicLibrary musicLibrary) {
         this.location = location;
         this.date = date;
         this.friends = friends;
+        this.musicLibrary = musicLibrary;
+        playlist = new ArrayList<>();
+        numMatches = new ArrayList<>();
     }
 
     public void addSong(Song song) {
         int reqMatches = numMatchesOfSong(song);
 
-        // If the song is disliked, we don't want to add it to the playlist
+        // If the song is disliked, we don't want to add it to the vibeModePlaylist
         if(reqMatches == DISLIKED_SONG) {
             return;
         }
 
-        // Check if the song is already in the playlist so we don't have repeats
-        int index = playlist.indexOf(song);
-        // If the song is already in the playlist, check which song (the previous or the current) has
+        // Check if the song is already in the vibeModePlaylist so we don't have repeats
+        int playlistIndex = playlist.indexOf(song);
+        int songIndex = song.getIndex();
+        // If the song is already in the vibeModePlaylist, check which song (the previous or the current) has
         // more requirement matches
-        if(index != -1) {
+        if(playlistIndex != -1) {
             // If the number of requirement matches for the current instance of the song is greater
-            // than the number of matches for the song that is already in the playlist, then replace
+            // than the number of matches for the song that is already in the vibeModePlaylist, then replace
             // the previous song with the current one
-            if(reqMatches > numMatches.get(index)) {
-                playlist.set(index, song);
-                numMatches.set(index, reqMatches);
+            if(reqMatches > numMatches.get(playlistIndex)) {
+                //TODO: Fix this so that the song in the music library is changed to this new song
+                musicLibrary.persistSong(song);
+                playlist.set(playlistIndex, song);
+                numMatches.set(playlistIndex, reqMatches);
             }
             // Else if the number of matches is the same, check which song has the higher priority
-            else if(reqMatches == numMatches.get(index)) {
-                // If the song that is not in the playlist has a higher priority, put it in the playlist,
+            else if(reqMatches == numMatches.get(playlistIndex)) {
+                // If the song that is not in the VibeModePlaylist has a higher priority, put it in the VibeModePlaylist,
                 // replacing the old instance of the song
-                if(hasHigherPriority(song, playlist.get(index))) {
-                    playlist.set(index, song);
-                    numMatches.set(index, reqMatches);
+                if(hasHigherPriority(song, playlist.get(playlistIndex))) {
+                    musicLibrary.persistSong(song);
+                    playlist.set(playlistIndex, song);
+                    numMatches.set(playlistIndex, reqMatches);
                 }
             }
         }
-        // Else the song isn't in the playlist yet, so add it
+        // Else the song isn't in the vibeModePlaylist yet, so add it
         else {
+            musicLibrary.persistSong(song);
             playlist.add(song);
             numMatches.add(reqMatches);
         }
@@ -72,7 +81,7 @@ public class VibeModePlaylist extends Playlist {
             // Only add the songs that are not disliked
             if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
 
-                // If the song is liked, it should occur earlier in the playlist than a song that is
+                // If the song is liked, it should occur earlier in the vibeModePlaylist than a song that is
                 // not liked
                 if(song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                     return LIKED_AND_THREE_MATCHES;
@@ -96,7 +105,7 @@ public class VibeModePlaylist extends Playlist {
             // Only add the songs that are not disliked
             if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
 
-                // If the song is liked, it should occur earlier in the playlist than a song that is
+                // If the song is liked, it should occur earlier in the vibeModePlaylist than a song that is
                 // not liked
                 if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                     return LIKED_AND_TWO_MATCHES;
@@ -116,7 +125,7 @@ public class VibeModePlaylist extends Playlist {
             // Only add the songs that are not disliked
             if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
 
-                // If the song is liked, it should occur earlier in the playlist than a song that is
+                // If the song is liked, it should occur earlier in the vibeModePlaylist than a song that is
                 // not liked
                 if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                     return LIKED_AND_ONE_MATCH;
@@ -135,8 +144,8 @@ public class VibeModePlaylist extends Playlist {
     /**
      * Breaks ties between duplicate songs. First checks if both song match requirements (a)-(c), then checks
      * there date and time if the songs have the same matches.
-     * @param newSong - the song that is not in the playlist
-     * @param oldSong - the song that has already been added to the playlist
+     * @param newSong - the song that is not in the vibeModePlaylist
+     * @param oldSong - the song that has already been added to the vibeModePlaylist
      * @return - returns true if the new song has higher priority, false otherwise
      */
     public boolean hasHigherPriority(Song newSong, Song oldSong) {
