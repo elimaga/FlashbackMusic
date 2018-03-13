@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.location.Address;
@@ -12,6 +13,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +26,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,47 +42,50 @@ public class SongActivity extends AppCompatActivity {
     int index = 0;
     Bundle extras;
     Button playPauseButton;
-    ArrayList<Integer> resIds;
-    ArrayList<Integer> indices;
-    ArrayList<String> newLatitudes;
-    ArrayList<String> newLongitudes;
-    ArrayList<String> newTimes;
-    ArrayList<String> newDays;
-    ArrayList<String> newDates;
+    MusicLibrary musicLibrary;
+    ArrayList<Integer> songIndices;
+    Song currSong;
+    boolean vibeModeOn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song);
 
-
+        musicLibrary = MusicLibrary.getInstance(SongActivity.this);
         extras = getIntent().getExtras();
-        indices = new ArrayList<>();
-        newLatitudes = new ArrayList<>();
-        newLongitudes = new ArrayList<>();
-        newTimes = new ArrayList<>();
-        newDays = new ArrayList<>();
-        newDates = new ArrayList<>();
-        boolean vibeModeOn = false;
+
 
         if(extras != null) {
-            resIds = extras.getIntegerArrayList("resIds");
+            songIndices = extras.getIntegerArrayList("songIndices");
             vibeModeOn = extras.getBoolean("vibeModeOn");
         }
 
-        // If Flashback Mode is on, display it to the user so they know they are in flashback mode
-        TextView VibeMode = (TextView) findViewById(R.id.vibe_mode);
-        if(vibeModeOn) {
-            VibeMode.setText("Vibe Mode");
-        }
 
-        // Update the screen for the first song, load the first song to play, and update the Arraylists
-        // of new data since the song is playing.
-        updateScreen();
-        loadMedia(resIds.get(index));
-        updateNewData();
+        // Update the screen for the first song, and play the first song
+        currSong = musicLibrary.getSongs().get(songIndices.remove(0));
 
+        updateScreen(currSong);
 
+        playSong(currSong);
+
+        setupMediaPlayer();
+
+        setupUI();
+
+        saveVibeState();
+
+    }
+
+    private void saveVibeState() {
+        // need to save whether the app was in vibe mode or not into shared preferences
+        SharedPreferences sharedPreferences = getSharedPreferences("vibe_mode", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("vibeModeOn", vibeModeOn);
+        editor.apply();
+    }
+
+    private void setupMediaPlayer() {
         // Play the song when it is prepared
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -88,7 +94,6 @@ public class SongActivity extends AppCompatActivity {
                 if (mediaPlayer.isPlaying())
                 {
                     Log.d("Testing Playback", "Song is playing");
-                    index++;
                 }
                 else
                 {
@@ -101,18 +106,27 @@ public class SongActivity extends AppCompatActivity {
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                if(index < resIds.size()) {
+                updateSong(currSong);
+                if(songIndices.size() > 0) {
+                    Song nextSong = musicLibrary.getSongs().get(songIndices.remove(0));
                     mediaPlayer.reset();
-                    updateScreen();
-                    loadMedia(resIds.get(index));
-                    updateNewData();
+                    updateScreen(nextSong);
+                    playSong(nextSong);
+                    currSong = nextSong;
                 }
                 else {
-                    sendDataBack(false);
                     finish();
                 }
             }
         });
+    }
+
+    private void setupUI() {
+        // If Flashback Mode is on, display it to the user so they know they are in flashback mode
+        TextView VibeMode = (TextView) findViewById(R.id.vibe_mode);
+        if(vibeModeOn) {
+            VibeMode.setText("Vibe Mode");
+        }
 
         playPauseButton = (Button) findViewById(R.id.playPauseButton);
         playPauseButton.setOnClickListener(new View.OnClickListener() {
@@ -121,8 +135,8 @@ public class SongActivity extends AppCompatActivity {
                 toggleMusic();
             }
         });
-
     }
+
 
     /**
      * Stops the music and and activity when the back button is pressed. Sends the new location/date/time
@@ -131,7 +145,6 @@ public class SongActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         mediaPlayer.stop();
-        sendDataBack(true);
         finish();
     }
 
@@ -149,19 +162,19 @@ public class SongActivity extends AppCompatActivity {
 
 
     /**
-     * Method to load the media in the MediaPlayer to play the song.
-     * @param resId - the resource id for the song that is to be played.
+     * Method to load song into media player and play song
+     * @param song - song object to play
      */
-    public void loadMedia(int resId)
+    public void playSong(Song song)
     {
         if (mediaPlayer == null)
         {
             mediaPlayer = new MediaPlayer();
         }
-
         try {
-            AssetFileDescriptor afd = this.getResources().openRawResourceFd(resId);
-            mediaPlayer.setDataSource(afd);
+            File file = new File(song.getPath());
+            Uri uri = Uri.fromFile(file);
+            mediaPlayer.setDataSource(SongActivity.this, uri);
             mediaPlayer.prepareAsync();
         }
         catch (Exception e)
@@ -194,7 +207,7 @@ public class SongActivity extends AppCompatActivity {
     /**
      * Method to update the screen so the user knows what song is playing
      */
-    private void updateScreen() {
+    private void updateScreen(Song song) {
 
         TextView songNameView = (TextView) findViewById(R.id.titleTextView);
         TextView songArtistView = (TextView) findViewById(R.id.artistTextView);
@@ -203,20 +216,21 @@ public class SongActivity extends AppCompatActivity {
         TextView songDateView = (TextView) findViewById(R.id.dateTextView);
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
 
+        double latitude = song.getLastLatitude();
+        double longitude = song.getLastLongitude();
 
-        double latitude = INVALID_COORDINATE;
-        double longitude = INVALID_COORDINATE;
+        String songName = song.getTitle();
+        String songArtist = song.getArtist();
+        String albumName = song.getAlbumName();
+        String date = song.getLastDate();
+        String time = song.getLastTime();
 
-        if(extras != null)
-        {
-
-            songNameView.setText("Title: " + (String) extras.getStringArrayList("titles").get(index));
-            songArtistView.setText("Artist: " + (String) extras.getStringArrayList("artists").get(index));
-            songAlbumView.setText("Album: " + (String) extras.getStringArrayList("albums").get(index));
-            latitude = extras.getDoubleArray("latitudes")[index];
-            longitude = extras.getDoubleArray("longitudes")[index];
-            songDateView.setText("Date: " + (String) extras.getStringArrayList("dates").get(index));
-            songTimeView.setText("Time: " + (String) extras.getStringArrayList("times").get(index));
+        if(extras != null) {
+            songNameView.setText("Title: " + songName);
+            songArtistView.setText("Artist: " + songArtist);
+            songAlbumView.setText("Album: " + albumName);
+            songDateView.setText("Date: " + date);
+            songTimeView.setText("Time: " + time);
         }
 
         // Shows the last location to the user
@@ -234,19 +248,15 @@ public class SongActivity extends AppCompatActivity {
                     songLocationView.setText("Location: " + result);
                 }
             }
-        }
-
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     /**
-     * Method to update the new data ArrayLists to send back to the MainActivity.
+     * Method to set new data to a song
      */
-    private void updateNewData() {
+    private void updateSong(Song song) {
 
         //get new location, day, and time
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -256,37 +266,8 @@ public class SongActivity extends AppCompatActivity {
         String newTime = UserInfo.getTime();
         String newDate = UserInfo.getDate();
 
-        // add them and their song index to their appropriate arraylist
-        indices.add(extras.getIntegerArrayList("indices").get(index));
-        newLatitudes.add("" + newLocation[0]);
-        newLongitudes.add("" + newLocation[1]);
-        newDays.add(newDay);
-        newTimes.add(newTime);
-        newDates.add(newDate);
-    }
-
-    /**
-     * Method to send data back to the MainActivity
-     * @param backPressed - tells whether the back button was pressed to cancel playback or the song(s)
-     *                    finished on their own
-     */
-    private void sendDataBack(boolean backPressed) {
-        // put new location, day, and time in extras to send back to main activity
-        Intent newData = new Intent();
-        newData.putExtra("newLatitudes", newLatitudes);
-        newData.putExtra("newLongitudes", newLongitudes);
-        newData.putExtra("newTimes", newTimes);
-        newData.putExtra("newDays", newDays);
-        newData.putExtra("newDates", newDates);
-        newData.putExtra("indices", indices);
-
-        // Tell whether the back button is pressed or not
-        if(backPressed) {
-            setResult(Activity.RESULT_CANCELED, newData);
-        }
-        else {
-            setResult(Activity.RESULT_OK, newData);
-        }
+        song.setData(newLocation[0], newLocation[1],newDay, newTime, newDate);
+        musicLibrary.persistSong(song);
     }
 }
 

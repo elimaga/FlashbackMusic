@@ -15,44 +15,64 @@ public class VibeModePlaylist extends Playlist {
     double[] location;
     String date;
     ArrayList<String> friends;
+    MusicLibrary musicLibrary;
 
-    public VibeModePlaylist(double[] location, String date, ArrayList<String> friends) {
+    public VibeModePlaylist(double[] location, String date, ArrayList<String> friends, MusicLibrary musicLibrary) {
         this.location = location;
         this.date = date;
         this.friends = friends;
+        this.musicLibrary = musicLibrary;
+        playlist = new ArrayList<>();
+        numMatches = new ArrayList<>();
     }
 
     public void addSong(Song song) {
         int reqMatches = numMatchesOfSong(song);
 
-        // If the song is disliked, we don't want to add it to the playlist
+        // If the song is disliked, we don't want to add it to the vibeModePlaylist
         if(reqMatches == DISLIKED_SONG) {
             return;
         }
 
-        // Check if the song is already in the playlist so we don't have repeats
-        int index = playlist.indexOf(song);
-        // If the song is already in the playlist, check which song (the previous or the current) has
+        // Check if the song is already in the vibeModePlaylist so we don't have repeats
+        int playlistIndex = playlist.indexOf(song);
+        int songIndex = song.getIndex();
+        // If the song is already in the vibeModePlaylist, check which song (the previous or the current) has
         // more requirement matches
-        if(index != -1) {
+        if(playlistIndex != -1) {
             // If the number of requirement matches for the current instance of the song is greater
-            // than the number of matches for the song that is already in the playlist, then replace
+            // than the number of matches for the song that is already in the vibeModePlaylist, then replace
             // the previous song with the current one
-            if(reqMatches > numMatches.get(index)) {
-                playlist.set(index, song);
-                numMatches.set(index, reqMatches);
+            if(reqMatches > numMatches.get(playlistIndex)) {
+                //TODO: Fix this so that the song in the music library is changed to this new song
+                musicLibrary.persistSong(song);
+                playlist.set(playlistIndex, song);
+                numMatches.set(playlistIndex, reqMatches);
             }
-            else if(reqMatches == numMatches.get(index)) {
-
+            // Else if the number of matches is the same, check which song has the higher priority
+            else if(reqMatches == numMatches.get(playlistIndex)) {
+                // If the song that is not in the VibeModePlaylist has a higher priority, put it in the VibeModePlaylist,
+                // replacing the old instance of the song
+                if(hasHigherPriority(song, playlist.get(playlistIndex))) {
+                    musicLibrary.persistSong(song);
+                    playlist.set(playlistIndex, song);
+                    numMatches.set(playlistIndex, reqMatches);
+                }
             }
         }
-        // Else the song isn't in the playlist yet, so add it
+        // Else the song isn't in the vibeModePlaylist yet, so add it
         else {
+            musicLibrary.persistSong(song);
             playlist.add(song);
             numMatches.add(reqMatches);
         }
     }
 
+    /**
+     * Helper method to see how many matches the song has with the requirements for Vibe Mode
+     * @param song - the song to get the number of matches for
+     * @return - the Vibe Mode requirements the song satisfies
+     */
     public int numMatchesOfSong(Song song) {
         // First check if it matches all 3 requirements
         if(matchesLocation(location[0], location[1], song.getLastLatitude(), song.getLastLongitude())
@@ -61,7 +81,7 @@ public class VibeModePlaylist extends Playlist {
             // Only add the songs that are not disliked
             if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
 
-                // If the song is liked, it should occur earlier in the playlist than a song that is
+                // If the song is liked, it should occur earlier in the vibeModePlaylist than a song that is
                 // not liked
                 if(song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                     return LIKED_AND_THREE_MATCHES;
@@ -85,7 +105,7 @@ public class VibeModePlaylist extends Playlist {
             // Only add the songs that are not disliked
             if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
 
-                // If the song is liked, it should occur earlier in the playlist than a song that is
+                // If the song is liked, it should occur earlier in the vibeModePlaylist than a song that is
                 // not liked
                 if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                     return LIKED_AND_TWO_MATCHES;
@@ -105,7 +125,7 @@ public class VibeModePlaylist extends Playlist {
             // Only add the songs that are not disliked
             if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
 
-                // If the song is liked, it should occur earlier in the playlist than a song that is
+                // If the song is liked, it should occur earlier in the vibeModePlaylist than a song that is
                 // not liked
                 if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                     return LIKED_AND_ONE_MATCH;
@@ -129,47 +149,70 @@ public class VibeModePlaylist extends Playlist {
      * @return - returns true if the new song has higher priority, false otherwise
      */
     public boolean hasHigherPriority(Song newSong, Song oldSong) {
+        // If both are within 1000 feet of the user location, check the dates
         if(matchesLocation(location[0], location[1], newSong.getLastLatitude(), newSong.getLastLongitude())
                 == matchesLocation(location[0], location[1], oldSong.getLastLatitude(), oldSong.getLastLongitude()))
         {
+            // If both songs have been played within a week of today, check if they were played by a friend
             if(matchesDate(newSong.getLastDate()) == matchesDate(oldSong.getLastDate())) {
+                // If both songs were played by a friend, check which song was more recently played
                 if (matchesFriend(newSong.getLastUser()) == matchesFriend(oldSong.getLastUser())) {
+
+                    // Check how many days apart the songs were played
                     int daysDiff = compareDates(newSong.getLastDate(), oldSong.getLastDate());
+
+                    // If they were played on the same day, check the time they were played
                     if(daysDiff == 0) {
+
+                        // If the time for the new song is later than the time for the old song, then
+                        // return true since the new song is newer
                         int newTimeDiff = compareTimes(newSong.getLastTime());
                         int oldTimeDiff = compareTimes(oldSong.getLastTime());
                         if(newTimeDiff < oldTimeDiff) {
                             return true;
                         }
+                        // Else, return false because the old song is newer or was played at the same time
                         else {
                             return false;
                         }
                     }
+                    // Else if the new song was played on a later date, return true
                     else if(daysDiff < 0) {
                         return true;
                     }
+                    // Else, return false because the old song was played on a later date
                     else {
                         return false;
                     }
                 }
+                // Else if the new song was played by a friend, then return true because the old song
+                // was not played by a friend
                 else if(matchesFriend(newSong.getLastUser())) {
                     return true;
                 }
+                // Else the new song was not played by a friend, but the old song was, so return false
                 else {
                     return false;
                 }
             }
+            // Else if the new song was played within the last week, then return true because the old
+            // song wasn't played within the last week
             else if(matchesDate(newSong.getLastDate())) {
                 return true;
             }
+            // Else the new song wasn't played within the last week, but the old song was, so return false
             else {
                 return false;
             }
         }
+        // Else if the new song matches the user's location, then return true because the old song is not
+        // within 1000 feet of the user's location
         else if(matchesLocation(location[0], location[1], newSong.getLastLatitude(), newSong.getLastLongitude()))
         {
             return true;
         }
+        // Else, return false because the new song was not played within 1000 feet of the user's location,
+        // but the old song was
         else
         {
             return false;

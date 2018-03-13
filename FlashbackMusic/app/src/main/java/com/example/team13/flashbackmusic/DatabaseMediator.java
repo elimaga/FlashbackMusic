@@ -27,39 +27,35 @@ public class DatabaseMediator implements SongObserver {
 
     final double KILOMETERS_IN_THOUSAND_FEET = 0.3048;
     final int DAYS_IN_WEEK = 7;
-    Song song;
     ArrayList<DatabaseEntry> queriedData;
     Callback finishedCallback;
 
-    public DatabaseMediator(Song song, Callback callback)
+    public DatabaseMediator(Callback callback)
     {
-        this.song = song;
-        song.registerObserver(this);
         queriedData = new ArrayList<>();
         finishedCallback = callback;
     }
-
 
     /**
      * Method that gets called when the data changes in the song object. Delegates to the send
      * method.
      */
-    public void update() {
-        send();
+    public void update(Song song) {
+        send(song);
     }
 
     /**
      * Sends Song/Location data to Google Firebase database
      */
-    private void send()
+    private void send(Song song)
     {
         String username = "usr1";
-        String databaseKey = username + "_" + song.getTitle() + "_" + song.getArtist();
+        final String databaseKey = username + "_" + song.getTitle() + "_" + song.getArtist();
 
         DatabaseEntry databaseEntry = new DatabaseEntry();
         databaseEntry.setTitle(song.getTitle());
         databaseEntry.setArtist(song.getArtist());
-        databaseEntry.setAlbumName(song.getAlbum().getAlbumName());
+        databaseEntry.setAlbumName(song.getAlbumName());
         databaseEntry.setLastDay(song.getLastDay());
         databaseEntry.setLastTime(song.getLastTime());
         databaseEntry.setLastDate(song.getLastDate());
@@ -76,7 +72,7 @@ public class DatabaseMediator implements SongObserver {
 
         songReference.child(databaseKey).setValue(databaseEntry, new DatabaseReference.CompletionListener() {
             public void onComplete(DatabaseError error, DatabaseReference ref) {
-                Log.d("Send Song Data","Values were set for song: " + song.getTitle());
+                Log.d("Send Song Data","Values were set for: " + databaseKey);
             }
         });
 
@@ -105,54 +101,91 @@ public class DatabaseMediator implements SongObserver {
         final DatabaseReference songReference = firebaseDatabase.getReference("Songs");
         GeoFire geoFire = new GeoFire(locationReference);
 
-        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), KILOMETERS_IN_THOUSAND_FEET);
+        // Only want to use a location if we have a valid latitude and longitude
+        if(latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 ) {
+            GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), KILOMETERS_IN_THOUSAND_FEET);
 
-        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
 
-            @Override
-            public void onKeyEntered(String key, GeoLocation location) {
-                Log.d("Retrieve Songs by Location", String.format("Key %s is within 1000 feet at [%f,%f]", key, location.latitude, location.longitude));
+                @Override
+                public void onKeyEntered(String key, GeoLocation location) {
+                    Log.d("Retrieve Songs by Location", String.format("Key %s is within 1000 feet at [%f,%f]", key, location.latitude, location.longitude));
 
-                // Add the songKey to the ArrayList of queried songs
-                String songKey = key.substring(0, key.indexOf("-"));
-                finishedCallback.incrNumSongsQueried();
-                DatabaseReference curRef = songReference.child(songKey);
-                curRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
-                        finishedCallback.callback(data);
-                        Log.d("Callback", data.getTitle());
-                    }
+                    // Add the songKey to the ArrayList of queried songs
+                    String songKey = key.substring(0, key.indexOf("-"));
+                    finishedCallback.incrNumSongsQueried();
+                    DatabaseReference curRef = songReference.child(songKey);
+                    curRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
+                            finishedCallback.callback(data);
+                            Log.d("Callback", data.getTitle());
+                        }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
-            }
+                        }
+                    });
+                }
 
-            @Override
-            public void onKeyExited(String key) {
-                Log.d("Retrieve Songs by Location", String.format("Key %s is no longer in the search area", key));
-            }
+                @Override
+                public void onKeyExited(String key) {
+                    Log.d("Retrieve Songs by Location", String.format("Key %s is no longer in the search area", key));
+                }
 
-            @Override
-            public void onKeyMoved(String key, GeoLocation location) {
-                Log.d("Retrieve Songs by Location", String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
-            }
+                @Override
+                public void onKeyMoved(String key, GeoLocation location) {
+                    Log.d("Retrieve Songs by Location", String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
+                }
 
-            @Override
-            public void onGeoQueryReady() {
-                Log.d("Retrieve Songs by Location", "All initial data has been loaded and events have been fired!");
-                finishedCallback.callback(queriedData);
-            }
+                @Override
+                public void onGeoQueryReady() {
+                    Log.d("Retrieve Songs by Location", "All initial data has been loaded and events have been fired!");
+                    finishedCallback.callback(queriedData);
+                }
 
-            @Override
-            public void onGeoQueryError(DatabaseError error) {
-                Log.d("Retrieve Songs by Location", "Error: " + error);
-            }
-        });
+                @Override
+                public void onGeoQueryError(DatabaseError error) {
+                    Log.d("Retrieve Songs by Location", "Error: " + error);
+                }
+            });
+        }
+        // Else query at location (0,0), but do not any of the database entries to the playlist because we are not supposed to
+        // be querying. This is just so we know when all of our queries have finished.
+        else {
+            GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(0, 0), KILOMETERS_IN_THOUSAND_FEET);
+
+            geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+
+                @Override
+                public void onKeyEntered(String key, GeoLocation location) {
+                    Log.d("Invalid retrieve Songs by Location", String.format("Key %s is not added.", key));
+                }
+
+                @Override
+                public void onKeyExited(String key) {
+                    Log.d("Invalid retrieve Songs by Location", String.format("Key %s is not removed.", key));
+                }
+
+                @Override
+                public void onKeyMoved(String key, GeoLocation location) {
+                    Log.d("Invalid retrieve Songs by Location", String.format("Key %s is not added.", key));
+                }
+
+                @Override
+                public void onGeoQueryReady() {
+                    Log.d("Invalid retrieve Songs by Location", "All initial data has been loaded and events have been fired!");
+                    finishedCallback.callback(queriedData);
+                }
+
+                @Override
+                public void onGeoQueryError(DatabaseError error) {
+                    Log.d("Invalid retrieve Songs by Location", "Error: " + error);
+                }
+            });
+        }
 
     }
 
@@ -257,7 +290,6 @@ public class DatabaseMediator implements SongObserver {
             });
         }
     }
-
 
     /**
      * Getter for the list of queried songs

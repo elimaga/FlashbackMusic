@@ -24,14 +24,14 @@ public class SimpleCallback implements Callback {
     public void callback(DatabaseEntry data) {
         numSongsCalledBack++;
         Log.d("Number of Total Songs to be in Playlist: ", "" + numSongsQueried);
-        Log.d("Number of songs in playlist right now: ", "" + numSongsCalledBack);
+        Log.d("Number of songs in vibeModePlaylist right now: ", "" + numSongsCalledBack);
     }
 
     public void callback(ArrayList<DatabaseEntry> data) {
         for(DatabaseEntry d : data) {
             numSongsCalledBack++;
             Log.d("Number of Total Songs to be in Playlist: ", "" + numSongsQueried);
-            Log.d("Number of songs in playlist right now: ", "" + numSongsCalledBack);
+            Log.d("Number of songs in vibeModePlaylist right now: ", "" + numSongsCalledBack);
         }
     }
 

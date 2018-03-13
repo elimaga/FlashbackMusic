@@ -13,7 +13,7 @@ public abstract class Playlist {
     final float METERS_IN_THOUSAND_FEET = 304.8f;
 
     // The variables that tell how many matches a song has with the user's current info and if
-    // the song is liked to break ties. These are used to sort the playlist from highest to lowest
+    // the song is liked to break ties. These are used to sort the vibeModePlaylist from highest to lowest
     final static int LIKED_AND_THREE_MATCHES = 6;
     final static int THREE_MATCHES = 5;
     final static int LIKED_AND_TWO_MATCHES = 4;
@@ -23,7 +23,7 @@ public abstract class Playlist {
     final static int DISLIKED_SONG = 0;
 
 
-    public static ArrayList<Song> playlist;      // the songs in the playlist
+    public static ArrayList<Song> playlist;      // the songs in the vibeModePlaylist
     public static ArrayList<Integer> numMatches;
 
     /**
@@ -91,6 +91,10 @@ public abstract class Playlist {
         diff -= songMin;
 
         return diff;
+    }
+
+    public ArrayList<Song> getPlaylist() {
+        return this.playlist;
     }
 
 }

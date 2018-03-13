@@ -89,21 +89,23 @@ public class Unzipper extends AsyncTask<String, Integer, Boolean> implements Sub
 
                 // Need to create directories if not exists, or
                 // it will generate an Exception...
-                if (ze.isDirectory()) {
-                    File fmd = new File(directoryPath + filename);
-                    fmd.mkdirs();
-                    continue;
-                } else {
-                    paths.add(directoryPath+filename);
-                }
-                if (!(new File(directoryPath+filename).exists())) {
-                    FileOutputStream fout = new FileOutputStream(directoryPath + filename);
-
-                    while ((count = zis.read(buffer)) != -1) {
-                        fout.write(buffer, 0, count);
+                if (!(filename.contains("__MACOSX"))) {
+                    if (ze.isDirectory()) {
+                        File fmd = new File(directoryPath + filename);
+                        fmd.mkdirs();
+                        continue;
+                    } else {
+                        paths.add(directoryPath + filename);
                     }
+                    if (!(new File(directoryPath + filename).exists())) {
+                        FileOutputStream fout = new FileOutputStream(directoryPath + filename);
 
-                    fout.close();
+                        while ((count = zis.read(buffer)) != -1) {
+                            fout.write(buffer, 0, count);
+                        }
+
+                        fout.close();
+                    }
                 }
                 zis.closeEntry();
             }

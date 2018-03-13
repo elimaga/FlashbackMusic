@@ -26,7 +26,7 @@ public class FlashbackPlaylist extends Playlist {
         numMatches = new ArrayList<>();  // the number of matches the song has with the user's info
 
         // Loop through every song in the array of songs and add the ones with at least one match
-        // to the playlist
+        // to the vibeModePlaylist
         for(Song song : allSongs) {
 
             // First check if it matches all 3 requirements
@@ -37,7 +37,7 @@ public class FlashbackPlaylist extends Playlist {
                 if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
                     playlist.add(song);
 
-                    // If the song is liked, it should occur earlier in the playlist than a song that is
+                    // If the song is liked, it should occur earlier in the vibeModePlaylist than a song that is
                     // not liked
                     if(song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                         numMatches.add(LIKED_AND_THREE_MATCHES);
@@ -61,7 +61,7 @@ public class FlashbackPlaylist extends Playlist {
                 if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
                     playlist.add(song);
 
-                    // If the song is liked, it should occur earlier in the playlist than a song that is
+                    // If the song is liked, it should occur earlier in the vibeModePlaylist than a song that is
                     // not liked
                     if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                         numMatches.add(LIKED_AND_TWO_MATCHES);
@@ -83,7 +83,7 @@ public class FlashbackPlaylist extends Playlist {
                     playlist.add(song);
 
 
-                    // If the song is liked, it should occur earlier in the playlist than a song that is
+                    // If the song is liked, it should occur earlier in the vibeModePlaylist than a song that is
                     // not liked
                     if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                         numMatches.add(LIKED_AND_ONE_MATCH);
@@ -98,17 +98,17 @@ public class FlashbackPlaylist extends Playlist {
             }
         }
 
-        // If the playlist is empty, then all the recently played songs should be added to the playlist
+        // If the vibeModePlaylist is empty, then all the recently played songs should be added to the vibeModePlaylist
         if(playlist.isEmpty()) {
             for(Song song : allSongs) {
                 // If the song has been played at all, then it will have a lastDate played so add it
-                // to the playlist
+                // to the vibeModePlaylist
                 if(song.getLastDate() != "") {
                     // Only add the songs that are not disliked
                     if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
                         playlist.add(song);
 
-                        // If the song is liked, it should occur earlier in the playlist than a song that is
+                        // If the song is liked, it should occur earlier in the vibeModePlaylist than a song that is
                         // not liked
                         if (song.getFavoriteStatus() == Song.FavoriteStatus.LIKED) {
                             numMatches.add(LIKED_AND_ONE_MATCH);
@@ -243,10 +243,5 @@ public class FlashbackPlaylist extends Playlist {
         }
 
     }
-
-    public ArrayList<Song> getPlaylist() {
-        return this.playlist;
-    }
-
 
 }
