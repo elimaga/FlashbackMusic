@@ -42,6 +42,9 @@ public class VibeModePlaylist extends Playlist {
                 playlist.set(index, song);
                 numMatches.set(index, reqMatches);
             }
+            else if(reqMatches == numMatches.get(index)) {
+
+            }
         }
         // Else the song isn't in the playlist yet, so add it
         else {
@@ -115,6 +118,61 @@ public class VibeModePlaylist extends Playlist {
                 return DISLIKED_SONG;
             }
 
+        }
+    }
+
+    /**
+     * Breaks ties between duplicate songs. First checks if both song match requirements (a)-(c), then checks
+     * there date and time if the songs have the same matches.
+     * @param newSong - the song that is not in the playlist
+     * @param oldSong - the song that has already been added to the playlist
+     * @return - returns true if the new song has higher priority, false otherwise
+     */
+    public boolean hasHigherPriority(Song newSong, Song oldSong) {
+        if(matchesLocation(location[0], location[1], newSong.getLastLatitude(), newSong.getLastLongitude())
+                == matchesLocation(location[0], location[1], oldSong.getLastLatitude(), oldSong.getLastLongitude()))
+        {
+            if(matchesDate(newSong.getLastDate()) == matchesDate(oldSong.getLastDate())) {
+                if (matchesFriend(newSong.getLastUser()) == matchesFriend(oldSong.getLastUser())) {
+                    int daysDiff = compareDates(newSong.getLastDate(), oldSong.getLastDate());
+                    if(daysDiff == 0) {
+                        int newTimeDiff = compareTimes(newSong.getLastTime());
+                        int oldTimeDiff = compareTimes(oldSong.getLastTime());
+                        if(newTimeDiff < oldTimeDiff) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                    else if(daysDiff < 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else if(matchesFriend(newSong.getLastUser())) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else if(matchesDate(newSong.getLastDate())) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else if(matchesLocation(location[0], location[1], newSong.getLastLatitude(), newSong.getLastLongitude()))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 

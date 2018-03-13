@@ -102,6 +102,7 @@ public class DatabaseMediator implements SongObserver {
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         final DatabaseReference locationReference = firebaseDatabase.getReference("Locations");
+        final DatabaseReference songReference = firebaseDatabase.getReference("Songs");
         GeoFire geoFire = new GeoFire(locationReference);
 
         GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), KILOMETERS_IN_THOUSAND_FEET);
@@ -114,14 +115,14 @@ public class DatabaseMediator implements SongObserver {
 
                 // Add the songKey to the ArrayList of queried songs
                 String songKey = key.substring(0, key.indexOf("-"));
-
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Songs/" + songKey);
-                ref.addValueEventListener(new ValueEventListener() {
+                finishedCallback.incrNumSongsQueried();
+                DatabaseReference curRef = songReference.child(songKey);
+                curRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
-                        queriedData.add(data);
-                        Log.d("Adding to Arraylist", data.getTitle());
+                        finishedCallback.callback(data);
+                        Log.d("Callback", data.getTitle());
                     }
 
                     @Override
@@ -144,6 +145,7 @@ public class DatabaseMediator implements SongObserver {
             @Override
             public void onGeoQueryReady() {
                 Log.d("Retrieve Songs by Location", "All initial data has been loaded and events have been fired!");
+                finishedCallback.callback(queriedData);
             }
 
             @Override
@@ -179,6 +181,7 @@ public class DatabaseMediator implements SongObserver {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     // Add the song key to the Arraylist of queried songs
+                    finishedCallback.incrNumSongsQueried();
                     DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
                     queriedData.add(data);
 
@@ -229,6 +232,7 @@ public class DatabaseMediator implements SongObserver {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     // Add the song key to the Arraylist of queried songs
+                    finishedCallback.incrNumSongsQueried();
                     DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
                     queriedData.add(data);
 

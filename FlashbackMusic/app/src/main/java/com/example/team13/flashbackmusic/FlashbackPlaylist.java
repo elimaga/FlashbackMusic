@@ -201,44 +201,6 @@ public class FlashbackPlaylist extends Playlist {
         return result;
     }
 
-    public static int compareDates(String songDate, String thisDate) {
-        if(songDate.isEmpty()) {
-            return Integer.MAX_VALUE;
-        }
-
-        int songMonth = Integer.parseInt(songDate.substring(0, songDate.indexOf(("/"))));
-        String sub = songDate.substring(songDate.indexOf("/") + 1, songDate.length());
-        int songDay = Integer.parseInt(sub.substring(0, sub.indexOf(("/"))));
-        sub = sub.substring(sub.indexOf("/") + 1, sub.length());
-        int songYear = Integer.parseInt(sub);
-
-        int thisMonth = Integer.parseInt(thisDate.substring(0, thisDate.indexOf(("/"))));
-        sub = thisDate.substring(thisDate.indexOf("/") + 1, thisDate.length());
-        int thisDay = Integer.parseInt(sub.substring(0, sub.indexOf(("/"))));
-        sub = sub.substring(sub.indexOf("/") + 1, sub.length());
-        int thisYear = Integer.parseInt(sub);
-
-        int diff = (thisYear - songYear) * 365;
-        diff += (thisMonth - songMonth) * 30;
-        diff += (thisDay - songDay);
-
-        return diff;
-    }
-
-    public static int compareTimes(String songTime) {
-        if(songTime.isEmpty()) {
-            return Integer.MAX_VALUE;
-        }
-
-        int songHour = Integer.parseInt(songTime.substring(0, songTime.indexOf(":")));
-        int songMin = Integer.parseInt(songTime.substring(songTime.indexOf(":")+1, songTime.length()));
-
-        int diff = (24 - songHour) * 60;
-        diff -= songMin;
-
-        return diff;
-    }
-
 
     /*
      * Helper method for the constructor to check if the current day of the user is the same as

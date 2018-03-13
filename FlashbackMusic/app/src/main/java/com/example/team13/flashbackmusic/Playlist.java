@@ -57,4 +57,40 @@ public abstract class Playlist {
         }
     }
 
+    public static int compareDates(String songDate, String curDate) {
+        if(songDate.isEmpty()) {
+            return Integer.MAX_VALUE;
+        }
+
+        int[] songDateValues = UserInfo.getDateValues(songDate);
+        int songMonth = songDateValues[0];
+        int songDay = songDateValues[1];
+        int songYear = songDateValues[2];
+
+        int[] curDateValues = UserInfo.getDateValues(curDate);
+        int curMonth = curDateValues[0];
+        int curDay = curDateValues[1];
+        int curYear = curDateValues[2];
+
+        int diff = (curYear - songYear) * 365;
+        diff += (curMonth - songMonth) * 30;
+        diff += (curDay - songDay);
+
+        return diff;
+    }
+
+    public static int compareTimes(String songTime) {
+        if(songTime.isEmpty()) {
+            return Integer.MAX_VALUE;
+        }
+
+        int songHour = Integer.parseInt(songTime.substring(0, songTime.indexOf(":")));
+        int songMin = Integer.parseInt(songTime.substring(songTime.indexOf(":")+1, songTime.length()));
+
+        int diff = (24 - songHour) * 60;
+        diff -= songMin;
+
+        return diff;
+    }
+
 }

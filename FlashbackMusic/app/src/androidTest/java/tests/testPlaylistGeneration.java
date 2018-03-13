@@ -32,7 +32,7 @@ public class testPlaylistGeneration {
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         int[] resourceIds = {R.raw._123_go, R.raw.america_religious, R.raw.beautiful_pain,
                 R.raw.cant_you_be_mine, R.raw.i_will_not_be_afraid, R.raw.stomp_jump_boogie};
-        mainActivity.getActivity().loadLibrary(mediaMetadataRetriever, resourceIds);
+        //mainActivity.getActivity().loadLibrary(mediaMetadataRetriever, resourceIds);
         double[] mockLocationCoordinates = {100, 100};
         flashbackPlaylist = new FlashbackPlaylist(
                 mainActivity.getActivity().getSongs(),
