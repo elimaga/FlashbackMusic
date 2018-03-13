@@ -123,7 +123,7 @@ public class VibeModePlaylist extends Playlist {
 
     /**
      * Breaks ties between duplicate songs. First checks if both song match requirements (a)-(c), then checks
-     * there date and time if the songs have the same matches.
+     * their date and time if the songs have the same matches.
      * @param newSong - the song that is not in the playlist
      * @param oldSong - the song that has already been added to the playlist
      * @return - returns true if the new song has higher priority, false otherwise
