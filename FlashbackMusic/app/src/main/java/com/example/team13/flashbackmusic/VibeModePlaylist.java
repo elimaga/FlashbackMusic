@@ -289,9 +289,12 @@ public class VibeModePlaylist extends Playlist {
             int secondIndex = index - 1;
             Song tempSong = songs.get(secondIndex);
             while(secondIndex >= 0 && hasHigherPriority(currSong, tempSong)) {
-                tempSong = songs.get(secondIndex);
-                songs.set(secondIndex+1, tempSong);
+                songs.set(secondIndex + 1, tempSong);
                 secondIndex--;
+                if(secondIndex >= 0) {
+                    tempSong = songs.get(secondIndex);
+                }
+                Log.d("Sorting: ", "Moving " + currSong.getTitle() + " in front of " + tempSong.getTitle());
             }
             songs.set(secondIndex + 1, currSong);
         }

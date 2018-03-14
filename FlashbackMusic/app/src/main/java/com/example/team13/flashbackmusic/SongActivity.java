@@ -116,6 +116,7 @@ public class SongActivity extends AppCompatActivity {
                     currSong = nextSong;
                 }
                 else {
+                    setResult(RESULT_OK);
                     finish();
                 }
             }

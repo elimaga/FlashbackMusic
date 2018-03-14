@@ -142,10 +142,10 @@ public class TestHasHigherPriority {
     public void testTimeTieBreaker()
     {
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
-                "Tuesday", "21:20", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
+                "Tuesday", "0:16", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
                 "Gary", THE_PAST_WEEK);
         song2 = new Song("Title", "Artist", "album", 0, "www", 0,
-                "Tuesday", "21:19", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
+                "Tuesday", "0:09", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
                 "Gary", THE_PAST_WEEK);
         assertEquals(true, vibeModePlaylist.hasHigherPriority(song1, song2));
     }

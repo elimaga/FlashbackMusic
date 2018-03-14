@@ -78,12 +78,12 @@ public class DataCallback implements Callback {
                 for(Song song : vibeModePlaylist.getPlaylist()){
                     Log.d("Song Title: ", "" + song.getTitle());
                     Log.d("Song Index: ", "" + song.getIndex());
-                    Log.d("Song lastDate: ", song.getLastDate());
+                    Log.d("Song lastTime: ", song.getLastTime());
                     songIndices.add(song.getIndex());
                 }
                 //Play the vibeModePlaylist
                 Intent intent = new Intent(context, SongActivity.class);
-                intent.putExtra("songIndices",songIndices);
+                intent.putExtra("songIndices", songIndices);
                 intent.putExtra("vibeModeOn",true);
                 mainActivity.startActivityForResult(intent, 1);
             }
