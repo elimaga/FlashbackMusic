@@ -97,17 +97,15 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
             HashMap<String, String> songMetadata = retrieveSongMetadata(path);
             if (!(songMetadataSet.contains(songMetadata))) {
                 HashMap<String, String> albumMetadata = extractAlbumMetadata(songMetadata);
-                Album album;
                 if (!(albumMetadataSet.contains(albumMetadata))) {
-                    album = new Album(songMetadata.get("albumName"),
+                    Album newAlbum = new Album(songMetadata.get("albumName"),
                             songMetadata.get("artist"),
                             songMetadata.get("track"),
                             albums.size());
-                    albums.add(album);
+                    albums.add(newAlbum);
                     albumMetadataSet.add(albumMetadata);
-                } else {
-                    album = albums.get(albumMetadataSet.indexOf(albumMetadata));
                 }
+                Album album = albums.get(albumMetadataSet.indexOf(albumMetadata));
                 Song song = new Song(songMetadata.get("title"),
                         songMetadata.get("artist"),
                         songMetadata.get("track"),
