@@ -3,6 +3,7 @@ package com.example.team13.flashbackmusic;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Eli on 3/11/2018.
@@ -15,28 +16,25 @@ public class VibeModePlaylist extends Playlist {
     double[] location;
     String date;
     ArrayList<String> friends;
-    MusicLibrary musicLibrary;
 
-    public VibeModePlaylist(double[] location, String date, ArrayList<String> friends, MusicLibrary musicLibrary) {
+    public VibeModePlaylist(double[] location, String date, ArrayList<String> friends) {
         this.location = location;
         this.date = date;
         this.friends = friends;
-        this.musicLibrary = musicLibrary;
         playlist = new ArrayList<>();
         numMatches = new ArrayList<>();
     }
 
-    public void addSong(Song song) {
+    public boolean addSong(Song song) {
         int reqMatches = numMatchesOfSong(song);
 
         // If the song is disliked, we don't want to add it to the vibeModePlaylist
         if(reqMatches == DISLIKED_SONG) {
-            return;
+            return false;
         }
 
         // Check if the song is already in the vibeModePlaylist so we don't have repeats
         int playlistIndex = playlist.indexOf(song);
-        int songIndex = song.getIndex();
         // If the song is already in the vibeModePlaylist, check which song (the previous or the current) has
         // more requirement matches
         if(playlistIndex != -1) {
@@ -44,27 +42,27 @@ public class VibeModePlaylist extends Playlist {
             // than the number of matches for the song that is already in the vibeModePlaylist, then replace
             // the previous song with the current one
             if(reqMatches > numMatches.get(playlistIndex)) {
-                //TODO: Fix this so that the song in the music library is changed to this new song
-                musicLibrary.persistSong(song);
                 playlist.set(playlistIndex, song);
                 numMatches.set(playlistIndex, reqMatches);
+                return true;
             }
             // Else if the number of matches is the same, check which song has the higher priority
             else if(reqMatches == numMatches.get(playlistIndex)) {
                 // If the song that is not in the VibeModePlaylist has a higher priority, put it in the VibeModePlaylist,
                 // replacing the old instance of the song
                 if(hasHigherPriority(song, playlist.get(playlistIndex))) {
-                    musicLibrary.persistSong(song);
                     playlist.set(playlistIndex, song);
                     numMatches.set(playlistIndex, reqMatches);
+                    return true;
                 }
             }
+            return false;
         }
         // Else the song isn't in the vibeModePlaylist yet, so add it
         else {
-            musicLibrary.persistSong(song);
             playlist.add(song);
             numMatches.add(reqMatches);
+            return true;
         }
     }
 
@@ -258,6 +256,45 @@ public class VibeModePlaylist extends Playlist {
      */
     public boolean matchesFriend(String lastUser) {
         return friends.contains(lastUser);
+    }
+
+    public void sortPlaylist(String date){
+        for(int i = LIKED_AND_THREE_MATCHES; i > 0; i--) {
+            int index = numMatches.indexOf(i);
+            ArrayList<Song> currentSongs = new ArrayList<>();
+            ArrayList<Integer> currentMatches = new ArrayList<>();
+
+            while(index != -1) {
+                currentSongs.add(playlist.get(index));
+                playlist.remove(index);
+                currentMatches.add(numMatches.remove(index));
+                index = numMatches.indexOf(i);
+            }
+            if (currentSongs.isEmpty()){
+                continue;
+            }
+            breakRequirementTies(currentSongs);
+            playlist.addAll(currentSongs);
+            numMatches.addAll(currentMatches);
+        }
+    }
+
+    public void sortPlaylist() {
+        sortPlaylist(this.date);
+    }
+
+    public void breakRequirementTies(ArrayList<Song> songs) {
+        for(int index = 1; index < songs.size(); index++) {
+            Song currSong = songs.get(index);
+            int secondIndex = index - 1;
+            Song tempSong = songs.get(secondIndex);
+            while(secondIndex >= 0 && hasHigherPriority(currSong, tempSong)) {
+                tempSong = songs.get(secondIndex);
+                songs.set(secondIndex+1, tempSong);
+                secondIndex--;
+            }
+            songs.set(secondIndex + 1, currSong);
+        }
     }
 
 }

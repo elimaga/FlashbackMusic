@@ -3,6 +3,7 @@ package com.example.team13.flashbackmusic;
 import android.location.Location;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by Eli on 3/11/2018.
@@ -25,6 +26,8 @@ public abstract class Playlist {
 
     public static ArrayList<Song> playlist;      // the songs in the vibeModePlaylist
     public static ArrayList<Integer> numMatches;
+
+    public abstract void sortPlaylist(String date);
 
     /**
      * Helper method for the constructor to check if the location of the song is close to the location
@@ -55,6 +58,61 @@ public abstract class Playlist {
         else {
             return false;
         }
+    }
+
+    public static ArrayList<Song> breakTimeTies(ArrayList<Song> songs) {
+        ArrayList<Integer> timeApart = new ArrayList<>();
+        ArrayList<Song> result = new ArrayList<>();
+
+        for(int i = 0; i < songs.size(); i++) {
+            int num = compareTimes(songs.get(i).getLastTime());
+            timeApart.add(num);
+        }
+
+        while(!timeApart.isEmpty()) {
+            int minIndex = minIndex(timeApart);
+
+            result.add(songs.get(minIndex));
+            songs.remove(minIndex);
+            timeApart.remove(minIndex);
+        }
+
+        return result;
+    }
+
+    public static int minIndex(ArrayList<Integer> list) {
+        return list.indexOf (Collections.min(list));
+    }
+
+
+    public static ArrayList<Song> breakDateTies(ArrayList<Song> songs, String date) {
+        ArrayList<Integer> daysApart = new ArrayList<>();
+        ArrayList<Song> result = new ArrayList<>();
+
+        for(int i = 0; i < songs.size(); i++) {
+            int num = compareDates(songs.get(i).getLastDate(), date);
+            daysApart.add(num);
+        }
+
+        ArrayList<Song> currentSongs = new ArrayList<>();
+        int prev = daysApart.get(minIndex(daysApart));
+        while(!daysApart.isEmpty()) {
+            int minIndex = minIndex(daysApart);
+
+            if(prev != daysApart.get(minIndex)) {
+                result.addAll(breakTimeTies(currentSongs));
+                currentSongs.clear();
+                prev = daysApart.get(minIndex);
+            }
+
+            currentSongs.add(songs.get(minIndex));
+            songs.remove(minIndex);
+            daysApart.remove(minIndex);
+        }
+
+        result.addAll(breakTimeTies(currentSongs));
+
+        return result;
     }
 
     public static int compareDates(String songDate, String curDate) {

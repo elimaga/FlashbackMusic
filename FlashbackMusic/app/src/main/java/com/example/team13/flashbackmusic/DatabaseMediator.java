@@ -49,7 +49,7 @@ public class DatabaseMediator implements SongObserver {
      */
     private void send(Song song)
     {
-        String username = "usr1";
+        String username = "usr2";
         final String databaseKey = username + "_" + song.getTitle() + "_" + song.getArtist();
 
         DatabaseEntry databaseEntry = new DatabaseEntry();

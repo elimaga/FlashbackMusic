@@ -32,16 +32,25 @@ public class DataCallback implements Callback {
     }
 
     public void callback(DatabaseEntry data){
-        Log.d("Number of Total Songs to be in Playlist: ", "" + numSongsQueried);
+        Log.d("Number of Songs Queried: ", "" + numSongsQueried);
 
         boolean songIsDownloaded = false;
 
+        Log.d("Song Title: ", data.getTitle());
+
         for(int index = 0; index < allSongs.size(); index++) {
-            if (allSongs.get(index).getTitle().equals(data.getTitle()) && allSongs.get(index).getArtist().equals(data.getArtist())) {
-                Song song = new Song(data.getTitle(), data.getArtist(), data.getAlbumName(), data.getTrackNumber(),
+            Song song = allSongs.get(index);
+            if (song.getTitle().equals(data.getTitle()) && song.getArtist().equals(data.getArtist())) {
+                Log.d("Trying to add song titled: ", song.getTitle());
+                Song newSong = new Song(data.getTitle(), data.getArtist(), data.getAlbumName(), data.getTrackNumber(),
                         data.getURL(), index, data.getLastDay(), data.getLastTime(), data.getLastLatitude(),
                         data.getLastLongitude(), data.getUsername(), data.getLastDate());
-                vibeModePlaylist.addSong(song);
+                newSong.setFavoriteStatus(song.getFavoriteStatus());
+                if(vibeModePlaylist.addSong(newSong)) {
+                    Log.d("Song added", "Setting data.");
+                    song.setDataWithoutNotify(data.getLastLatitude(), data.getLastLongitude(), data.getLastDay(),
+                                                data.getLastTime(), data.getLastDate(), data.getUsername());
+                }
                 songIsDownloaded = true;
                 break;
             }
@@ -58,15 +67,18 @@ public class DataCallback implements Callback {
         }
 
         numSongsCalledBack++;
-        Log.d("Number of songs in vibeModePlaylist right now: ", "" + numSongsCalledBack);
+        Log.d("Number of songs called back: ", "" + numSongsCalledBack);
 
         if(numSongsCalledBack == numSongsQueried) {
-            // sort the vibeModePlaylist
+            vibeModePlaylist.sortPlaylist();
 
             // Only activate vibe mode if there are songs to play
             if (!vibeModePlaylist.getPlaylist().isEmpty()) {
                 ArrayList<Integer> songIndices = new ArrayList<>();
                 for(Song song : vibeModePlaylist.getPlaylist()){
+                    Log.d("Song Title: ", "" + song.getTitle());
+                    Log.d("Song Index: ", "" + song.getIndex());
+                    Log.d("Song lastDate: ", song.getLastDate());
                     songIndices.add(song.getIndex());
                 }
                 //Play the vibeModePlaylist

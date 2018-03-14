@@ -171,6 +171,27 @@ public class Song implements SongSubject {
         notifyObservers();
     }
 
+    /**
+     * Method to set the location, date, and time data for the song without notifying the observers.
+     * This is because we are updating the song with the data from Firebase, but the song has not
+     * been played yet.
+     * @param lastLatitude - the latitude that the song was played at
+     * @param lastLongitude - the longitude the song was played at
+     * @param day - the day of the week the song was played on
+     * @param time - the time the song was played at
+     * @param date - the date the song was played on
+     * @param lastUser - the last user to play the song
+     */
+    public void setDataWithoutNotify(double lastLatitude, double lastLongitude,
+                        String day, String time, String date, String lastUser) {
+        this.lastDay = day;
+        this.lastTime = time;
+        this.lastLatitude = lastLatitude;
+        this.lastLongitude = lastLongitude;
+        this.lastDate = date;
+        this.lastUser = lastUser;
+        setTimeOfDay(time);
+    }
 
     /**
      * Method to get the time of day (Morning, Afternoon, or Evening)

@@ -125,7 +125,7 @@ public class FlashbackPlaylist extends Playlist {
         sortPlaylist(date);
     }
 
-    public static ArrayList<Song> sortPlaylist(String date){
+    public void sortPlaylist(String date){
 
         for(int i = LIKED_AND_THREE_MATCHES; i > 0; i--) {
             int index = numMatches.indexOf(i);
@@ -143,62 +143,6 @@ public class FlashbackPlaylist extends Playlist {
             currentSongs = breakDateTies(currentSongs, date);
             playlist.addAll(currentSongs);
         }
-        return playlist;
-    }
-
-    public static ArrayList<Song> breakTimeTies(ArrayList<Song> songs) {
-        ArrayList<Integer> timeApart = new ArrayList<>();
-        ArrayList<Song> result = new ArrayList<>();
-
-        for(int i = 0; i < songs.size(); i++) {
-            int num = compareTimes(songs.get(i).getLastTime());
-            timeApart.add(num);
-        }
-
-        while(!timeApart.isEmpty()) {
-            int minIndex = minIndex(timeApart);
-
-            result.add(songs.get(minIndex));
-            songs.remove(minIndex);
-            timeApart.remove(minIndex);
-        }
-
-        return result;
-    }
-
-    public static int minIndex(ArrayList<Integer> list) {
-        return list.indexOf (Collections.min(list));
-    }
-
-
-    public static ArrayList<Song> breakDateTies(ArrayList<Song> songs, String date) {
-        ArrayList<Integer> daysApart = new ArrayList<>();
-        ArrayList<Song> result = new ArrayList<>();
-
-        for(int i = 0; i < songs.size(); i++) {
-            int num = compareDates(songs.get(i).getLastDate(), date);
-            daysApart.add(num);
-        }
-
-        ArrayList<Song> currentSongs = new ArrayList<>();
-        int prev = daysApart.get(minIndex(daysApart));
-        while(!daysApart.isEmpty()) {
-            int minIndex = minIndex(daysApart);
-
-            if(prev != daysApart.get(minIndex)) {
-                result.addAll(breakTimeTies(currentSongs));
-                currentSongs.clear();
-                prev = daysApart.get(minIndex);
-            }
-
-            currentSongs.add(songs.get(minIndex));
-            songs.remove(minIndex);
-            daysApart.remove(minIndex);
-        }
-
-        result.addAll(breakTimeTies(currentSongs));
-
-        return result;
     }
 
 

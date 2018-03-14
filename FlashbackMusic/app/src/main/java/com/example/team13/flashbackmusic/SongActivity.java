@@ -108,6 +108,7 @@ public class SongActivity extends AppCompatActivity {
             public void onCompletion(MediaPlayer mediaPlayer) {
                 updateSong(currSong);
                 if(songIndices.size() > 0) {
+                    Log.d("More Songs to Play: ", songIndices.size() + " more songs.");
                     Song nextSong = musicLibrary.getSongs().get(songIndices.remove(0));
                     mediaPlayer.reset();
                     updateScreen(nextSong);

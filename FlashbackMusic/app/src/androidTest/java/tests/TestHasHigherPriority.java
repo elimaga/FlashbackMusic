@@ -18,12 +18,13 @@ import static junit.framework.Assert.assertEquals;
  * Created by andrewyu on 3/12/18.
  */
 
-public class TestVibeModePlaylist {
-    public static final int DEFAULT_COORDINATE = 90;
-    public static final String TODAY = "1/1/2011";
+public class TestHasHigherPriority {
+    private static final int DEFAULT_COORDINATE = 90;
+    private static final String TODAY = "1/1/2011";
     private static final String ONE_YEAR_AGO = "1/1/2010";
-    private static final String THE_PAST_WEEK = "12/25/2010";
-    final float METERS_IN_THOUSAND_FEET = 304.8f;
+    private static final String THE_PAST_WEEK = "12/26/2010";
+    private static final String FRIEND = "Gary";
+    private static final String STRANGER = "George";
 
     @Rule
     public ActivityTestRule<MainActivity> mainActivity = new ActivityTestRule<MainActivity>(MainActivity.class);
