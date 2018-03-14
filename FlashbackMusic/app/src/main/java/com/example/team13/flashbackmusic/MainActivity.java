@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
     final int INVALID_COORDINATE = 200;
+    private GoogleUtility googleUtility;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         musicLibrary = MusicLibrary.getInstance(MainActivity.this);
         songs = musicLibrary.getSongs();
+        googleUtility = new GoogleUtility(MainActivity.this, this);
 
         setUpUI();
 
@@ -136,7 +138,9 @@ public class MainActivity extends AppCompatActivity {
                         // set item as selected to persist highlight
                         int id = menuItem.getItemId();
                         if(id == R.id.signout){
-                            //signout Activity
+                            googleUtility.userSignOut();
+                            Intent intent = new Intent(MainActivity.this, SignInActivity.class);
+                            startActivity(intent);
                         }
                         else if (id == R.id.download){
                             //Bring up downloadActivity

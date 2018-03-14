@@ -17,6 +17,8 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
@@ -42,6 +44,7 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
             "429092130830-j48ij24k28cit76hp23tti7mpm9ppqes.apps.googleusercontent.com";
     private List<Person> people;
     private Activity activity;
+
 
     public GoogleUtility (Activity activity, FragmentActivity fragmentActivity) {
         this.activity = activity;
@@ -92,6 +95,13 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
         return null;
     }
 
+    public void userSignOut() {
+        if (mGoogleSignInClient.isConnected()) {
+            Auth.GoogleSignInApi.signOut(mGoogleSignInClient);
+            mGoogleSignInClient.disconnect();
+            mGoogleSignInClient.connect();
+        }
+    }
 
     private class PeopleAsync extends AsyncTask<String, Void, Void> {
 
