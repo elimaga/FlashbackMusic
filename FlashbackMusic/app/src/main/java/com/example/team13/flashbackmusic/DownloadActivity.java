@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.EditText;
@@ -182,6 +183,23 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
         textView.setText("Loading files into library...");
         // calling addSongsIntoLibraryFromPath internally
         String url = urlEditText.getText().toString();
+        for (int i = 0; i < paths.size(); i++) {
+            try {
+                String extension = MimeTypeMap.getFileExtensionFromUrl(new File(paths.get(i)).toURI().toURL().toString());
+                MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+                String mime = mimeTypeMap.getMimeTypeFromExtension(extension);
+
+                if (MimeTypeFilter.matches(mime, new String[]{"audio/mpeg",
+                        "audio/mpeg3",
+                        "audio/x-mpeg-3",
+                        "video/mpeg",
+                        "video/x-mpeg"}) == null) {
+                    paths.remove(paths.get(i));
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
         musicLibrary.updateLibraryInBackground(paths, url);
     }
 
