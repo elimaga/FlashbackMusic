@@ -42,9 +42,11 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
     private final static String webClientID =
             "487097348986-q5ogibt021sgjtk1jcpe3mo4g48r2h2b.apps.googleusercontent.com";
     private static List<Person> people;
+    private static FBMUser user;
     private Activity activity;
 
     public GoogleUtility (Activity activity, FragmentActivity fragmentActivity) {
+        user = new FBMUser();
         this.activity = activity;
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestServerAuthCode(webClientID)
@@ -59,6 +61,10 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
                 // .addConnectionCallbacks(this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+    }
+
+    public void setUser(FBMUser user) {
+        this.user = user;
     }
 
     @Override
@@ -162,6 +168,13 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
             return new PeopleService.Builder(httpTransport, jsonFactory, credential)
                     .setApplicationName("Sign In Test")
                     .build();
+        }
+
+        @Override
+        protected void onPostExecute(Void v) {
+            user.setConnections(people);
+            Log.d("GoogleUtility", "user name: " + user.getName());
+            Log.d("GoogleUtility", "connections: " + user.getFriendsID());
         }
     }
 }
