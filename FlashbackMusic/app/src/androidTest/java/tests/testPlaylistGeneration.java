@@ -16,7 +16,7 @@ import static junit.framework.Assert.assertEquals;
 /**
  * Created by andrewyu on 2/17/18.
  */
-public class TestPlaylistGeneration {
+public class testPlaylistGeneration {
 
     private static final int DEFAULT_COORDINATE = 45;
     private static final String TODAY = "1/1/2011";
