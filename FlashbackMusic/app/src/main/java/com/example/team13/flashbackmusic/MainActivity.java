@@ -32,6 +32,7 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     static final int REQUEST_LOCATION = 1;
     final int INVALID_COORDINATE = 200;
     private GoogleUtility googleUtility;
+    private FBMUser usr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +61,11 @@ public class MainActivity extends AppCompatActivity {
 
         musicLibrary = MusicLibrary.getInstance(MainActivity.this);
         songs = musicLibrary.getSongs();
+
         googleUtility = new GoogleUtility(MainActivity.this, this);
+        GoogleSignInAccount acct = googleUtility.getLastAccount();
+        usr = new FBMUser(acct.getId(), acct.getDisplayName(), acct.getEmail());
+        Log.d("MainActivity", "Created user: " + usr.getName());
 
         setUpUI();
 
@@ -77,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         }
 
+
+
         // Testing retrieve methods
         Song song = new Song();
         DatabaseMediator databaseMediator = new DatabaseMediator();
@@ -92,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         for (String d : data){
             System.out.println(d);
         }
+
     }
 
     private void setUpUI() {

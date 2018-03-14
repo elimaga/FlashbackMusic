@@ -5,10 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 
 public class SignInActivity extends AppCompatActivity {
     private GoogleUtility googleUtility;
@@ -18,7 +15,6 @@ public class SignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
         googleUtility = new GoogleUtility(SignInActivity.this, this);
-
         findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -35,6 +31,8 @@ public class SignInActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         googleUtility.connectClient();
+        GoogleSignInAccount account = googleUtility.getLastAccount();
+        updateUI(account);
     }
 
     private void updateUI(GoogleSignInAccount account) {

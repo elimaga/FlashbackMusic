@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
@@ -17,8 +18,6 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
@@ -40,16 +39,15 @@ import java.util.List;
 public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener {
     private GoogleApiClient mGoogleSignInClient;
     private final static int RC_SIGN_IN = 0;
-    private final static String serverAuthCode =
-            "429092130830-j48ij24k28cit76hp23tti7mpm9ppqes.apps.googleusercontent.com";
-    private List<Person> people;
+    private final static String webClientID =
+            "487097348986-q5ogibt021sgjtk1jcpe3mo4g48r2h2b.apps.googleusercontent.com";
+    private static List<Person> people;
     private Activity activity;
-
 
     public GoogleUtility (Activity activity, FragmentActivity fragmentActivity) {
         this.activity = activity;
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestServerAuthCode(serverAuthCode)
+                .requestServerAuthCode(webClientID)
                 .requestEmail()
                 .requestScopes(new Scope(Scopes.PLUS_LOGIN),
                         new Scope(PeopleServiceScopes.CONTACTS_READONLY))
@@ -85,7 +83,6 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
 
             if (result.isSuccess()){
                 GoogleSignInAccount acct = result.getSignInAccount();
-
                 PeopleAsync async = new PeopleAsync();
                 async.execute(acct.getServerAuthCode());
                 return acct;
@@ -93,6 +90,10 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
         }
 
         return null;
+    }
+
+    public GoogleSignInAccount getLastAccount() {
+        return GoogleSignIn.getLastSignedInAccount(activity);
     }
 
     public void userSignOut() {
@@ -118,12 +119,14 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
 
                 people = response.getConnections();
                 if(people != null) {
-                    for (Person person : people) {
-                        if (!person.getNames().isEmpty()) {
-                            Log.d("SignInActivity", "name: " +
-                                    person.getNames().get(0).getDisplayName());
-                        }
-                    }
+                    Log.d("SignInActivity", "got list of friends");
+
+//               TODO: for future reference
+//                    for (Person person : people) {
+//                        if (!person.getNames().isEmpty()) {
+//                                    person.getNames().get(0).getDisplayName());
+//                        }
+//                    }
                 }
 
             } catch (IOException e) {
@@ -138,19 +141,18 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
             // Redirect URL for web based applications.
             // Can be empty too.
             String redirectUrl = "";
-            String clientId = "429092130830-j48ij24k28cit76hp23tti7mpm9ppqes.apps.googleusercontent.com";
-            String clientSecret = "acIDjVS2xktjLHFnaTJokr95";
+            String clientSecret = "xga1yqjSDEZOlF3GuA1qRnyG";
             // STEP 1
             GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(
                     httpTransport,
                     jsonFactory,
-                    clientId,
+                    webClientID,
                     clientSecret,
                     serverAuthCode,
                     redirectUrl).execute();
             // STEP 2
             GoogleCredential credential = new GoogleCredential.Builder()
-                    .setClientSecrets(clientId, clientSecret)
+                    .setClientSecrets(webClientID, clientSecret)
                     .setTransport(httpTransport)
                     .setJsonFactory(jsonFactory)
                     .build();
