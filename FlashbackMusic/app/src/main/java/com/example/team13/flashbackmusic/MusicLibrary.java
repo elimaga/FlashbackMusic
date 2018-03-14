@@ -209,7 +209,7 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
         String songMetadataSetJson = gson.toJson(songMetadataSet);
         String albumMetadataSetJson = gson.toJson(albumMetadataSet);
         editor.putString(SONG_METADATA_SET_KEY, songMetadataSetJson);
-        editor.putString(SONG_METADATA_SET_KEY, albumMetadataSetJson);
+        editor.putString(ALBUM_METADATA_SET_KEY, albumMetadataSetJson);
         editor.apply();
     }
 
