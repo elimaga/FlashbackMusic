@@ -95,6 +95,14 @@ public class testPlaylistGeneration {
     }
 
     /**
+     * Testing to see if VibeModePlaylist can match Today with itself
+     */
+    @Test
+    public void testMatchesSameWeek() {
+        assertEquals(true, vibeModePlaylist.matchesDate(THE_PAST_WEEK));
+    }
+
+    /**
      * Testing to see if VibeModePlaylist doesn't match Today with a day more than 7 days ago
      */
     @Test

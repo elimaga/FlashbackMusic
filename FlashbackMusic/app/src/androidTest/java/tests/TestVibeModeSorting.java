@@ -265,7 +265,7 @@ public class TestVibeModeSorting {
                 "Tuesday", "21:21", DEFAULT_COORDINATE / 2, DEFAULT_COORDINATE / 2,
                 FRIEND, ONE_YEAR_AGO);
         //Satisfies no catagories
-        Song song7 = new Song("", "", "", 0, "www", 0,
+        Song song7 = new Song("Hound Dog", "Elvis Presley", "From Vegas to Memphis", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE / 2, DEFAULT_COORDINATE / 2,
                 FRIEND, ONE_YEAR_AGO);
 
