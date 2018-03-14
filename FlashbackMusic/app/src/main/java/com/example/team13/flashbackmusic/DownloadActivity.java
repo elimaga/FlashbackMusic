@@ -55,8 +55,6 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
         textView = findViewById(R.id.textView);
         urlEditText = findViewById(R.id.editText);
         musicFileDownloader = new MusicFileDownloader(DownloadActivity.this);
-        unzipper = new Unzipper();
-        unzipper.registerObserver(this);
         isAidle = true;
         musicLibrary = MusicLibrary.getInstance(DownloadActivity.this);
         musicLibrary.registerObserver(this);
@@ -99,7 +97,6 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
 
     public void downloadPressed(View view) {
         urlString = urlEditText.getText().toString();
-
         if (hasStoragePermission()) {
             if (URLUtil.isValidUrl(urlString)) {
 
@@ -168,6 +165,8 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
                 new String[]{"application/x-compressed", "application/x-zip-compressed","application/zip","multipart/x-zip"})!= null) {
 
             textView.setText("Unzipping...");
+            unzipper = new Unzipper();
+            unzipper.registerObserver(this);
             unzipper.execute(directoryPath, filename);
 
         } else {
