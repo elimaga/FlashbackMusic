@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import com.example.team13.flashbackmusic.MainActivity;
+import com.example.team13.flashbackmusic.MusicLibrary;
 import com.example.team13.flashbackmusic.R;
 
 import org.hamcrest.Description;
@@ -54,11 +55,12 @@ public class testSongMetadataDisplay {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    MusicLibrary musicLibrary = MusicLibrary.getInstance(mActivityTestRule.getActivity());
 
     @Before
     public void setup()
     {
-        mActivityTestRule.getActivity().getSongs().get(0).setData(
+        musicLibrary.getSongs().get(0).setData(
                 DEFAULT_LATITUDE, DEFAULT_LONGITUDE, DEFAULT_DAY, DEFAULT_TIME, DEFAULT_DATE);
     }
 
@@ -135,7 +137,7 @@ public class testSongMetadataDisplay {
         pressBack();
 
         // change song metadata for testing
-        mActivityTestRule.getActivity().getSongs().get(0).setData(
+        musicLibrary.getSongs().get(0).setData(
                 TEST_LATITUDE, TEST_LONGITUDE, TEST_DAY, TEST_TIME, TEST_DATE);
 
         DataInteraction relativeLayout2 = onData(anything())

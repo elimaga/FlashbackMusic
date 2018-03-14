@@ -21,7 +21,7 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by Kazutaka on 3/6/18.
  */
 
-class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subject<MusicLibraryObserver> {
+public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subject<MusicLibraryObserver> {
 
     private Context mContext;
     private static MusicLibrary instance = null;
@@ -88,7 +88,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
         return instance;
     }
 
-    ArrayList<Song> getSongs() { return new ArrayList<>(songs); }
+    public ArrayList<Song> getSongs() { return new ArrayList<>(songs); }
 
     ArrayList<Album> getAlbums() { return new ArrayList<>(albums); }
 

@@ -4,6 +4,7 @@ import android.support.test.rule.ActivityTestRule;
 
 import com.example.team13.flashbackmusic.FlashbackPlaylist;
 import com.example.team13.flashbackmusic.MainActivity;
+import com.example.team13.flashbackmusic.MusicLibrary;
 import com.example.team13.flashbackmusic.Song;
 import com.example.team13.flashbackmusic.VibeModePlaylist;
 
@@ -36,7 +37,7 @@ public class TestVibeModePlaylist {
         double[] location = {DEFAULT_COORDINATE, DEFAULT_COORDINATE};
         ArrayList<String> friends =  new ArrayList<>();
         friends.add("Gary");
-        vibeModePlaylist = new VibeModePlaylist(location, "1/1/2011", friends);
+        vibeModePlaylist = new VibeModePlaylist(location, "1/1/2011", friends, MusicLibrary.getInstance(mainActivity.getActivity()));
 
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
         "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,

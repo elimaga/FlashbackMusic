@@ -8,6 +8,7 @@ import android.support.test.rule.ActivityTestRule;
 
 import com.example.team13.flashbackmusic.FlashbackPlaylist;
 import com.example.team13.flashbackmusic.MainActivity;
+import com.example.team13.flashbackmusic.MusicLibrary;
 import com.example.team13.flashbackmusic.R;
 
 import org.junit.Before;
@@ -25,6 +26,7 @@ public class testPlaylistGeneration {
     @Rule
     public ActivityTestRule<MainActivity> mainActivity = new ActivityTestRule<MainActivity>(MainActivity.class);
     FlashbackPlaylist flashbackPlaylist;
+    MusicLibrary musicLibrary = MusicLibrary.getInstance(mainActivity.getActivity());
 
     @Before
     public void setUp()
@@ -35,7 +37,7 @@ public class testPlaylistGeneration {
         //mainActivity.getActivity().loadLibrary(mediaMetadataRetriever, resourceIds);
         double[] mockLocationCoordinates = {100, 100};
         flashbackPlaylist = new FlashbackPlaylist(
-                mainActivity.getActivity().getSongs(),
+                musicLibrary.getSongs(),
                 mockLocationCoordinates,
                 "Saturday",
                 "13:57", "2/15/17");
