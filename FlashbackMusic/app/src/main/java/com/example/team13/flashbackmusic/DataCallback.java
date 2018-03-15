@@ -17,14 +17,17 @@ public class DataCallback implements Callback {
 
     ArrayList<Song> allSongs;
     VibeModePlaylist vibeModePlaylist;
+    FBMUser user;
     Context context;
     Activity mainActivity;
     int numSongsQueried;
     int numSongsCalledBack;
 
-    public DataCallback(ArrayList<Song> allSongs, VibeModePlaylist vibeModePlaylist, Context context, Activity mainActivity) {
+    public DataCallback(ArrayList<Song> allSongs, VibeModePlaylist vibeModePlaylist, FBMUser user,
+                        Context context, Activity mainActivity) {
         this.allSongs = allSongs;
         this.vibeModePlaylist = vibeModePlaylist;
+        this.user = user;
         this.context = context;
         this.mainActivity = mainActivity;
         this.numSongsQueried = 0;
@@ -44,12 +47,21 @@ public class DataCallback implements Callback {
                 Log.d("Trying to add song titled: ", song.getTitle());
                 Song newSong = new Song(data.getTitle(), data.getArtist(), data.getAlbumName(), data.getTrackNumber(),
                         data.getURL(), index, data.getLastDay(), data.getLastTime(), data.getLastLatitude(),
-                        data.getLastLongitude(), data.getUsername(), data.getLastDate());
+                        data.getLastLongitude(), data.getUsername(), data.getUserId(), data.getLastDate());
                 newSong.setFavoriteStatus(song.getFavoriteStatus());
+
                 if(vibeModePlaylist.addSong(newSong)) {
                     Log.d("Song added", "Setting data.");
-                    song.setDataWithoutNotify(data.getLastLatitude(), data.getLastLongitude(), data.getLastDay(),
-                                                data.getLastTime(), data.getLastDate(), data.getUsername());
+                    if(user.checkIfFriend(newSong.getLastUserId())) {
+                        song.setDataWithoutNotify(data.getLastLatitude(), data.getLastLongitude(), data.getLastDay(),
+                                data.getLastTime(), data.getLastDate(), data.getUsername(), data.getUserId());
+                    }
+                    else {
+                        String proxyname = user.createProxyName(data.getUsername(), data.getUserId());
+                        song.setDataWithoutNotify(data.getLastLatitude(), data.getLastLongitude(), data.getLastDay(),
+                                data.getLastTime(), data.getLastDate(), proxyname, data.getUserId());
+                    }
+
                 }
                 songIsDownloaded = true;
                 break;
@@ -60,7 +72,7 @@ public class DataCallback implements Callback {
             //TODO: Check if the album is already created, if so, just create the song object with that album, if not then create a new album
             Song newSong = new Song(data.getTitle(), data.getArtist(), data.getAlbumName(), data.getTrackNumber(),
                     data.getURL(), allSongs.size(), data.getLastDay(), data.getLastTime(), data.getLastLatitude(),
-                    data.getLastLongitude(), data.getUsername(), data.getLastDate());
+                    data.getLastLongitude(), data.getUsername(), data.getUserId(), data.getLastDate());
             allSongs.add(newSong);
             vibeModePlaylist.addSong(newSong);
             //TODO: Download the song
@@ -78,13 +90,15 @@ public class DataCallback implements Callback {
                 for(Song song : vibeModePlaylist.getPlaylist()){
                     Log.d("Song Title: ", "" + song.getTitle());
                     Log.d("Song Index: ", "" + song.getIndex());
-                    Log.d("Song lastTime: ", song.getLastTime());
+                    Log.d("Song lastUsername: ", song.getLastUserName());
                     songIndices.add(song.getIndex());
                 }
                 //Play the vibeModePlaylist
                 Intent intent = new Intent(context, SongActivity.class);
                 intent.putExtra("songIndices", songIndices);
                 intent.putExtra("vibeModeOn",true);
+                intent.putExtra("username", user.getName());
+                intent.putExtra("userId", user.getID());
                 mainActivity.startActivityForResult(intent, 1);
             }
         }

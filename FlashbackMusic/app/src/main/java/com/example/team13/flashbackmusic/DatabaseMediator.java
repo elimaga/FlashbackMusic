@@ -18,6 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Set;
 
 /**
  * Created by Andrew Yu and Elijah Magallanes on 3/1/18.
@@ -49,8 +50,7 @@ public class DatabaseMediator implements SongObserver {
      */
     private void send(Song song)
     {
-        String username = "usr2";
-        final String databaseKey = username + "_" + song.getTitle() + "_" + song.getArtist();
+        final String databaseKey = song.getLastUserId() + "_" + song.getTitle() + "_" + song.getArtist();
 
         DatabaseEntry databaseEntry = new DatabaseEntry();
         databaseEntry.setTitle(song.getTitle());
@@ -63,7 +63,8 @@ public class DatabaseMediator implements SongObserver {
         databaseEntry.setLastLongitude(song.getLastLongitude());
         databaseEntry.setURL(song.getUrl());
         databaseEntry.setTrackNumber(song.getTrack());
-        databaseEntry.setUsername(username);
+        databaseEntry.setUsername(song.getLastUserName());
+        databaseEntry.setUserId(song.getLastUserId());
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference songReference = firebaseDatabase.getReference("Songs");
@@ -251,7 +252,7 @@ public class DatabaseMediator implements SongObserver {
      * Method to query the database for all songs that have been played by friends
      * @param friends - the list of the user's friends
      */
-    public void retrieveSongsByFriend(ArrayList<String> friends) {
+    public void retrieveSongsByFriend(Set<String> friends) {
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         final DatabaseReference songReference = firebaseDatabase.getReference("Songs");

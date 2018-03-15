@@ -12,7 +12,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Song implements SongSubject {
 
-    private String title, artist, albumName, lastDay, lastTime, setting, lastDate, lastUser, path, url;
+    private String title, artist, albumName, lastDay, lastTime, setting, lastDate, lastUserName, lastUserId, path, url;
     private double lastLatitude, lastLongitude;
     private int track;
     private int index; // index in the ArrayList of Songs
@@ -57,11 +57,12 @@ public class Song implements SongSubject {
         this.observers = new ArrayList<>();
         this.path = "";
         this.albumName = albumName;
+        this.lastUserId = "";
     }
 
     public Song(String title, String artist, String album, int track, String url, int index,
                 String lastDay, String lastTime, double lastLatitude, double lastLongitude,
-                String lastUser, String lastDate) {
+                String lastUserName, String lastUserId , String lastDate) {
         this.title = title;
         this.artist = artist;
         this.track = track;
@@ -71,7 +72,8 @@ public class Song implements SongSubject {
         this.lastTime = lastTime;
         this.lastLatitude = lastLatitude;
         this.lastLongitude = lastLongitude;
-        this.lastUser = lastUser;
+        this.lastUserName = lastUserName;
+        this.lastUserId = lastUserId;
         this.lastDate = lastDate;
         this.albumName = album;
     }
@@ -87,6 +89,7 @@ public class Song implements SongSubject {
         this.observers = new ArrayList<>();
         this.path = "";
         this.albumName = "";
+        this.lastUserId = "";
     }
 
     public String getTitle() {
@@ -133,7 +136,9 @@ public class Song implements SongSubject {
         return this.setting;
     }
 
-    public String getLastUser() { return this.lastUser; }
+    public String getLastUserName() { return this.lastUserName; }
+
+    public String getLastUserId () { return this.lastUserId; }
 
     public String getPath() { return this.path; }
 
@@ -157,16 +162,19 @@ public class Song implements SongSubject {
      * @param day - the day of the week the song was played on
      * @param time - the time the song was played at
      * @param date - the date the song was played on
+     * @param lastUserName - the name of the last user to play the song
+     * @param lastUserId - the id of the last user to play the song
      */
     public void setData(double lastLatitude, double lastLongitude,
-                         String day, String time, String date) {
+                        String day, String time, String date,
+                        String lastUserName, String lastUserId) {
         this.lastDay = day;
         this.lastTime = time;
         this.lastLatitude = lastLatitude;
         this.lastLongitude = lastLongitude;
         this.lastDate = date;
-        // TODO: Change this to the actual username when we have that
-        this.lastUser = "you";
+        this.lastUserName = lastUserName;
+        this.lastUserId = lastUserId;
         setTimeOfDay(time);
         notifyObservers();
     }
@@ -180,16 +188,19 @@ public class Song implements SongSubject {
      * @param day - the day of the week the song was played on
      * @param time - the time the song was played at
      * @param date - the date the song was played on
-     * @param lastUser - the last user to play the song
+     * @param lastUserName - the name of the last user to play the song
+     * @param lastUserId - the id of the last user to play the song
      */
     public void setDataWithoutNotify(double lastLatitude, double lastLongitude,
-                        String day, String time, String date, String lastUser) {
+                        String day, String time, String date,
+                        String lastUserName, String lastUserId) {
         this.lastDay = day;
         this.lastTime = time;
         this.lastLatitude = lastLatitude;
         this.lastLongitude = lastLongitude;
         this.lastDate = date;
-        this.lastUser = lastUser;
+        this.lastUserName = lastUserName;
+        this.lastUserId = lastUserId;
         setTimeOfDay(time);
     }
 

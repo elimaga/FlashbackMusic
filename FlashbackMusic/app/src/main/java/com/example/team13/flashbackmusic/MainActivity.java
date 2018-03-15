@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     static final int REQUEST_LOCATION = 1;
     final int INVALID_COORDINATE = 200;
     private GoogleUtility googleUtility;
-    private FBMUser usr;
+    public FBMUser usr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,17 +176,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                SharedPreferences sp = getSharedPreferences("UserFriends", MODE_PRIVATE);
+                Set<String> friendsID = sp.getStringSet("friendsID", new HashSet<String>());
+                usr.setFriendsID(friendsID);
+
+                Log.d("User", "Username: " + usr.getName());
+
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
                 //String userTime = UserInfo.getTime();
                 //String userDay = UserInfo.getDay();
                 String userDate = UserInfo.getDate();
-                ArrayList<String> userFriends = new ArrayList<>();
-                userFriends.add("usr1");
-
-                SharedPreferences sp = getSharedPreferences("UserFriends", MODE_PRIVATE);
-                Set<String> friendsID = sp.getStringSet("friendsID", new HashSet<String>());
-                usr.setFriendsID(friendsID);
+                Set<String> userFriends = usr.getFriendsID();
 
                 // Generate the Flashback Playlist
                 //FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
@@ -195,7 +196,8 @@ public class MainActivity extends AppCompatActivity {
 
                 VibeModePlaylist vibeModePlaylist = new VibeModePlaylist(userLocation, userDate, userFriends);
 
-                Callback callback = new DataCallback(musicLibrary.getSongs(), vibeModePlaylist, MainActivity.this, instance);
+                Callback callback = new DataCallback(musicLibrary.getSongs(), vibeModePlaylist, usr,
+                        MainActivity.this, instance);
                 DatabaseMediator mediator = new DatabaseMediator(callback);
                 mediator.retrieveSongsByFriend(userFriends);
                 mediator.retrieveSongsByDate(userDate);
@@ -245,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
 
         // if the songs ended normally in Flashback Mode then update the songs and restart
         // flashback mode
-        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             vibeModeButton.performClick();
         }
     }
