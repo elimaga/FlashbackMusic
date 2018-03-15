@@ -269,5 +269,18 @@ public class SongActivity extends AppCompatActivity {
         song.setData(newLocation[0], newLocation[1],newDay, newTime, newDate);
         musicLibrary.persistSong(song);
     }
+
+    public void skipSong() {
+        if(songIndices.size() > 0) {
+            Song nextSong = musicLibrary.getSongs().get(songIndices.remove(0));
+            mediaPlayer.reset();
+            updateScreen(nextSong);
+            playSong(nextSong);
+            currSong = nextSong;
+        }
+        else {
+            finish();
+        }
+    }
 }
 
