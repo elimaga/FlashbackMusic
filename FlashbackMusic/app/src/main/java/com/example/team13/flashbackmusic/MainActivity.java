@@ -31,14 +31,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
-import com.firebase.geofire.GeoLocation;
+import com.example.team13.flashbackmusic.interfaces.Callback;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-
-import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
+
+    MainActivity instance;
 
     ImageButton vibeModeButton;
     private DrawerLayout mDrawerLayout;
@@ -55,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        instance = this;
 
         musicLibrary = MusicLibrary.getInstance(MainActivity.this);
         songs = musicLibrary.getSongs();
@@ -76,20 +77,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Testing retrieve methods
+        /*
         Song song = new Song();
-        DatabaseMediator databaseMediator = new DatabaseMediator();
-        databaseMediator.retrieveSongsByLocation(49.0, 25.0);
-        databaseMediator.retrieveSongsByDate("3/6/18");
+        DatabaseMediator databaseMediator = new DatabaseMediator(song, new SimpleCallback());
+        databaseMediator.retrieveSongsByLocation(37.4219983333, -122.084);
+        databaseMediator.retrieveSongsByDate("3/14/2018");
 
         ArrayList<String> friends = new ArrayList<>();
         friends.add("usr1");
         databaseMediator.retrieveSongsByFriend(friends);
 
-        // TODO: Fix this so we can actually get the list of queried songs
-        ArrayList<String> data = databaseMediator.getQueriedSongs();
-        for (String d : data){
-            System.out.println(d);
-        }
+        ArrayList<DatabaseEntry> data = databaseMediator.getQueriedData();
+        for (DatabaseEntry d : data){
+            System.out.println(d.getTitle());
+        }*/
     }
 
     private void setUpUI() {
@@ -144,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(intent);
 
                         }
-//                        menuItem.setChecked(true);
+                        //menuItem.setChecked(true);
                         // close drawer when item is tapped
                         mDrawerLayout.closeDrawers();
 
@@ -165,28 +166,26 @@ public class MainActivity extends AppCompatActivity {
 
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
-                String userTime = UserInfo.getTime();
-                String userDay = UserInfo.getDay();
+                //String userTime = UserInfo.getTime();
+                //String userDay = UserInfo.getDay();
                 String userDate = UserInfo.getDate();
+                ArrayList<String> userFriends = new ArrayList<>();
+                userFriends.add("usr1");
 
                 // Generate the Flashback Playlist
-                FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
-                        userDay, userTime, userDate);
-                ArrayList<Song> playlist = flashbackPlaylist.getPlaylist();
+                //FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
+                //        userDay, userTime, userDate);
+                //ArrayList<Song> vibeModePlaylist = flashbackPlaylist.getPlaylist();
 
-                // Only activate flashback mode if there are songs to play
-                if (!playlist.isEmpty()) {
-                    ArrayList<Integer> songIndices = new ArrayList<>();
-                    for( Song song : playlist){
-                        songIndices.add(song.getIndex());
-                    }
-                    //Play the playlist
-                    Intent intent = new Intent(MainActivity.this, SongActivity.class);
-                    intent.putExtra("songIndices",songIndices);
-                    intent.putExtra("vibeModeOn",true);
-                    startActivityForResult(intent, 1);
-                }
-                Log.d("Flashback Button", "Flashback button is pressed from main activity");
+                VibeModePlaylist vibeModePlaylist = new VibeModePlaylist(userLocation, userDate, userFriends);
+
+                Callback callback = new DataCallback(musicLibrary.getSongs(), vibeModePlaylist, MainActivity.this, instance);
+                DatabaseMediator mediator = new DatabaseMediator(callback);
+                mediator.retrieveSongsByFriend(userFriends);
+                mediator.retrieveSongsByDate(userDate);
+                mediator.retrieveSongsByLocation(userLocation[0], userLocation[1]);
+
+                Log.d("Vibe Mode Button", "Vibe Mode button is pressed from main activity");
 
             }
         });
@@ -200,21 +199,6 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         }
 
-        // Testing retrieve methods
-        Song song = new Song();
-        DatabaseMediator databaseMediator = new DatabaseMediator();
-        databaseMediator.retrieveSongsByLocation(49.0, 25.0);
-        databaseMediator.retrieveSongsByDate("3/6/18");
-
-        ArrayList<String> friends = new ArrayList<>();
-        friends.add("usr1");
-        databaseMediator.retrieveSongsByFriend(friends);
-
-        // TODO: Fix this so we can actually get the list of queried songs
-        ArrayList<String> data = databaseMediator.getQueriedSongs();
-        for (String d : data){
-            System.out.println(d);
-        }
     }
 
     @Override

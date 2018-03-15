@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.EditText;
@@ -54,8 +55,6 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
         textView = findViewById(R.id.textView);
         urlEditText = findViewById(R.id.editText);
         musicFileDownloader = new MusicFileDownloader(DownloadActivity.this);
-        unzipper = new Unzipper();
-        unzipper.registerObserver(this);
         isAidle = true;
         musicLibrary = MusicLibrary.getInstance(DownloadActivity.this);
         musicLibrary.registerObserver(this);
@@ -98,7 +97,6 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
 
     public void downloadPressed(View view) {
         urlString = urlEditText.getText().toString();
-
         if (hasStoragePermission()) {
             if (URLUtil.isValidUrl(urlString)) {
 
@@ -167,6 +165,8 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
                 new String[]{"application/x-compressed", "application/x-zip-compressed","application/zip","multipart/x-zip"})!= null) {
 
             textView.setText("Unzipping...");
+            unzipper = new Unzipper();
+            unzipper.registerObserver(this);
             unzipper.execute(directoryPath, filename);
 
         } else {
@@ -182,6 +182,23 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
         textView.setText("Loading files into library...");
         // calling addSongsIntoLibraryFromPath internally
         String url = urlEditText.getText().toString();
+        for (int i = 0; i < paths.size(); i++) {
+            try {
+                String extension = MimeTypeMap.getFileExtensionFromUrl(new File(paths.get(i)).toURI().toURL().toString());
+                MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+                String mime = mimeTypeMap.getMimeTypeFromExtension(extension);
+
+                if (MimeTypeFilter.matches(mime, new String[]{"audio/mpeg",
+                        "audio/mpeg3",
+                        "audio/x-mpeg-3",
+                        "video/mpeg",
+                        "video/x-mpeg"}) == null) {
+                    paths.remove(paths.get(i));
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
         musicLibrary.updateLibraryInBackground(paths, url);
     }
 

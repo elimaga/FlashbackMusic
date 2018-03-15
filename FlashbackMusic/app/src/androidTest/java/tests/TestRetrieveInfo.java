@@ -15,7 +15,7 @@ import static junit.framework.Assert.assertEquals;
 /**
  * Created by Eli on 2/17/2018.
  */
-
+/*
 public class TestRetrieveInfo {
 
     @Rule
@@ -64,7 +64,7 @@ public class TestRetrieveInfo {
     /**
      * Testing to see if the new historical information about the song was loaded correctly from the
      * SharedPreferences where the location is valid.
-     */
+     *
     @Test
     public void testRetrieveInfoValidLocation() {
         Song song = new Song("Crane City", "", "", 0, "0/", 0 );
@@ -80,7 +80,7 @@ public class TestRetrieveInfo {
     /**
      * Testing to see if the new historical information about the song was loaded correctly from the
      * SharedPreferences where the location is invalid.
-     */
+     *
     @Test
     public void testRetrieveInfoInvalidLocation() {
         Song song = new Song("mojo potion #61/49", "", "", 0, "0/", 1);
@@ -96,7 +96,7 @@ public class TestRetrieveInfo {
     /**
      * Testing to see if the historical information about the song was loaded correctly from the
      * SharedPreferences when there is no previous info
-     */
+     *
     @Test
     public void testRetrieveNoInfo() {
         Song song = new Song("Tightrope Walker", "", "", 0, "0/", 2);
@@ -110,3 +110,4 @@ public class TestRetrieveInfo {
     }
 
 }
+*/
