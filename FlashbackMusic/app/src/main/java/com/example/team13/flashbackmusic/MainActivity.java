@@ -67,9 +67,9 @@ public class MainActivity extends AppCompatActivity {
         googleUtility = new GoogleUtility(MainActivity.this, this);
         GoogleSignInAccount acct = googleUtility.getLastAccount();
         usr = new FBMUser(acct.getId(), acct.getDisplayName());
-        acct.get
+
         googleUtility.setUser(usr);
-        Log.d("MainActivity", "Created user: " + usr.getName());
+        Log.d("MainActivity", "user id: " + usr.getID());
 
         setUpUI();
 

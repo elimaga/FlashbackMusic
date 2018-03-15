@@ -179,9 +179,6 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
             SharedPreferences.Editor e = sp.edit();
             e.putStringSet("friendsID", user.getFriendsID());
             e.apply();
-
-            Log.d("GoogleUtility", "user name: " + user.getName());
-            Log.d("GoogleUtility", "connections: " + people);
         }
     }
 }

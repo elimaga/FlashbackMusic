@@ -3,7 +3,6 @@ package com.example.team13.flashbackmusic;
 import android.util.Log;
 
 import com.google.api.services.people.v1.model.Person;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +15,10 @@ import java.util.Set;
 public class FBMUser {
     private String ID, name, proxyName;
     private Set<String> friendsID;
+    private String[] proxyPrefix = {"aardvark", "baboon", "chimp", "dingo", "elephant",
+        "flamingo", "giraffe", "hyena", "iguana", "jackalope", "kangaroo", "llama", "manatee",
+        "narwhal", "octopus", "penguin", "quail", "raccoon", "sloth", "turtle", "upupa",
+        "viper", "wombat", "xenarthra", "yak", "zebra"};
 
     public FBMUser() {
         ID = "";
@@ -28,6 +31,7 @@ public class FBMUser {
         this.ID = ID;
         this.name = name;
         this.proxyName = createProxyName();
+        Log.d("FBM", "proxy: " + proxyName);
         friendsID = new HashSet<>();
     }
 
@@ -58,16 +62,18 @@ public class FBMUser {
     public void setConnections(List<Person> connections) {
         if(connections != null) {
             for (Person p : connections) {
-                friendsID.add(p.getResourceName());
-                Log.d("FBMUser", "name: " + p.getNames().get(0).getDisplayName() +
-                        "; friend id: " + p.getResourceName());
+                if(p.getNames().size() > 1) {
+                    friendsID.add(p.getNames().get(1).getMetadata().getSource().getId());
+                }
             }
         }
     }
 
-    // TODO
     private String createProxyName() {
-        return "";
+        char c = name.toLowerCase().toCharArray()[0];
+        int index = ((int) c) - 97;
+
+        return proxyPrefix[index] + ID.substring(ID.length() - 5, ID.length());
     }
 
 }
