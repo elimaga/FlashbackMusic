@@ -1,132 +1,137 @@
 package tests;
 
-import java.lang.Math;
+import java.util.ArrayList;
 
-import android.location.Location;
-import android.media.MediaMetadataRetriever;
 import android.support.test.rule.ActivityTestRule;
 
-import com.example.team13.flashbackmusic.FlashbackPlaylist;
 import com.example.team13.flashbackmusic.MainActivity;
-import com.example.team13.flashbackmusic.R;
+import com.example.team13.flashbackmusic.VibeModePlaylist;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static junit.framework.Assert.assertEquals;
+
 /**
  * Created by andrewyu on 2/17/18.
  */
-
 public class testPlaylistGeneration {
 
-    final float METERS_IN_THOUSAND_FEET = 304.8f;
+    private static final int DEFAULT_COORDINATE = 45;
+    private static final String TODAY = "1/1/2011";
+    private static final String ONE_YEAR_AGO = "1/1/2010";
+    private static final String THE_PAST_WEEK = "12/26/2010";
+    private static final String ONE_WEEK_AGO = "12/25/2010";
+    private static final double KM_IN_THOUSAND_FEET = 0.3048;
+    private static final double ONE_KM_IN_DEGREES = 1 / 111.32; // ~= 0.0000089
+    private static final double THOUSAND_FEET_IN_DEGREES = ONE_KM_IN_DEGREES * KM_IN_THOUSAND_FEET;
+    private static final String FRIEND = "Gary";
+    private static final String STRANGER = "George";
 
     @Rule
-    public ActivityTestRule<MainActivity> mainActivity = new ActivityTestRule<MainActivity>(MainActivity.class);
-    FlashbackPlaylist flashbackPlaylist;
+    public ActivityTestRule<MainActivity> mainActivity = new ActivityTestRule<>(MainActivity.class);
+    VibeModePlaylist vibeModePlaylist;
 
     @Before
     public void setUp()
     {
-        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-        int[] resourceIds = {R.raw._123_go, R.raw.america_religious, R.raw.beautiful_pain,
-                R.raw.cant_you_be_mine, R.raw.i_will_not_be_afraid, R.raw.stomp_jump_boogie};
-        mainActivity.getActivity().loadLibrary(mediaMetadataRetriever, resourceIds);
-        double[] mockLocationCoordinates = {100, 100};
-        flashbackPlaylist = new FlashbackPlaylist(
-                mainActivity.getActivity().getSongs(),
-                mockLocationCoordinates,
-                "Saturday",
-                "13:57", "2/15/17");
-
+        double[] location = {DEFAULT_COORDINATE, DEFAULT_COORDINATE};
+        ArrayList<String> friends =  new ArrayList<>();
+        friends.add(FRIEND);
+        vibeModePlaylist = new VibeModePlaylist(location, TODAY, friends);
     }
 
 
     /**
-     * Testing to see if FlashbackPlaylist can detect that our current location is
+     * Testing to see if VibeModePlaylist can detect that our current location is
      * exactly at the last known location stored in a song
      */
     @Test
     public void testMatchesExactLocation() {
-        assert flashbackPlaylist.matchesLocation(
-                100, 100,
-                100, 100);
+        assertEquals(true, vibeModePlaylist.matchesLocation(DEFAULT_COORDINATE, DEFAULT_COORDINATE,
+                DEFAULT_COORDINATE, DEFAULT_COORDINATE));
     }
 
     /**
-     * Testing to see if FlashbackPlaylist can detect that our current location is
+     * Testing to see if VibeModePlaylist can detect that our current location is
      * 1000 ft from the last known location stored in a song
      */
     @Test
     public void testMatchesEdgeLocation() {
-        assert flashbackPlaylist.matchesLocation(
-                100, 100 + METERS_IN_THOUSAND_FEET,
-                100, 100);
+        assertEquals(true, vibeModePlaylist.matchesLocation(DEFAULT_COORDINATE, DEFAULT_COORDINATE,
+                DEFAULT_COORDINATE - THOUSAND_FEET_IN_DEGREES,
+                DEFAULT_COORDINATE));
     }
 
     /**
-     * Testing to see if FlashbackPlaylist can detect that our current location is
-     * 1001 ft from the last known location stored in a song and returns false
+     * Testing to see if VibeModePlaylist can detect that our current location is
+     * outside 1000 ft from the last known location stored in a song and returns false
      */
     @Test
     public void testDoesNotMatchesLocationOnOutside() {
-        assert !flashbackPlaylist.matchesLocation(
-                100, 100 + METERS_IN_THOUSAND_FEET + 1,
-                100, 100);
+        assertEquals(false, vibeModePlaylist.matchesLocation(DEFAULT_COORDINATE, DEFAULT_COORDINATE,
+                DEFAULT_COORDINATE - THOUSAND_FEET_IN_DEGREES,
+                DEFAULT_COORDINATE - THOUSAND_FEET_IN_DEGREES));
     }
 
     /**
-     * Testing to see if FlashbackPlaylist can detect that our current location is
+     * Testing to see if VibeModePlaylist can detect that our current location is
      * 1000 ft from the last known location stored in a song (using a 45-45-90 triangle)
      */
     @Test
     public void testMatchesLocation() {
-        assert flashbackPlaylist.matchesLocation(
-                100 + (METERS_IN_THOUSAND_FEET / Math.sqrt(2)),
-                100 + (METERS_IN_THOUSAND_FEET / Math.sqrt(2)),
-                100, 100);
+        assertEquals(true, vibeModePlaylist.matchesLocation(DEFAULT_COORDINATE, DEFAULT_COORDINATE,
+                DEFAULT_COORDINATE - THOUSAND_FEET_IN_DEGREES / Math.sqrt(2),
+                DEFAULT_COORDINATE - THOUSAND_FEET_IN_DEGREES / Math.sqrt(2)));
     }
 
     /**
-     * Testing to see if FlashbackPlaylist can match days of the week
+     * Testing to see if VibeModePlaylist can match Today with itself
      */
     @Test
     public void testMatchesSameDay() {
-        assert flashbackPlaylist.matchesDay("Saturday", "Saturday");
+        assertEquals(true, vibeModePlaylist.matchesDate(TODAY));
     }
 
     /**
-     * Testing to see if FlashbackPlaylist doesn't match one day of the week to another
+     * Testing to see if VibeModePlaylist can match Today with itself
+     */
+    @Test
+    public void testMatchesSameWeek() {
+        assertEquals(true, vibeModePlaylist.matchesDate(THE_PAST_WEEK));
+    }
+
+    /**
+     * Testing to see if VibeModePlaylist doesn't match Today with a day more than 7 days ago
      */
     @Test
     public void testDoesNotMatchesDifferentDay() {
-        assert !flashbackPlaylist.matchesDay("Saturday", "Sunday");
+        assertEquals(false, vibeModePlaylist.matchesDate(ONE_WEEK_AGO));
     }
 
     /**
-     * Testing to see if FlashbackPlaylist matches a time with itself
+     * Testing to see if VibeModePlaylist matches a time with itself
      */
     @Test
-    public void testMatchesSameTimeOfDay() {
-        assert flashbackPlaylist.matchesTimeOfDay("13:57", "13:57");
+    public void testDoesNotMatchOneYearAgo() {
+        assertEquals(false, vibeModePlaylist.matchesDate(ONE_YEAR_AGO));
     }
 
     /**
-     * Testing to see if FlashbackPlaylist matches a time between 5-11am with another time between
-     * 5-11am
+     * Testing to see if VibeModePlaylist matches a user with their friend
      */
     @Test
-    public void testMatchesPeriodOfDay() {
-        assert flashbackPlaylist.matchesTimeOfDay("8:21", "10:57");
+    public void testMatchesFriends() {
+        assertEquals(true, vibeModePlaylist.matchesFriend(FRIEND));
     }
 
     /**
-     * Testing to see if FlashbackPlaylist does not match a time between 5am - 11am with
-     * a time between 5pm - 5am
+     * Testing to see if VibeModePlaylist does not match a user with a stranger
      */
     @Test
-    public void testDoesNotMatchesDifferentPeriodsOfDay() {
-        assert !flashbackPlaylist.matchesTimeOfDay("8:21", "20:57");
+    public void testDoesNotMatchStranger() {
+        assertEquals(false, vibeModePlaylist.matchesFriend(STRANGER));
     }
 }
+

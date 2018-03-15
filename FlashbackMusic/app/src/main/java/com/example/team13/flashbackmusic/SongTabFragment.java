@@ -29,8 +29,7 @@ public class SongTabFragment extends Fragment {
 
         main = (MainActivity) getActivity();
         View rootView = inflater.inflate(R.layout.song_tab_fragment, container, false);
-        musicLibrary = MusicLibrary.getInstance(main
-        );
+        musicLibrary = MusicLibrary.getInstance(main);
 
         songListView = rootView.findViewById(R.id.song_list_view);
         songListView.setOnItemClickListener(new ListView.OnItemClickListener() {
@@ -38,7 +37,6 @@ public class SongTabFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 Song song = (Song) adapterView.getItemAtPosition(position);
-
                 ArrayList<Song> songToPlay = new ArrayList<>();
                 ArrayList<Integer> indexOfSong = new ArrayList<>();
 

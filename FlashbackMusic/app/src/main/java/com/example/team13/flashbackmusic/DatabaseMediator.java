@@ -2,6 +2,7 @@ package com.example.team13.flashbackmusic;
 
 import android.util.Log;
 
+import com.example.team13.flashbackmusic.interfaces.Callback;
 import com.example.team13.flashbackmusic.interfaces.SongObserver;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -13,6 +14,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,11 +27,13 @@ public class DatabaseMediator implements SongObserver {
 
     final double KILOMETERS_IN_THOUSAND_FEET = 0.3048;
     final int DAYS_IN_WEEK = 7;
-    ArrayList<String> queriedSongs;
+    ArrayList<DatabaseEntry> queriedData;
+    Callback finishedCallback;
 
-    public DatabaseMediator()
+    public DatabaseMediator(Callback callback)
     {
-        queriedSongs = new ArrayList<>();
+        queriedData = new ArrayList<>();
+        finishedCallback = callback;
     }
 
     /**
@@ -45,7 +49,7 @@ public class DatabaseMediator implements SongObserver {
      */
     private void send(Song song)
     {
-        String username = "usr1";
+        String username = "usr2";
         final String databaseKey = username + "_" + song.getTitle() + "_" + song.getArtist();
 
         DatabaseEntry databaseEntry = new DatabaseEntry();
@@ -94,41 +98,94 @@ public class DatabaseMediator implements SongObserver {
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         final DatabaseReference locationReference = firebaseDatabase.getReference("Locations");
+        final DatabaseReference songReference = firebaseDatabase.getReference("Songs");
         GeoFire geoFire = new GeoFire(locationReference);
 
-        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), KILOMETERS_IN_THOUSAND_FEET);
+        // Only want to use a location if we have a valid latitude and longitude
+        if(latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 ) {
+            GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), KILOMETERS_IN_THOUSAND_FEET);
 
-        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
 
-            @Override
-            public void onKeyEntered(String key, GeoLocation location) {
-                Log.d("Retrieve Songs by Location", String.format("Key %s is within 1000 feet at [%f,%f]", key, location.latitude, location.longitude));
+                @Override
+                public void onKeyEntered(String key, GeoLocation location) {
+                    Log.d("Retrieve Songs by Location", String.format("Key %s is within 1000 feet at [%f,%f]", key, location.latitude, location.longitude));
 
-                // Add the songKey to the ArrayList of queried songs
-                String songKey = key.substring(0, key.indexOf("-"));
-                queriedSongs.add(songKey);
-            }
+                    // Add the songKey to the ArrayList of queried songs
+                    String songKey = key.substring(0, key.indexOf("-"));
+                    finishedCallback.incrNumSongsQueried();
+                    DatabaseReference curRef = songReference.child(songKey);
+                    curRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
+                            finishedCallback.callback(data);
+                            Log.d("Callback", data.getTitle());
+                        }
 
-            @Override
-            public void onKeyExited(String key) {
-                Log.d("Retrieve Songs by Location", String.format("Key %s is no longer in the search area", key));
-            }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-            @Override
-            public void onKeyMoved(String key, GeoLocation location) {
-                Log.d("Retrieve Songs by Location", String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
-            }
+                        }
+                    });
+                }
 
-            @Override
-            public void onGeoQueryReady() {
-                Log.d("Retrieve Songs by Location", "All initial data has been loaded and events have been fired!");
-            }
+                @Override
+                public void onKeyExited(String key) {
+                    Log.d("Retrieve Songs by Location", String.format("Key %s is no longer in the search area", key));
+                }
 
-            @Override
-            public void onGeoQueryError(DatabaseError error) {
-                Log.d("Retrieve Songs by Location", "Error: " + error);
-            }
-        });
+                @Override
+                public void onKeyMoved(String key, GeoLocation location) {
+                    Log.d("Retrieve Songs by Location", String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
+                }
+
+                @Override
+                public void onGeoQueryReady() {
+                    Log.d("Retrieve Songs by Location", "All initial data has been loaded and events have been fired!");
+                    finishedCallback.callback(queriedData);
+                }
+
+                @Override
+                public void onGeoQueryError(DatabaseError error) {
+                    Log.d("Retrieve Songs by Location", "Error: " + error);
+                }
+            });
+        }
+        // Else query at location (0,0), but do not any of the database entries to the playlist because we are not supposed to
+        // be querying. This is just so we know when all of our queries have finished.
+        else {
+            GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(0, 0), KILOMETERS_IN_THOUSAND_FEET);
+
+            geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+
+                @Override
+                public void onKeyEntered(String key, GeoLocation location) {
+                    Log.d("Invalid retrieve Songs by Location", String.format("Key %s is not added.", key));
+                }
+
+                @Override
+                public void onKeyExited(String key) {
+                    Log.d("Invalid retrieve Songs by Location", String.format("Key %s is not removed.", key));
+                }
+
+                @Override
+                public void onKeyMoved(String key, GeoLocation location) {
+                    Log.d("Invalid retrieve Songs by Location", String.format("Key %s is not added.", key));
+                }
+
+                @Override
+                public void onGeoQueryReady() {
+                    Log.d("Invalid retrieve Songs by Location", "All initial data has been loaded and events have been fired!");
+                    finishedCallback.callback(queriedData);
+                }
+
+                @Override
+                public void onGeoQueryError(DatabaseError error) {
+                    Log.d("Invalid retrieve Songs by Location", "Error: " + error);
+                }
+            });
+        }
 
     }
 
@@ -138,17 +195,16 @@ public class DatabaseMediator implements SongObserver {
      */
     public void retrieveSongsByDate(String curDate) {
 
-        int firstSlash = curDate.indexOf("/");
-        int secondSlash = curDate.lastIndexOf("/");
-        int curMonth = Integer.parseInt(curDate.substring(0, firstSlash));
-        int curDay = Integer.parseInt(curDate.substring(firstSlash + 1, secondSlash));
-        int curYear = Integer.parseInt(curDate.substring(secondSlash + 1, curDate.length()));
+        int[] curDateValues = UserInfo.getDateValues(curDate);
+        int curMonth = curDateValues[0];
+        int curDay = curDateValues[1];
+        int curYear = curDateValues[2];
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         final DatabaseReference songReference = firebaseDatabase.getReference("Songs");
 
         // Loop 7 times through the days in the past week
-        for (int i = 1; i < DAYS_IN_WEEK; i++) {
+        for (int i = 0; i < DAYS_IN_WEEK; i++) {
 
             String queryDate = curMonth + "/" + curDay + "/" + curYear;
 
@@ -158,9 +214,9 @@ public class DatabaseMediator implements SongObserver {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     // Add the song key to the Arraylist of queried songs
+                    finishedCallback.incrNumSongsQueried();
                     DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
-                    String songKey = data.getUsername() + "_" + data.getTitle() +"_" + data.getArtist();
-                    queriedSongs.add(songKey);
+                    queriedData.add(data);
 
                     Log.d("Retrieve Songs By Date", "Retrieved song titled " + data.getTitle());
                 }
@@ -182,13 +238,11 @@ public class DatabaseMediator implements SongObserver {
                 }
             });
 
-            // Rolls the date back one day, might move this to UserInfo later
-            Calendar cal = Calendar.getInstance();
-            cal.set(curYear, curMonth - 1, curDay);
-            cal.add(Calendar.DAY_OF_YEAR, -1);
-            curDay = cal.get(Calendar.DATE);
-            curMonth = cal.get(Calendar.MONTH) + 1;
-            curYear = cal.get(Calendar.YEAR);
+            // Rolls the date back one day
+            int[] newDateValues = UserInfo.backOneDay(curMonth, curDay, curYear);
+            curMonth = newDateValues[0];
+            curDay = newDateValues[1];
+            curYear = newDateValues[2];
 
         }
     }
@@ -211,9 +265,9 @@ public class DatabaseMediator implements SongObserver {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     // Add the song key to the Arraylist of queried songs
+                    finishedCallback.incrNumSongsQueried();
                     DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
-                    String songKey = data.getUsername() + "_" + data.getTitle() + "_" + data.getArtist();
-                    queriedSongs.add(songKey);
+                    queriedData.add(data);
 
                     Log.d("Retrieve Songs By Friends", "Retrieved song titled " + data.getTitle());
                 }
@@ -241,6 +295,6 @@ public class DatabaseMediator implements SongObserver {
      * Getter for the list of queried songs
      * @return the list of queried songs
      */
-    public ArrayList<String> getQueriedSongs() { return queriedSongs; }
+    public ArrayList<DatabaseEntry> getQueriedData() { return queriedData; }
 
 }
