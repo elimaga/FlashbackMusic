@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
+
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
@@ -41,7 +42,14 @@ import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.example.team13.flashbackmusic.interfaces.Callback;
+
+import java.util.ArrayList;
+
+
 public class MainActivity extends AppCompatActivity {
+
+    MainActivity instance;
 
     ImageButton vibeModeButton;
     private DrawerLayout mDrawerLayout;
@@ -60,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        instance = this;
 
         musicLibrary = MusicLibrary.getInstance(MainActivity.this);
         songs = musicLibrary.getSongs();
@@ -86,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         }
+
     }
 
     private void setUpUI() {
@@ -146,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(intent);
 
                         }
-//                        menuItem.setChecked(true);
+                        //menuItem.setChecked(true);
                         // close drawer when item is tapped
                         mDrawerLayout.closeDrawers();
 
@@ -167,32 +178,30 @@ public class MainActivity extends AppCompatActivity {
 
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
-                String userTime = UserInfo.getTime();
-                String userDay = UserInfo.getDay();
+                //String userTime = UserInfo.getTime();
+                //String userDay = UserInfo.getDay();
                 String userDate = UserInfo.getDate();
+                ArrayList<String> userFriends = new ArrayList<>();
+                userFriends.add("usr1");
 
                 SharedPreferences sp = getSharedPreferences("UserFriends", MODE_PRIVATE);
                 Set<String> friendsID = sp.getStringSet("friendsID", new HashSet<String>());
                 usr.setFriendsID(friendsID);
 
                 // Generate the Flashback Playlist
-                FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
-                        userDay, userTime, userDate);
-                ArrayList<Song> playlist = flashbackPlaylist.getPlaylist();
+                //FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
+                //        userDay, userTime, userDate);
+                //ArrayList<Song> vibeModePlaylist = flashbackPlaylist.getPlaylist();
 
-                // Only activate flashback mode if there are songs to play
-                if (!playlist.isEmpty()) {
-                    ArrayList<Integer> songIndices = new ArrayList<>();
-                    for( Song song : playlist){
-                        songIndices.add(song.getIndex());
-                    }
-                    //Play the playlist
-                    Intent intent = new Intent(MainActivity.this, SongActivity.class);
-                    intent.putExtra("songIndices",songIndices);
-                    intent.putExtra("vibeModeOn",true);
-                    startActivityForResult(intent, 1);
-                }
-                Log.d("Flashback Button", "Flashback button is pressed from main activity");
+                VibeModePlaylist vibeModePlaylist = new VibeModePlaylist(userLocation, userDate, userFriends);
+
+                Callback callback = new DataCallback(musicLibrary.getSongs(), vibeModePlaylist, MainActivity.this, instance);
+                DatabaseMediator mediator = new DatabaseMediator(callback);
+                mediator.retrieveSongsByFriend(userFriends);
+                mediator.retrieveSongsByDate(userDate);
+                mediator.retrieveSongsByLocation(userLocation[0], userLocation[1]);
+
+                Log.d("Vibe Mode Button", "Vibe Mode button is pressed from main activity");
 
             }
         });

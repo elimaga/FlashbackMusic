@@ -12,7 +12,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Song implements SongSubject {
 
-    private String title, artist, albumName, lastDay, lastTime, setting, lastDate, path, url;
+    private String title, artist, albumName, lastDay, lastTime, setting, lastDate, lastUser, path, url;
     private double lastLatitude, lastLongitude;
     private int track;
     private int index; // index in the ArrayList of Songs
@@ -58,6 +58,24 @@ public class Song implements SongSubject {
         this.path = "";
         this.albumName = albumName;
     }
+
+    public Song(String title, String artist, String album, int track, String url, int index,
+                String lastDay, String lastTime, double lastLatitude, double lastLongitude,
+                String lastUser, String lastDate) {
+        this.title = title;
+        this.artist = artist;
+        this.track = track;
+        this.url = url;
+        this.index = index;
+        this.lastDay = lastDay;
+        this.lastTime = lastTime;
+        this.lastLatitude = lastLatitude;
+        this.lastLongitude = lastLongitude;
+        this.lastUser = lastUser;
+        this.lastDate = lastDate;
+        this.albumName = album;
+    }
+
 
     public Song()
     {
@@ -115,12 +133,13 @@ public class Song implements SongSubject {
         return this.setting;
     }
 
+    public String getLastUser() { return this.lastUser; }
+
     public String getPath() { return this.path; }
 
     public void setFavoriteStatus(FavoriteStatus status) {
         this.favoriteStatus = status;
     }
-
 
     public boolean isDownloaded() { return !(this.path.equals("")); }
 
@@ -146,10 +165,33 @@ public class Song implements SongSubject {
         this.lastLatitude = lastLatitude;
         this.lastLongitude = lastLongitude;
         this.lastDate = date;
+        // TODO: Change this to the actual username when we have that
+        this.lastUser = "you";
         setTimeOfDay(time);
         notifyObservers();
     }
 
+    /**
+     * Method to set the location, date, and time data for the song without notifying the observers.
+     * This is because we are updating the song with the data from Firebase, but the song has not
+     * been played yet.
+     * @param lastLatitude - the latitude that the song was played at
+     * @param lastLongitude - the longitude the song was played at
+     * @param day - the day of the week the song was played on
+     * @param time - the time the song was played at
+     * @param date - the date the song was played on
+     * @param lastUser - the last user to play the song
+     */
+    public void setDataWithoutNotify(double lastLatitude, double lastLongitude,
+                        String day, String time, String date, String lastUser) {
+        this.lastDay = day;
+        this.lastTime = time;
+        this.lastLatitude = lastLatitude;
+        this.lastLongitude = lastLongitude;
+        this.lastDate = date;
+        this.lastUser = lastUser;
+        setTimeOfDay(time);
+    }
 
     /**
      * Method to get the time of day (Morning, Afternoon, or Evening)
@@ -173,7 +215,7 @@ public class Song implements SongSubject {
         }
     }
 
-    
+
     /**
      * Method to add observers to the song object
      * @param observer - the observer to add
@@ -189,6 +231,19 @@ public class Song implements SongSubject {
         for(SongObserver observer : observers) {
             observer.update(this);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // If the object is a Song, check if the title and artist match
+        if (o instanceof Song) {
+            // If the title and artist match, return true
+            if(this.getTitle().equals(((Song)o).getTitle()) && this.getArtist().equals(((Song)o).getArtist())) {
+                return true;
+            }
+        }
+        // Return false if o is not a Song or the titles/artists don't match
+        return false;
     }
 
 }
