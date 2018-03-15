@@ -21,7 +21,7 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by Kazutaka on 3/6/18.
  */
 
-class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subject<MusicLibraryObserver> {
+public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subject<MusicLibraryObserver> {
 
     private Context mContext;
     private static MusicLibrary instance = null;
@@ -44,7 +44,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
         mContext = context;
         albums = new ArrayList<>();
         songs = new ArrayList<>();
-        songMediator = new DatabaseMediator();
+        songMediator = new DatabaseMediator(new SimpleCallback());
         songMetadataSet = new ArrayList<>();
         albumMetadataSet = new ArrayList<>();
         observers = new ArrayList<>();
@@ -57,7 +57,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
         mContext = musicLibrary.mContext;
         albums = musicLibrary.albums;
         songs = musicLibrary.songs;
-        songMediator = new DatabaseMediator();
+        songMediator = new DatabaseMediator(new SimpleCallback());
         songMetadataSet = musicLibrary.songMetadataSet;
         albumMetadataSet = musicLibrary.albumMetadataSet;
         observers = musicLibrary.observers;
@@ -88,7 +88,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
         return instance;
     }
 
-    ArrayList<Song> getSongs() { return new ArrayList<>(songs); }
+    public ArrayList<Song> getSongs() { return new ArrayList<>(songs); }
 
     ArrayList<Album> getAlbums() { return new ArrayList<>(albums); }
 
@@ -97,17 +97,15 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
             HashMap<String, String> songMetadata = retrieveSongMetadata(path);
             if (!(songMetadataSet.contains(songMetadata))) {
                 HashMap<String, String> albumMetadata = extractAlbumMetadata(songMetadata);
-                Album album;
                 if (!(albumMetadataSet.contains(albumMetadata))) {
-                    album = new Album(songMetadata.get("albumName"),
+                    Album newAlbum = new Album(songMetadata.get("albumName"),
                             songMetadata.get("artist"),
                             songMetadata.get("track"),
                             albums.size());
-                    albums.add(album);
+                    albums.add(newAlbum);
                     albumMetadataSet.add(albumMetadata);
-                } else {
-                    album = albums.get(albumMetadataSet.indexOf(albumMetadata));
                 }
+                Album album = albums.get(albumMetadataSet.indexOf(albumMetadata));
                 Song song = new Song(songMetadata.get("title"),
                         songMetadata.get("artist"),
                         songMetadata.get("track"),
@@ -209,7 +207,7 @@ class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements Subjec
         String songMetadataSetJson = gson.toJson(songMetadataSet);
         String albumMetadataSetJson = gson.toJson(albumMetadataSet);
         editor.putString(SONG_METADATA_SET_KEY, songMetadataSetJson);
-        editor.putString(SONG_METADATA_SET_KEY, albumMetadataSetJson);
+        editor.putString(ALBUM_METADATA_SET_KEY, albumMetadataSetJson);
         editor.apply();
     }
 

@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNotEquals;
 /**
  * Created by KM on 2/18/2018.
  */
-
+/*
 public class TestChangingValues {
 
     @Rule
@@ -93,3 +93,4 @@ public class TestChangingValues {
         assertEquals("NEUTRAL",actualValue);
     }
 }
+*/

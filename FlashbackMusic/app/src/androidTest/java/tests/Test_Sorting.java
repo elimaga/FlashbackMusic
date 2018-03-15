@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by rolandkong on 2/14/18.
  */
-
+/*
 public class Test_Sorting {
 
     FlashbackPlaylist list;
@@ -124,5 +124,5 @@ public class Test_Sorting {
         assertEquals("Fourth", sorted.get(5).getTitle());
 
     }
-
 }
+*/
