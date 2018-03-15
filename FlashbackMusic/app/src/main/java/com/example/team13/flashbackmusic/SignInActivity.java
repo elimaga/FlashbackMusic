@@ -1,6 +1,7 @@
 package com.example.team13.flashbackmusic;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,7 +55,8 @@ public class SignInActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("SignInActivity", "running onActivityResult");
 
-        GoogleSignInAccount acct = googleUtility.getAccount(requestCode, data);
+        SharedPreferences sp = getSharedPreferences("UserFriends", MODE_PRIVATE);
+        GoogleSignInAccount acct = googleUtility.getAccount(requestCode, data, sp);
         updateUI(acct);
     }
 

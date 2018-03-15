@@ -2,8 +2,9 @@ package com.example.team13.flashbackmusic;
 
 import com.google.api.services.people.v1.model.Person;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
 
 
 /**
@@ -11,23 +12,21 @@ import java.util.List;
  */
 
 public class FBMUser {
-    private String ID, name, email, proxyName;
-    private List<String> friendsID;
+    private String ID, name, proxyName;
+    private Set<String> friendsID;
 
     public FBMUser() {
         ID = "";
         name = "";
         proxyName = "";
-        email = "";
-        friendsID = new ArrayList<>();
+        friendsID = new HashSet<>();
     }
 
-    public FBMUser(String ID, String name, String email) {
+    public FBMUser(String ID, String name) {
         this.ID = ID;
         this.name = name;
         this.proxyName = createProxyName();
-        this.email = email;
-        friendsID = new ArrayList<>();
+        friendsID = new HashSet<>();
     }
 
     public String getID() {
@@ -38,21 +37,22 @@ public class FBMUser {
         return name;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     public String getProxyName() {
         return proxyName;
     }
 
-    public List<String> getFriendsID() {
+    public Set<String> getFriendsID() {
         return friendsID;
+    }
+
+    public boolean checkIfFriend(String friendID) {
+        return friendsID.contains(friendID);
     }
 
     public void setConnections(List<Person> connections) {
         for(Person p : connections) {
             friendsID.add(p.getResourceName());
+
         }
     }
 

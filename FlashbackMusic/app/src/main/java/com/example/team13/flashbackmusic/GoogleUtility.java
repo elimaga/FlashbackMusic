@@ -3,6 +3,7 @@ package com.example.team13.flashbackmusic;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
@@ -44,6 +45,7 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
     private static List<Person> people;
     private static FBMUser user;
     private Activity activity;
+    private SharedPreferences sp;
 
     public GoogleUtility (Activity activity, FragmentActivity fragmentActivity) {
         user = new FBMUser();
@@ -82,12 +84,13 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
         return Auth.GoogleSignInApi.getSignInIntent(mGoogleSignInClient);
     }
 
-    public GoogleSignInAccount getAccount(int requestCode, Intent data) {
+    public GoogleSignInAccount getAccount(int requestCode, Intent data, SharedPreferences sp) {
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             Log.d("SignInActivity", "result=" + result.getStatus().toString());
 
             if (result.isSuccess()){
+                this.sp = sp;
                 GoogleSignInAccount acct = result.getSignInAccount();
                 PeopleAsync async = new PeopleAsync();
                 async.execute(acct.getServerAuthCode());
@@ -173,8 +176,12 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
         @Override
         protected void onPostExecute(Void v) {
             user.setConnections(people);
+            SharedPreferences.Editor e = sp.edit();
+            e.putStringSet("friendsID", user.getFriendsID());
+            e.apply();
+
             Log.d("GoogleUtility", "user name: " + user.getName());
-            Log.d("GoogleUtility", "connections: " + user.getFriendsID());
+            Log.d("GoogleUtility", "user id: " + user.getID());
         }
     }
 }

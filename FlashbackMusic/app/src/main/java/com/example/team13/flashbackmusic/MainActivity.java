@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         googleUtility = new GoogleUtility(MainActivity.this, this);
         GoogleSignInAccount acct = googleUtility.getLastAccount();
-        usr = new FBMUser(acct.getId(), acct.getDisplayName(), acct.getEmail());
+        usr = new FBMUser(acct.getId(), acct.getDisplayName());
         googleUtility.setUser(usr);
         Log.d("MainActivity", "Created user: " + usr.getName());
 
@@ -150,6 +151,10 @@ public class MainActivity extends AppCompatActivity {
                         if(id == R.id.signout){
                             googleUtility.userSignOut();
                             Intent intent = new Intent(MainActivity.this, SignInActivity.class);
+                            SharedPreferences.Editor e  =
+                                    getSharedPreferences("UserFriends", MODE_PRIVATE).edit();
+                            e.putStringSet("friendsID", new HashSet<String>());
+                            e.apply();
                             startActivity(intent);
                         }
                         else if (id == R.id.download){
