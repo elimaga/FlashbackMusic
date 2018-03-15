@@ -31,9 +31,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
+
+import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.example.team13.flashbackmusic.interfaces.Callback;
 
 import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
     LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
     final int INVALID_COORDINATE = 200;
+    private GoogleUtility googleUtility;
+    private FBMUser usr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +73,13 @@ public class MainActivity extends AppCompatActivity {
 
         musicLibrary = MusicLibrary.getInstance(MainActivity.this);
         songs = musicLibrary.getSongs();
+
+        googleUtility = new GoogleUtility(MainActivity.this, this);
+        GoogleSignInAccount acct = googleUtility.getLastAccount();
+        usr = new FBMUser(acct.getId(), acct.getDisplayName());
+
+        googleUtility.setUser(usr);
+        Log.d("MainActivity", "user id: " + usr.getID());
 
         setUpUI();
 
@@ -76,21 +97,6 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         }
 
-        // Testing retrieve methods
-        /*
-        Song song = new Song();
-        DatabaseMediator databaseMediator = new DatabaseMediator(song, new SimpleCallback());
-        databaseMediator.retrieveSongsByLocation(37.4219983333, -122.084);
-        databaseMediator.retrieveSongsByDate("3/14/2018");
-
-        ArrayList<String> friends = new ArrayList<>();
-        friends.add("usr1");
-        databaseMediator.retrieveSongsByFriend(friends);
-
-        ArrayList<DatabaseEntry> data = databaseMediator.getQueriedData();
-        for (DatabaseEntry d : data){
-            System.out.println(d.getTitle());
-        }*/
     }
 
     private void setUpUI() {
@@ -137,7 +143,13 @@ public class MainActivity extends AppCompatActivity {
                         // set item as selected to persist highlight
                         int id = menuItem.getItemId();
                         if(id == R.id.signout){
-                            //signout Activity
+                            googleUtility.userSignOut();
+                            Intent intent = new Intent(MainActivity.this, SignInActivity.class);
+                            SharedPreferences.Editor e  =
+                                    getSharedPreferences("UserFriends", MODE_PRIVATE).edit();
+                            e.putStringSet("friendsID", new HashSet<String>());
+                            e.apply();
+                            startActivity(intent);
                         }
                         else if (id == R.id.download){
                             //Bring up downloadActivity
@@ -171,6 +183,10 @@ public class MainActivity extends AppCompatActivity {
                 String userDate = UserInfo.getDate();
                 ArrayList<String> userFriends = new ArrayList<>();
                 userFriends.add("usr1");
+
+                SharedPreferences sp = getSharedPreferences("UserFriends", MODE_PRIVATE);
+                Set<String> friendsID = sp.getStringSet("friendsID", new HashSet<String>());
+                usr.setFriendsID(friendsID);
 
                 // Generate the Flashback Playlist
                 //FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
