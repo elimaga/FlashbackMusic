@@ -113,10 +113,16 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
                         songs.size(),
                         album.getAlbumName());
                 song.setPath(path);
-                songs.add(song);
                 song.registerObserver(songMediator);
                 album.addSong(song);
                 songMetadataSet.add(songMetadata);
+            }
+        }
+        for (Album album : albums) {
+            for (Song song : album.getSongs()) {
+                if (song != null) {
+                    songs.add(song);
+                }
             }
         }
         return;
