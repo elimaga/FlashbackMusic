@@ -216,6 +216,7 @@ public class SongActivity extends AppCompatActivity {
         TextView songDateView = (TextView) findViewById(R.id.dateTextView);
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
 
+
         double latitude = song.getLastLatitude();
         double longitude = song.getLastLongitude();
 
