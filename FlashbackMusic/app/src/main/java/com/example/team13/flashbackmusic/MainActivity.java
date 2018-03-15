@@ -39,6 +39,7 @@ import java.util.Calendar;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         googleUtility = new GoogleUtility(MainActivity.this, this);
         GoogleSignInAccount acct = googleUtility.getLastAccount();
         usr = new FBMUser(acct.getId(), acct.getDisplayName());
+        acct.get
         googleUtility.setUser(usr);
         Log.d("MainActivity", "Created user: " + usr.getName());
 
@@ -84,25 +86,6 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         }
-
-
-
-        // Testing retrieve methods
-        Song song = new Song();
-        DatabaseMediator databaseMediator = new DatabaseMediator();
-        databaseMediator.retrieveSongsByLocation(49.0, 25.0);
-        databaseMediator.retrieveSongsByDate("3/6/18");
-
-        ArrayList<String> friends = new ArrayList<>();
-        friends.add("usr1");
-        databaseMediator.retrieveSongsByFriend(friends);
-
-        // TODO: Fix this so we can actually get the list of queried songs
-        ArrayList<String> data = databaseMediator.getQueriedSongs();
-        for (String d : data){
-            System.out.println(d);
-        }
-
     }
 
     private void setUpUI() {
@@ -188,6 +171,10 @@ public class MainActivity extends AppCompatActivity {
                 String userDay = UserInfo.getDay();
                 String userDate = UserInfo.getDate();
 
+                SharedPreferences sp = getSharedPreferences("UserFriends", MODE_PRIVATE);
+                Set<String> friendsID = sp.getStringSet("friendsID", new HashSet<String>());
+                usr.setFriendsID(friendsID);
+
                 // Generate the Flashback Playlist
                 FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
                         userDay, userTime, userDate);
@@ -219,21 +206,6 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         }
 
-        // Testing retrieve methods
-        Song song = new Song();
-        DatabaseMediator databaseMediator = new DatabaseMediator();
-        databaseMediator.retrieveSongsByLocation(49.0, 25.0);
-        databaseMediator.retrieveSongsByDate("3/6/18");
-
-        ArrayList<String> friends = new ArrayList<>();
-        friends.add("usr1");
-        databaseMediator.retrieveSongsByFriend(friends);
-
-        // TODO: Fix this so we can actually get the list of queried songs
-        ArrayList<String> data = databaseMediator.getQueriedSongs();
-        for (String d : data){
-            System.out.println(d);
-        }
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.example.team13.flashbackmusic;
 
+import android.util.Log;
+
 import com.google.api.services.people.v1.model.Person;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,6 +43,10 @@ public class FBMUser {
         return proxyName;
     }
 
+    public void setFriendsID(Set<String> friendsID) {
+        this.friendsID = friendsID;
+    }
+
     public Set<String> getFriendsID() {
         return friendsID;
     }
@@ -50,9 +56,12 @@ public class FBMUser {
     }
 
     public void setConnections(List<Person> connections) {
-        for(Person p : connections) {
-            friendsID.add(p.getResourceName());
-
+        if(connections != null) {
+            for (Person p : connections) {
+                friendsID.add(p.getResourceName());
+                Log.d("FBMUser", "name: " + p.getNames().get(0).getDisplayName() +
+                        "; friend id: " + p.getResourceName());
+            }
         }
     }
 

@@ -181,7 +181,7 @@ public class GoogleUtility implements GoogleApiClient.OnConnectionFailedListener
             e.apply();
 
             Log.d("GoogleUtility", "user name: " + user.getName());
-            Log.d("GoogleUtility", "user id: " + user.getID());
+            Log.d("GoogleUtility", "connections: " + people);
         }
     }
 }
