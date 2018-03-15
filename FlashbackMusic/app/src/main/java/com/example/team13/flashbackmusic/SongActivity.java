@@ -23,6 +23,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,7 @@ public class SongActivity extends AppCompatActivity {
     int index = 0;
     Bundle extras;
     Button playPauseButton;
+    FavoriteStatusImageButton favoriteButton;
     MusicLibrary musicLibrary;
     ArrayList<Integer> songIndices;
     Song currSong;
@@ -65,13 +67,13 @@ public class SongActivity extends AppCompatActivity {
         // Update the screen for the first song, and play the first song
         currSong = musicLibrary.getSongs().get(songIndices.remove(0));
 
+        setupUI();
+
         updateScreen(currSong);
 
         playSong(currSong);
 
         setupMediaPlayer();
-
-        setupUI();
 
         saveVibeState();
 
@@ -129,6 +131,18 @@ public class SongActivity extends AppCompatActivity {
         if(vibeModeOn) {
             VibeMode.setText("Vibe Mode");
         }
+
+        favoriteButton = (FavoriteStatusImageButton) findViewById(R.id.favoriteButton);
+        favoriteButton.setSong(currSong);
+        favoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FavoriteStatusImageButton button = (FavoriteStatusImageButton) v;
+                button.updateStatus();
+                button.updateImage();
+            }
+        });
+
 
         playPauseButton = (Button) findViewById(R.id.playPauseButton);
         playPauseButton.setOnClickListener(new View.OnClickListener() {
@@ -218,7 +232,6 @@ public class SongActivity extends AppCompatActivity {
         TextView songDateView = (TextView) findViewById(R.id.dateTextView);
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
 
-
         double latitude = song.getLastLatitude();
         double longitude = song.getLastLongitude();
 
@@ -228,13 +241,14 @@ public class SongActivity extends AppCompatActivity {
         String date = song.getLastDate();
         String time = song.getLastTime();
 
-        if(extras != null) {
-            songNameView.setText("Title: " + songName);
-            songArtistView.setText("Artist: " + songArtist);
-            songAlbumView.setText("Album: " + albumName);
-            songDateView.setText("Date: " + date);
-            songTimeView.setText("Time: " + time);
-        }
+
+        songNameView.setText("Title: " + songName);
+        songArtistView.setText("Artist: " + songArtist);
+        songAlbumView.setText("Album: " + albumName);
+        songDateView.setText("Date: " + date);
+        songTimeView.setText("Time: " + time);
+
+        favoriteButton.setSong(song);
 
         // Shows the last location to the user
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());

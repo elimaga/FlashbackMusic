@@ -38,7 +38,7 @@ public class FavoriteStatusImageButton extends android.support.v7.widget.AppComp
         }
     }
 
-    public void updateStatus(Context context) {
+    public void updateStatus() {
 
         String title = song.getTitle();
 
