@@ -217,6 +217,7 @@ public class SongActivity extends AppCompatActivity {
         TextView songLocationView = (TextView) findViewById(R.id.locationTextView);
         TextView songDateView = (TextView) findViewById(R.id.dateTextView);
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
+        TextView userTextView = (TextView) findViewById(R.id.userTextView);
 
         double latitude = song.getLastLatitude();
         double longitude = song.getLastLongitude();
@@ -226,6 +227,7 @@ public class SongActivity extends AppCompatActivity {
         String albumName = song.getAlbumName();
         String date = song.getLastDate();
         String time = song.getLastTime();
+        String user = song.getLastUser();
 
         if(extras != null) {
             songNameView.setText("Title: " + songName);
@@ -233,6 +235,7 @@ public class SongActivity extends AppCompatActivity {
             songAlbumView.setText("Album: " + albumName);
             songDateView.setText("Date: " + date);
             songTimeView.setText("Time: " + time);
+            userTextView.setText("User: " + user);
         }
 
         // Shows the last location to the user
@@ -269,6 +272,7 @@ public class SongActivity extends AppCompatActivity {
         String newDate = UserInfo.getDate();
 
         song.setData(newLocation[0], newLocation[1],newDay, newTime, newDate);
+        //TODO: Set User to yourself
         musicLibrary.persistSong(song);
     }
 }
