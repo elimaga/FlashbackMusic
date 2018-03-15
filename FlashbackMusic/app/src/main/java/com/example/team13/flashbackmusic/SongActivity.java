@@ -272,7 +272,7 @@ public class SongActivity extends AppCompatActivity {
         musicLibrary.persistSong(song);
     }
 
-    public void skipSong() {
+    public void skipSong(View view) {
         if(songIndices.size() > 0) {
             Song nextSong = musicLibrary.getSongs().get(songIndices.remove(0));
             mediaPlayer.reset();
