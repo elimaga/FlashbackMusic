@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
                 VibeModePlaylist vibeModePlaylist = new VibeModePlaylist(userLocation, userDate, userFriends);
 
-                Callback callback = new DataCallback(songs, vibeModePlaylist, MainActivity.this, instance);
+                Callback callback = new DataCallback(musicLibrary.getSongs(), vibeModePlaylist, MainActivity.this, instance);
                 DatabaseMediator mediator = new DatabaseMediator(callback);
                 mediator.retrieveSongsByFriend(userFriends);
                 mediator.retrieveSongsByDate(userDate);
