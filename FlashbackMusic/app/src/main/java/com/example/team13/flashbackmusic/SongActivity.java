@@ -199,6 +199,7 @@ public class SongActivity extends AppCompatActivity {
                 mediaPlayer.setDataSource(SongActivity.this, uri);
                 mediaPlayer.prepareAsync();
             } else {
+                // TODO: enqeue a song to download here
                 skipSong(null);
             }
         }
@@ -323,11 +324,24 @@ public class SongActivity extends AppCompatActivity {
 
     public void skipSong(View view) {
         if(songIndices.size() > 0) {
-            Song nextSong = musicLibrary.getSongs().get(songIndices.remove(0));
+            int nextIndex = songIndices.remove(0);
+            // TODO:
+            // this while-loop should not be needed. please delete after implementing updateLibrary()
+            // because musicLibrary always must have specified index.
+            while (nextIndex > musicLibrary.getSongs().size()) {
+                if (songIndices.size() > 0) {
+                    nextIndex = songIndices.remove(0);
+                } else{
+                    finish();
+                }
+            }
+            // delete till here
+            Song nextSong = musicLibrary.getSongs().get(nextIndex);
             mediaPlayer.reset();
             updateScreen(nextSong);
             playSong(nextSong);
             currSong = nextSong;
+
         }
         else {
             finish();
