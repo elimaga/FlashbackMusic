@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="    @Override     public boolean onCreateOptionsMenu(Menu menu) {         getMenuInflater().inflate(R.menu.overflow_menu, menu);         return true;     }">
+
+    <item
+        android:id="@+id/action_sort_by_title"
+        android:title="Sort by title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_sort_by_artist"
+        android:title="Sort by artist"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_sort_by_album"
+        android:title="Sort by album"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_favorite"
+        android:title="Favorite"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/flashback_button"
+        android:icon="@drawable/flashback_button"
+        android:title="vibe"
+        app:showAsAction="always" />
+</menu>

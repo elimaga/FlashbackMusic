@@ -69,13 +69,14 @@ public class SongActivity extends AppCompatActivity {
 
         // Update the screen for the first song, and play the first song
         Log.d("Song Activity", "Playing song at index " + songIndices.get(0));
+        // TODO: this could cause crash
         currSong = musicLibrary.getSongs().get(songIndices.remove(0));
 
         setupUI();
 
-        updateScreen(currSong);
-
         playSong(currSong);
+
+        updateScreen(currSong);
 
         setupMediaPlayer();
 
@@ -328,11 +329,12 @@ public class SongActivity extends AppCompatActivity {
             // TODO:
             // this while-loop should not be needed. please delete after implementing updateLibrary()
             // because musicLibrary always must have specified index.
-            while (nextIndex > musicLibrary.getSongs().size()) {
+            while (nextIndex >= musicLibrary.getSongs().size()) {
                 if (songIndices.size() > 0) {
                     nextIndex = songIndices.remove(0);
                 } else{
                     finish();
+                    return;
                 }
             }
             // delete till here
