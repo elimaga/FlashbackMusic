@@ -29,6 +29,7 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
     private ArrayList<Song> songs = null;
     private SharedPreferences sharedPreferences;
     private final String NUM_OF_ALBUMS_KEY = "num_of_albums";
+    private final String NUM_OF_SONGS_KEY = "num_of_songs";
     private final String SONG_METADATA_SET_KEY = "song_metadata_set";
     private final String ALBUM_METADATA_SET_KEY = "album_metadata_set";
     private SongObserver songMediator;
@@ -92,8 +93,6 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
     ArrayList<Album> getAlbums() { return new ArrayList<>(albums); }
 
     private void addSongsIntoLibraryFromPath(ArrayList<String> paths, String url) {
-        int nextIndex = songs.size();
-        ArrayList<Album> newlyCreatedAlbums = new ArrayList<>();
         for (String path : paths) {
             HashMap<String, String> songMetadata = retrieveSongMetadata(path);
             HashMap<String, String> albumMetadata = extractAlbumMetadata(songMetadata);
@@ -107,7 +106,6 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
                         albums.size());
                 albums.add(album);
                 albumMetadataSet.add(albumMetadata);
-                newlyCreatedAlbums.add(album);
             } else {
                 int albumIndex = albumMetadataSet.indexOf(albumMetadata);
                 album = albums.get(albumIndex);
@@ -118,46 +116,23 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
                         songMetadata.get("artist"),
                         songMetadata.get("track"),
                         url,
-                        nextIndex,
+                        songs.size(),
                         album.getAlbumName());
                 song.setPath(path);
-                nextIndex++;
                 song.registerObserver(songMediator);
                 album.addSong(song);
+                songs.add(song);
                 songMetadataSet.add(songMetadata);
             }
-//            if (!(songMetadataSet.contains(songMetadata))) {
-//
-//                if (!(albumMetadataSet.contains(albumMetadata))) {
-//                    Album newAlbum = new Album(songMetadata.get("albumName"),
-//                            songMetadata.get("artist"),
-//                            songMetadata.get("track"),
-//                            albums.size());
-//                    albums.add(newAlbum);
-//                    albumMetadataSet.add(albumMetadata);
+        }
+//        for (Album album : newlyCreatedAlbums) {
+//            for (Song song : album.getSongs()) {
+//                if (song != null) {
+//                    song.setIndex(songs.size(), true);
+//                    songs.add(song);
 //                }
-//                Album album = albums.get(albumMetadataSet.indexOf(albumMetadata));
-//                Song song = new Song(songMetadata.get("title"),
-//                        songMetadata.get("artist"),
-//                        songMetadata.get("track"),
-//                        url,
-//                        nextIndex,
-//                        album.getAlbumName());
-//                song.setPath(path);
-//                nextIndex++;
-//                song.registerObserver(songMediator);
-//                album.addSong(song);
-//                songMetadataSet.add(songMetadata);
 //            }
-        }
-        for (Album album : newlyCreatedAlbums) {
-            for (Song song : album.getSongs()) {
-                if (song != null) {
-                    song.setIndex(songs.size(), true);
-                    songs.add(song);
-                }
-            }
-        }
+//        }
         persistLibrary();
     }
 
@@ -202,6 +177,7 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
             persistAlbum(album);
         }
         editor.putInt(NUM_OF_ALBUMS_KEY, albums.size());
+        editor.putInt(NUM_OF_SONGS_KEY, songs.size());
         editor.apply();
         persistMetadataSet();
     }
@@ -237,6 +213,11 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
 
     private void loadLibraryFromSharedPref() {
         int numOfStoredAlbums = sharedPreferences.getInt(NUM_OF_ALBUMS_KEY, 0);
+        int numOfStoredSongs = sharedPreferences.getInt(NUM_OF_SONGS_KEY, 0);
+        songs = new ArrayList<>();
+        for (int i = 0; i < numOfStoredSongs; i++ ) {
+            songs.add(null);
+        }
         for (int i = 0; i < numOfStoredAlbums; i++) {
             String json = sharedPreferences.getString(Integer.toString(i), "");
             Gson gson = new Gson();
@@ -244,7 +225,7 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
             albums.add(album);
             for (Song song : album.getSongs()) {
                 song.registerObserver(songMediator);
-                songs.add(song);
+                songs.set(song.getIndex(), song);
             }
         }
     }
