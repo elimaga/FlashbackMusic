@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
+import com.google.api.services.people.v1.model.Source;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -56,21 +58,17 @@ public class FBMUser {
     public void setConnections(List<Person> connections) {
         if(connections != null) {
             for (Person p : connections) {
-                List<Name> names = p.getNames();
-
-                if(names == null) {
-                    Log.d("Set Connections", "names is null");
-                }
-                else if(names.size() > 1) {
-                    friendsID.add(p.getNames().get(1).getMetadata().getSource().getId());
-                    Log.d("Friends:", "Index 1; name: " + p.getNames().get(1).getDisplayName());
-                    Log.d("Size:", "" + names.size());
-
-                }
-                else if(names.size() > 0){
-                    friendsID.add(p.getNames().get(0).getMetadata().getSource().getId());
-                    Log.d("Friends:", "Index 0; name: " + p.getNames().get(0).getDisplayName());
-                    Log.d("Size:", "" + names.size());
+                if(p.getNames() != null) {
+                    List<Name> names = p.getNames();
+                    for(Name name : names) {
+                        Source contactSource = name.getMetadata().getSource();
+                        String contactType = contactSource.getType();
+                        if(contactType.equals("PROFILE")) {
+                            friendsID.add(contactSource.getId());
+                            Log.d("FBMUser", "id: " + contactSource.getId()
+                                    + "; name: " + name.getDisplayName());
+                        }
+                    }
                 }
             }
         }
