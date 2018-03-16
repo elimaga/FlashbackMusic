@@ -189,6 +189,10 @@ public class MainActivity extends AppCompatActivity {
                 String userDate = UserInfo.getDate();
                 Set<String> userFriends = usr.getFriendsID();
 
+                for(String friend : userFriends) {
+                    Log.d("Friends ID: ", friend);
+                }
+
                 // Generate the Flashback Playlist
                 //FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
                 //        userDay, userTime, userDate);

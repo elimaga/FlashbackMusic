@@ -1,6 +1,8 @@
 package tests;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.support.test.rule.ActivityTestRule;
 
@@ -37,7 +39,7 @@ public class testPlaylistGeneration {
     public void setUp()
     {
         double[] location = {DEFAULT_COORDINATE, DEFAULT_COORDINATE};
-        ArrayList<String> friends =  new ArrayList<>();
+        Set<String> friends =  new HashSet<>();
         friends.add(FRIEND);
         vibeModePlaylist = new VibeModePlaylist(location, TODAY, friends);
     }

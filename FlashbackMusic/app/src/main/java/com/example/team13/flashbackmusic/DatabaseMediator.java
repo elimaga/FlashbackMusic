@@ -260,7 +260,7 @@ public class DatabaseMediator implements SongObserver {
         // Loop through the list of all friends
         for (String friend : friends) {
 
-            Query queryRef = songReference.orderByChild("username").equalTo(friend);
+            Query queryRef = songReference.orderByChild("userId").equalTo(friend);
 
             queryRef.addChildEventListener(new ChildEventListener() {
                 @Override

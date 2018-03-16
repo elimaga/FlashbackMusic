@@ -2,6 +2,7 @@ package com.example.team13.flashbackmusic;
 
 import android.util.Log;
 
+import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
 import java.util.HashSet;
 import java.util.List;
@@ -55,8 +56,21 @@ public class FBMUser {
     public void setConnections(List<Person> connections) {
         if(connections != null) {
             for (Person p : connections) {
-                if(p.getNames().size() > 1) {
+                List<Name> names = p.getNames();
+
+                if(names == null) {
+                    Log.d("Set Connections", "names is null");
+                }
+                else if(names.size() > 1) {
                     friendsID.add(p.getNames().get(1).getMetadata().getSource().getId());
+                    Log.d("Friends:", "Index 1; name: " + p.getNames().get(1).getDisplayName());
+                    Log.d("Size:", "" + names.size());
+
+                }
+                else if(names.size() > 0){
+                    friendsID.add(p.getNames().get(0).getMetadata().getSource().getId());
+                    Log.d("Friends:", "Index 0; name: " + p.getNames().get(0).getDisplayName());
+                    Log.d("Size:", "" + names.size());
                 }
             }
         }
