@@ -145,7 +145,9 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
-        unzipper.removeObserver(this);
+        if (unzipper != null) {
+            unzipper.removeObserver(this);
+        }
         musicLibrary.removeObserver(this);
     }
 
