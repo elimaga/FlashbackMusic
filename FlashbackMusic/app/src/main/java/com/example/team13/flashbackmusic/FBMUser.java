@@ -16,7 +16,7 @@ import java.util.Set;
  */
 
 public class FBMUser {
-    private String ID, name, proxyName;
+    private String ID, name;
     private Set<String> friendsID;
     private String[] proxyPrefix = {"aardvark", "baboon", "chimp", "dingo", "elephant",
         "flamingo", "giraffe", "hyena", "iguana", "jackalope", "kangaroo", "llama", "manatee",
@@ -26,15 +26,12 @@ public class FBMUser {
     public FBMUser() {
         ID = "";
         name = "";
-        proxyName = "";
         friendsID = new HashSet<>();
     }
 
     public FBMUser(String ID, String name) {
         this.ID = ID;
         this.name = name;
-        this.proxyName = createProxyName();
-        Log.d("FBM", "proxy: " + proxyName);
         friendsID = new HashSet<>();
     }
 
@@ -44,10 +41,6 @@ public class FBMUser {
 
     public String getName() {
         return name;
-    }
-
-    public String getProxyName() {
-        return proxyName;
     }
 
     public void setFriendsID(Set<String> friendsID) {
@@ -81,11 +74,11 @@ public class FBMUser {
         }
     }
 
-    private String createProxyName() {
-        char c = name.toLowerCase().toCharArray()[0];
+    public String createProxyName(String username, String id) {
+        char c = username.toLowerCase().toCharArray()[0];
         int index = ((int) c) - 97;
 
-        return proxyPrefix[index] + ID.substring(ID.length() - 5, ID.length());
+        return proxyPrefix[index] + id.substring(id.length() - 5, id.length());
     }
 
 }

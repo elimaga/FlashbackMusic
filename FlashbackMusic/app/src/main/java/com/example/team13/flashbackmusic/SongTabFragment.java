@@ -44,6 +44,9 @@ public class SongTabFragment extends Fragment {
                 if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
                     songToPlay.add(song);
                     indexOfSong.add(song.getIndex());
+                    Log.d("Song Tab Fragment", "Song Title: " + song.getTitle());
+                    Log.d("Song Tab Fragment", "Song Index: " + song.getIndex());
+
                 }
                 else {
                     Log.d("Disliked Song", "Skipping");
@@ -55,6 +58,8 @@ public class SongTabFragment extends Fragment {
                     Intent intent = new Intent(main, SongActivity.class);
                     intent.putExtra("songIndices",indexOfSong);
                     intent.putExtra("vibeModeOn", false);
+                    intent.putExtra("username", main.usr.getName());
+                    intent.putExtra("userId", main.usr.getID());
 
                     main.startActivityForResult(intent, 0);
                 }

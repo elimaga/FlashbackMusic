@@ -11,7 +11,7 @@ public class DatabaseEntry {
     private String title, artist, albumName, lastDay, lastTime, lastDate, url;
     private double lastLatitude, lastLongitude;
     private int track;
-    private String username;
+    private String username, userId;
 
     public DatabaseEntry()
     {
@@ -27,6 +27,7 @@ public class DatabaseEntry {
         this.lastLongitude = INVALID_LOCATION;
         this.track = 0;
         this.username = "";
+        this.userId = "";
     }
 
   
@@ -42,6 +43,7 @@ public class DatabaseEntry {
     public double getLastLongitude() { return lastLongitude; }
     public int getTrackNumber() { return track; }
     public String getUsername() { return username; }
+    public String getUserId() { return userId; }
 
     //Public setters
     public void setTitle(String newTitle) { this.title = newTitle; }
@@ -55,4 +57,6 @@ public class DatabaseEntry {
     public void setLastLongitude(double newLongitude) { this.lastLongitude = newLongitude; }
     public void setTrackNumber(int newTrack) { this.track = newTrack; }
     public void setUsername(String newUsername) { this.username = newUsername; }
+    public void setUserId(String newUserId) { this.userId = newUserId; }
+
 }

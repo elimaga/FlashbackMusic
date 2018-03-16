@@ -26,11 +26,9 @@
         android:layout_height="wrap_content"
         android:text="Title:"
         android:textColor="#000000"
-        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintVertical_bias="0.1"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/historical"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
@@ -41,7 +39,7 @@
         android:textColor="#000000"
         app:layout_constraintVertical_bias="0.2"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/titleTextView"
+        app:layout_constraintLeft_toLeftOf="@id/historical"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
@@ -52,19 +50,21 @@
         android:textColor="#000000"
         app:layout_constraintVertical_bias="0.3"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/titleTextView"
+        app:layout_constraintLeft_toLeftOf="@id/historical"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
+        android:id="@+id/historical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="36dp"
         android:text="Historical Track Data:"
-        android:textColor="#000000"
+        android:textColor="#120fc9"
         android:textSize="15dp"
-        app:layout_constraintVertical_bias="0.4"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/titleTextView"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.401" />
 
     <TextView
         android:id="@+id/locationTextView"
@@ -75,7 +75,7 @@
         app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintVertical_bias="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/titleTextView"
+        app:layout_constraintLeft_toLeftOf="@id/historical"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
@@ -87,7 +87,7 @@
         app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintVertical_bias="0.6"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/titleTextView"
+        app:layout_constraintLeft_toLeftOf="@id/historical"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
@@ -99,19 +99,31 @@
         app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintVertical_bias="0.7"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/titleTextView"
+        app:layout_constraintLeft_toLeftOf="@id/historical"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/userTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="User:"
+        android:text="User: "
         android:textColor="#000000"
         app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintVertical_bias="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/titleTextView"
+        app:layout_constraintLeft_toLeftOf="@id/historical"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/userNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textColor="#000000"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintVertical_bias="0.8"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/userTextView"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <Button
