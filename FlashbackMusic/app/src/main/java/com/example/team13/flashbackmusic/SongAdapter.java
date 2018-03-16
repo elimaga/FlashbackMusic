@@ -71,7 +71,7 @@ public class SongAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                     FavoriteStatusImageButton button = (FavoriteStatusImageButton) view;
-                    button.updateStatus(mContext);
+                    button.updateStatus();
                     button.updateImage();
             }
         });

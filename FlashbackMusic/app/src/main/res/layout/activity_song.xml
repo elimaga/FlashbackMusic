@@ -126,5 +126,17 @@
         app:layout_constraintTop_toTopOf="@+id/playPauseButton"
         app:srcCompat="@android:drawable/ic_media_next" />
 
+    <com.example.team13.flashbackmusic.FavoriteStatusImageButton
+        android:id="@+id/favoriteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="16dp"
+        android:background="@null"
+        app:layout_constraintBottom_toBottomOf="@+id/playPauseButton"
+        app:layout_constraintEnd_toStartOf="@+id/playPauseButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/playPauseButton"
+        app:srcCompat="@drawable/neutral" />
 
 </android.support.constraint.ConstraintLayout>
