@@ -49,7 +49,7 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
         albumMetadataSet = new ArrayList<>();
         observers = new ArrayList<>();
         sharedPreferences = mContext.getSharedPreferences("music_library", MODE_PRIVATE);
-        loadSongObjects();
+        loadLibraryFromSharedPref();
         loadMetadataSet();
     }
 
@@ -76,7 +76,6 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
     @Override
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
-        persistUnsavedAlbums();
         persistMetadataSet();
         notifyObservers(new Intent());
     }
@@ -92,43 +91,77 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
 
     ArrayList<Album> getAlbums() { return new ArrayList<>(albums); }
 
-    void addSongsIntoLibraryFromPath(ArrayList<String> paths, String url) {
+    private void addSongsIntoLibraryFromPath(ArrayList<String> paths, String url) {
+        int nextIndex = songs.size();
+        ArrayList<Album> newlyCreatedAlbums = new ArrayList<>();
         for (String path : paths) {
             HashMap<String, String> songMetadata = retrieveSongMetadata(path);
+            HashMap<String, String> albumMetadata = extractAlbumMetadata(songMetadata);
+            Album album;
+            Song song;
+
+            if (!(albumMetadataSet.contains(albumMetadata))) {
+                album = new Album(songMetadata.get("albumName"),
+                        songMetadata.get("artist"),
+                        songMetadata.get("track"),
+                        albums.size());
+                albums.add(album);
+                albumMetadataSet.add(albumMetadata);
+                newlyCreatedAlbums.add(album);
+            } else {
+                int albumIndex = albumMetadataSet.indexOf(albumMetadata);
+                album = albums.get(albumIndex);
+            }
+
             if (!(songMetadataSet.contains(songMetadata))) {
-                HashMap<String, String> albumMetadata = extractAlbumMetadata(songMetadata);
-                if (!(albumMetadataSet.contains(albumMetadata))) {
-                    Album newAlbum = new Album(songMetadata.get("albumName"),
-                            songMetadata.get("artist"),
-                            songMetadata.get("track"),
-                            albums.size());
-                    albums.add(newAlbum);
-                    albumMetadataSet.add(albumMetadata);
-                }
-                Album album = albums.get(albumMetadataSet.indexOf(albumMetadata));
-                Song song = new Song(songMetadata.get("title"),
+                song = new Song(songMetadata.get("title"),
                         songMetadata.get("artist"),
                         songMetadata.get("track"),
                         url,
-                        songs.size(),
+                        nextIndex,
                         album.getAlbumName());
                 song.setPath(path);
+                nextIndex++;
                 song.registerObserver(songMediator);
                 album.addSong(song);
                 songMetadataSet.add(songMetadata);
             }
+//            if (!(songMetadataSet.contains(songMetadata))) {
+//
+//                if (!(albumMetadataSet.contains(albumMetadata))) {
+//                    Album newAlbum = new Album(songMetadata.get("albumName"),
+//                            songMetadata.get("artist"),
+//                            songMetadata.get("track"),
+//                            albums.size());
+//                    albums.add(newAlbum);
+//                    albumMetadataSet.add(albumMetadata);
+//                }
+//                Album album = albums.get(albumMetadataSet.indexOf(albumMetadata));
+//                Song song = new Song(songMetadata.get("title"),
+//                        songMetadata.get("artist"),
+//                        songMetadata.get("track"),
+//                        url,
+//                        nextIndex,
+//                        album.getAlbumName());
+//                song.setPath(path);
+//                nextIndex++;
+//                song.registerObserver(songMediator);
+//                album.addSong(song);
+//                songMetadataSet.add(songMetadata);
+//            }
         }
-        for (Album album : albums) {
+        for (Album album : newlyCreatedAlbums) {
             for (Song song : album.getSongs()) {
                 if (song != null) {
+                    song.setIndex(songs.size(), true);
                     songs.add(song);
                 }
             }
         }
-        return;
+        persistLibrary();
     }
 
-    public void updateLibraryInBackground(ArrayList<String> paths, String url) {
+    void updateLibraryInBackground(ArrayList<String> paths, String url) {
         ArrayList<String> argArrayList = paths;
         argArrayList.add(url);
         instance = new MusicLibrary(this);
@@ -140,19 +173,16 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
         for (Song song : songs) {
             // todo check duplicate
         }
-        persistUnsavedAlbums();
     }
 
-    static private HashMap<String, String> extractAlbumMetadata(HashMap<String, String> songMetadata) {
+    private static HashMap<String, String> extractAlbumMetadata(HashMap<String, String> songMetadata) {
         HashMap<String, String> albumMetadata = new HashMap<>();
         albumMetadata.put("artist", songMetadata.get("artist"));
         albumMetadata.put("albumName", songMetadata.get("albumName"));
         return albumMetadata;
     }
 
-
-
-    static HashMap<String, String> retrieveSongMetadata(String path) {
+    private static HashMap<String, String> retrieveSongMetadata(String path) {
         HashMap<String, String> map = new HashMap<>();
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         mmr.setDataSource(path);
@@ -163,7 +193,7 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
         return map;
     }
 
-    private void persistUnsavedAlbums() {
+    private void persistLibrary() {
         // Save the info in the SharedPreferences
         SharedPreferences.Editor editor = sharedPreferences.edit();
         int numOfStoredAlbums = sharedPreferences.getInt(NUM_OF_ALBUMS_KEY, 0);
@@ -173,6 +203,7 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
         }
         editor.putInt(NUM_OF_ALBUMS_KEY, albums.size());
         editor.apply();
+        persistMetadataSet();
     }
 
     private void persistAlbum(Album album) {
@@ -180,29 +211,15 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
         Gson gson = new Gson();
         String json = gson.toJson(album);
         editor.putString(Integer.toString(album.getIndex()), json);
+        editor.putInt(NUM_OF_ALBUMS_KEY, albums.size());
         editor.apply();
     }
 
-    public void persistSong(Song song) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+    void persistSong(Song song) {
         for (Album album : albums) {
             if (album.getAlbumName().equals(song.getAlbumName())) {
                 persistAlbum(album);
                 break;
-            }
-        }
-    }
-
-    private void loadSongObjects() {
-        int numOfStoredAlbums = sharedPreferences.getInt(NUM_OF_ALBUMS_KEY, 0);
-        for (int i = 0; i < numOfStoredAlbums; i++) {
-            String json = sharedPreferences.getString(Integer.toString(i), "");
-            Gson gson = new Gson();
-            Album album = gson.fromJson(json, Album.class);
-            albums.add(album);
-            for (Song song : album.getSongs()) {
-                song.registerObserver(songMediator);
-                songs.add(song);
             }
         }
     }
@@ -215,6 +232,21 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
         editor.putString(SONG_METADATA_SET_KEY, songMetadataSetJson);
         editor.putString(ALBUM_METADATA_SET_KEY, albumMetadataSetJson);
         editor.apply();
+    }
+
+
+    private void loadLibraryFromSharedPref() {
+        int numOfStoredAlbums = sharedPreferences.getInt(NUM_OF_ALBUMS_KEY, 0);
+        for (int i = 0; i < numOfStoredAlbums; i++) {
+            String json = sharedPreferences.getString(Integer.toString(i), "");
+            Gson gson = new Gson();
+            Album album = gson.fromJson(json, Album.class);
+            albums.add(album);
+            for (Song song : album.getSongs()) {
+                song.registerObserver(songMediator);
+                songs.add(song);
+            }
+        }
     }
 
     private void loadMetadataSet() {

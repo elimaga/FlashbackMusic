@@ -145,6 +145,14 @@ public class Song implements SongSubject {
 
     public void setPath(String path) { this.path = path; }
 
+    // for safety purporse, it check it's from music library
+    // not the best practice...
+    void setIndex(int index, boolean isFromMusicLibrary) {
+        if (isFromMusicLibrary) {
+            this.index = index;
+        }
+    }
+
     public void setAlbumName(String albumName) {
         this.albumName = albumName;
     }

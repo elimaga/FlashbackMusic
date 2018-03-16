@@ -39,8 +39,6 @@ public class SongActivity extends AppCompatActivity {
 
     private MediaPlayer mediaPlayer;
     private LocationManager locationManager;
-    final int INVALID_COORDINATE = 200;
-    int index = 0;
     Bundle extras;
     Button playPauseButton;
     FavoriteStatusImageButton favoriteButton;
@@ -188,10 +186,15 @@ public class SongActivity extends AppCompatActivity {
             mediaPlayer = new MediaPlayer();
         }
         try {
-            File file = new File(song.getPath());
-            Uri uri = Uri.fromFile(file);
-            mediaPlayer.setDataSource(SongActivity.this, uri);
-            mediaPlayer.prepareAsync();
+            String path = song.getPath();
+            if (path != null) {
+                File file = new File(song.getPath());
+                Uri uri = Uri.fromFile(file);
+                mediaPlayer.setDataSource(SongActivity.this, uri);
+                mediaPlayer.prepareAsync();
+            } else {
+                skipSong(null);
+            }
         }
         catch (Exception e)
         {
