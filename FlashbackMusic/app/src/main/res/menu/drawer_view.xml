@@ -7,6 +7,11 @@
         <item
             android:id="@+id/download"
             android:title="Download" />
-
+        <item
+            android:id="@+id/mocktime"
+            android:title="Mock Time" />
+        <item
+            android:id="@+id/realtime"
+            android:title="Set Real Time" />
     </group>
 </menu>
