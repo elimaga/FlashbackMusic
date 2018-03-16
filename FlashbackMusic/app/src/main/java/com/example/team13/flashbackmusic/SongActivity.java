@@ -143,6 +143,9 @@ public class SongActivity extends AppCompatActivity {
                 FavoriteStatusImageButton button = (FavoriteStatusImageButton) v;
                 button.updateStatus();
                 button.updateImage();
+                if(currSong.getFavoriteStatus() == Song.FavoriteStatus.DISLIKED) {
+                    skipSong(null);
+                }
             }
         });
 
