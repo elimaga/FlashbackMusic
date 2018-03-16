@@ -1,18 +1,14 @@
 package com.example.team13.flashbackmusic;
 
 
-import android.content.res.AssetFileDescriptor;
-import android.media.MediaMetadataRetriever;
-
 import android.Manifest;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.annotation.NonNull;
 
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
@@ -29,23 +25,18 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.TimePicker;
 
-
-import com.firebase.geofire.GeoLocation;
+import com.example.team13.flashbackmusic.interfaces.Callback;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
-import java.lang.reflect.Field;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.example.team13.flashbackmusic.interfaces.Callback;
-
-import java.util.ArrayList;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -77,9 +68,8 @@ public class MainActivity extends AppCompatActivity {
         googleUtility = new GoogleUtility(MainActivity.this, this);
         GoogleSignInAccount acct = googleUtility.getLastAccount();
         usr = new FBMUser(acct.getId(), acct.getDisplayName());
-
         googleUtility.setUser(usr);
-        Log.d("MainActivity", "user id: " + usr.getID());
+        Log.d("MainActivity", "Created user: " + usr.getName());
 
         setUpUI();
 
@@ -96,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         }
-
     }
 
     private void setUpUI() {
@@ -157,7 +146,17 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(intent);
 
                         }
-                        //menuItem.setChecked(true);
+                        else if (id == R.id.mocktime){
+                            openTimePicker();
+                            openDatePicker();
+                        }
+                        else if (id ==R.id.realtime){
+                            UserInfo.setRealTime();
+                            Log.d("TimeSetter", "Real " + UserInfo.getTime());
+                            Log.d("TimeSetter", "Real " + UserInfo.getDate() + " " + UserInfo.getDay());
+
+                        }
+//                        menuItem.setChecked(true);
                         // close drawer when item is tapped
                         mDrawerLayout.closeDrawers();
 
@@ -254,6 +253,37 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 1 && resultCode == RESULT_OK) {
             vibeModeButton.performClick();
         }
+    }
+    private void openTimePicker() {
+        Calendar cal = Calendar.getInstance();
+
+        final TimePickerDialog timePicker = new TimePickerDialog(this,
+                new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(final TimePicker timePicker,
+                                  final int selectedHour,
+                                  final int selectedMinute) {
+                UserInfo.mockTime(selectedHour, selectedMinute);
+                Log.d("TimeSetter", UserInfo.getTime());
+
+            }},
+                           cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false);
+
+
+        timePicker.show();
+    }
+
+    private void openDatePicker(){
+        Calendar cal = Calendar.getInstance();
+        final DatePickerDialog datePicker = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                UserInfo.mockDate(month, dayOfMonth, year);
+                Log.d("TimeSetter", "Mock " + UserInfo.getDate() + " " + UserInfo.getDay());
+
+            }
+        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
+        datePicker.show();
     }
 }
 
