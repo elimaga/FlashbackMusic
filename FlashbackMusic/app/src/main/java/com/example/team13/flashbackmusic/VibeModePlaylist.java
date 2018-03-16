@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Eli on 3/11/2018.
@@ -15,9 +16,9 @@ public class VibeModePlaylist extends Playlist {
 
     double[] location;
     String date;
-    ArrayList<String> friends;
+    Set<String> friends;
 
-    public VibeModePlaylist(double[] location, String date, ArrayList<String> friends) {
+    public VibeModePlaylist(double[] location, String date, Set<String> friends) {
         this.location = location;
         this.date = date;
         this.friends = friends;
@@ -74,7 +75,7 @@ public class VibeModePlaylist extends Playlist {
     public int numMatchesOfSong(Song song) {
         // First check if it matches all 3 requirements
         if(matchesLocation(location[0], location[1], song.getLastLatitude(), song.getLastLongitude())
-                && matchesDate(song.getLastDate()) && matchesFriend(song.getLastUser())) {
+                && matchesDate(song.getLastDate()) && matchesFriend(song.getLastUserId())) {
 
             // Only add the songs that are not disliked
             if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
@@ -97,8 +98,8 @@ public class VibeModePlaylist extends Playlist {
         // Else check if it matches 2 of the requirements
         else if((matchesLocation(location[0], location[1], song.getLastLatitude(), song.getLastLongitude())
                 && matchesDate(song.getLastDate())) || (matchesLocation(location[0], location[1],
-                song.getLastLatitude(), song.getLastLongitude()) && matchesFriend(song.getLastUser()))
-                || (matchesDate(song.getLastDate()) && matchesFriend(song.getLastUser()))) {
+                song.getLastLatitude(), song.getLastLongitude()) && matchesFriend(song.getLastUserId()))
+                || (matchesDate(song.getLastDate()) && matchesFriend(song.getLastUserId()))) {
 
             // Only add the songs that are not disliked
             if (song.getFavoriteStatus() != Song.FavoriteStatus.DISLIKED) {
@@ -154,7 +155,7 @@ public class VibeModePlaylist extends Playlist {
             // If both songs have been played within a week of today, check if they were played by a friend
             if(matchesDate(newSong.getLastDate()) == matchesDate(oldSong.getLastDate())) {
                 // If both songs were played by a friend, check which song was more recently played
-                if (matchesFriend(newSong.getLastUser()) == matchesFriend(oldSong.getLastUser())) {
+                if (matchesFriend(newSong.getLastUserId()) == matchesFriend(oldSong.getLastUserId())) {
 
                     // Check how many days apart the songs were played
                     int daysDiff = compareDates(newSong.getLastDate(), oldSong.getLastDate());
@@ -185,7 +186,7 @@ public class VibeModePlaylist extends Playlist {
                 }
                 // Else if the new song was played by a friend, then return true because the old song
                 // was not played by a friend
-                else if(matchesFriend(newSong.getLastUser())) {
+                else if(matchesFriend(newSong.getLastUserId())) {
                     return true;
                 }
                 // Else the new song was not played by a friend, but the old song was, so return false
@@ -251,11 +252,11 @@ public class VibeModePlaylist extends Playlist {
 
     /**
      * Helper method to determine if the last user to play the song was a friend
-     * @param lastUser - the last user who played the song
+     * @param lastUserId - the Id of the last user who played the song
      * @return - true if the last user is a friend, false if not
      */
-    public boolean matchesFriend(String lastUser) {
-        return friends.contains(lastUser);
+    public boolean matchesFriend(String lastUserId) {
+        return friends.contains(lastUserId);
     }
 
     public void sortPlaylist(String date){

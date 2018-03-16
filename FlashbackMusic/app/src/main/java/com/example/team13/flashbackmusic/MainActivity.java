@@ -1,18 +1,14 @@
 package com.example.team13.flashbackmusic;
 
 
-import android.content.res.AssetFileDescriptor;
-import android.media.MediaMetadataRetriever;
-
 import android.Manifest;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.annotation.NonNull;
 
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
@@ -29,23 +25,18 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.TimePicker;
 
-
-import com.firebase.geofire.GeoLocation;
+import com.example.team13.flashbackmusic.interfaces.Callback;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
-import java.lang.reflect.Field;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.example.team13.flashbackmusic.interfaces.Callback;
-
-import java.util.ArrayList;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -62,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     static final int REQUEST_LOCATION = 1;
     final int INVALID_COORDINATE = 200;
     private GoogleUtility googleUtility;
-    private FBMUser usr;
+    public FBMUser usr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +68,8 @@ public class MainActivity extends AppCompatActivity {
         googleUtility = new GoogleUtility(MainActivity.this, this);
         GoogleSignInAccount acct = googleUtility.getLastAccount();
         usr = new FBMUser(acct.getId(), acct.getDisplayName());
-
         googleUtility.setUser(usr);
-        Log.d("MainActivity", "user id: " + usr.getID());
+        Log.d("MainActivity", "Created user: " + usr.getName());
 
         setUpUI();
 
@@ -96,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         }
-
     }
 
     private void setUpUI() {
@@ -157,7 +146,17 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(intent);
 
                         }
-                        //menuItem.setChecked(true);
+                        else if (id == R.id.mocktime){
+                            openTimePicker();
+                            openDatePicker();
+                        }
+                        else if (id ==R.id.realtime){
+                            UserInfo.setRealTime();
+                            Log.d("TimeSetter", "Real " + UserInfo.getTime());
+                            Log.d("TimeSetter", "Real " + UserInfo.getDate() + " " + UserInfo.getDay());
+
+                        }
+//                        menuItem.setChecked(true);
                         // close drawer when item is tapped
                         mDrawerLayout.closeDrawers();
 
@@ -176,17 +175,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                SharedPreferences sp = getSharedPreferences("UserFriends", MODE_PRIVATE);
+                Set<String> friendsID = sp.getStringSet("friendsID", new HashSet<String>());
+                usr.setFriendsID(friendsID);
+
+                Log.d("User", "Username: " + usr.getName());
+
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
                 //String userTime = UserInfo.getTime();
                 //String userDay = UserInfo.getDay();
                 String userDate = UserInfo.getDate();
-                ArrayList<String> userFriends = new ArrayList<>();
-                userFriends.add("usr1");
+                Set<String> userFriends = usr.getFriendsID();
 
-                SharedPreferences sp = getSharedPreferences("UserFriends", MODE_PRIVATE);
-                Set<String> friendsID = sp.getStringSet("friendsID", new HashSet<String>());
-                usr.setFriendsID(friendsID);
+                for(String friend : userFriends) {
+                    Log.d("Friends ID: ", friend);
+                }
 
                 // Generate the Flashback Playlist
                 //FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
@@ -195,7 +199,8 @@ public class MainActivity extends AppCompatActivity {
 
                 VibeModePlaylist vibeModePlaylist = new VibeModePlaylist(userLocation, userDate, userFriends);
 
-                Callback callback = new DataCallback(musicLibrary.getSongs(), vibeModePlaylist, MainActivity.this, instance);
+                Callback callback = new DataCallback(musicLibrary.getSongs(), vibeModePlaylist, usr,
+                        MainActivity.this, instance);
                 DatabaseMediator mediator = new DatabaseMediator(callback);
                 mediator.retrieveSongsByFriend(userFriends);
                 mediator.retrieveSongsByDate(userDate);
@@ -245,9 +250,40 @@ public class MainActivity extends AppCompatActivity {
 
         // if the songs ended normally in Flashback Mode then update the songs and restart
         // flashback mode
-        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             vibeModeButton.performClick();
         }
+    }
+    private void openTimePicker() {
+        Calendar cal = Calendar.getInstance();
+
+        final TimePickerDialog timePicker = new TimePickerDialog(this,
+                new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(final TimePicker timePicker,
+                                  final int selectedHour,
+                                  final int selectedMinute) {
+                UserInfo.mockTime(selectedHour, selectedMinute);
+                Log.d("TimeSetter", UserInfo.getTime());
+
+            }},
+                           cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false);
+
+
+        timePicker.show();
+    }
+
+    private void openDatePicker(){
+        Calendar cal = Calendar.getInstance();
+        final DatePickerDialog datePicker = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                UserInfo.mockDate(month, dayOfMonth, year);
+                Log.d("TimeSetter", "Mock " + UserInfo.getDate() + " " + UserInfo.getDay());
+
+            }
+        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
+        datePicker.show();
     }
 }
 

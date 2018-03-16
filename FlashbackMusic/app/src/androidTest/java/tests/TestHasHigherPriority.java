@@ -11,6 +11,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -23,8 +25,11 @@ public class TestHasHigherPriority {
     private static final String TODAY = "1/1/2011";
     private static final String ONE_YEAR_AGO = "1/1/2010";
     private static final String THE_PAST_WEEK = "12/26/2010";
-    private static final String FRIEND = "Gary";
-    private static final String STRANGER = "George";
+    private static final String FRIEND_NAME = "Gary";
+    private static final String FRIEND_ID = "1";
+    private static final String STRANGER_NAME = "George";
+    private static final String STRANGER_ID = "0";
+
 
     @Rule
     public ActivityTestRule<MainActivity> mainActivity = new ActivityTestRule<MainActivity>(MainActivity.class);
@@ -36,16 +41,16 @@ public class TestHasHigherPriority {
     public void setUp()
     {
         double[] location = {DEFAULT_COORDINATE, DEFAULT_COORDINATE};
-        ArrayList<String> friends =  new ArrayList<>();
-        friends.add("Gary");
+        Set<String> friends =  new HashSet<>();
+        friends.add(FRIEND_ID);
         vibeModePlaylist = new VibeModePlaylist(location, TODAY, friends);
 
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
         "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-        "Gary", TODAY);
+                FRIEND_NAME, FRIEND_ID, TODAY);
         song2 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "Gary", TODAY);
+                FRIEND_NAME, FRIEND_ID, TODAY);
     }
 
     @Test
@@ -59,10 +64,10 @@ public class TestHasHigherPriority {
     {
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "Gary", TODAY);
+                FRIEND_NAME, FRIEND_ID, TODAY);
         song2 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", 0, 0,
-                "Gary", TODAY);
+                FRIEND_NAME, FRIEND_ID, TODAY);
         assertEquals(true, vibeModePlaylist.hasHigherPriority(song1, song2));
     }
 
@@ -71,10 +76,10 @@ public class TestHasHigherPriority {
     {
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "Gary", TODAY);
+                FRIEND_NAME, FRIEND_ID, TODAY);
         song2 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "Gary", ONE_YEAR_AGO);
+                FRIEND_NAME, FRIEND_ID, ONE_YEAR_AGO);
         assertEquals(true, vibeModePlaylist.hasHigherPriority(song1, song2));
     }
 
@@ -83,10 +88,10 @@ public class TestHasHigherPriority {
     {
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "Gary", TODAY);
+                FRIEND_NAME, FRIEND_ID, TODAY);
         song2 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "George", TODAY);
+                STRANGER_NAME, STRANGER_ID, TODAY);
         assertEquals(true, vibeModePlaylist.hasHigherPriority(song1, song2));
     }
 
@@ -95,10 +100,10 @@ public class TestHasHigherPriority {
     {
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE/2, DEFAULT_COORDINATE/2,
-                "Gary", TODAY);
+                FRIEND_NAME, FRIEND_ID, TODAY);
         song2 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "George", TODAY);
+                STRANGER_NAME, STRANGER_ID, TODAY);
         assertEquals(false, vibeModePlaylist.hasHigherPriority(song1, song2));
     }
 
@@ -107,10 +112,10 @@ public class TestHasHigherPriority {
     {
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE/2, DEFAULT_COORDINATE/2,
-                "Gary", ONE_YEAR_AGO);
+                FRIEND_NAME, FRIEND_ID, ONE_YEAR_AGO);
         song2 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "George", THE_PAST_WEEK);
+                STRANGER_NAME, STRANGER_ID, THE_PAST_WEEK);
         assertEquals(false, vibeModePlaylist.hasHigherPriority(song1, song2));
     }
 
@@ -119,10 +124,10 @@ public class TestHasHigherPriority {
     {
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE/2, DEFAULT_COORDINATE/2,
-                "George", THE_PAST_WEEK);
+                STRANGER_NAME, STRANGER_ID, THE_PAST_WEEK);
         song2 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "George", THE_PAST_WEEK);
+                STRANGER_NAME, STRANGER_ID, THE_PAST_WEEK);
         assertEquals(false, vibeModePlaylist.hasHigherPriority(song1, song2));
     }
 
@@ -131,10 +136,10 @@ public class TestHasHigherPriority {
     {
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "George", THE_PAST_WEEK);
+                STRANGER_NAME, STRANGER_ID, THE_PAST_WEEK);
         song2 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "George", ONE_YEAR_AGO);
+                STRANGER_NAME, STRANGER_ID, ONE_YEAR_AGO);
         assertEquals(true, vibeModePlaylist.hasHigherPriority(song1, song2));
     }
 
@@ -143,10 +148,10 @@ public class TestHasHigherPriority {
     {
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "0:16", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "Gary", THE_PAST_WEEK);
+                FRIEND_NAME, FRIEND_ID, THE_PAST_WEEK);
         song2 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "0:09", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "Gary", THE_PAST_WEEK);
+                FRIEND_NAME, FRIEND_ID, THE_PAST_WEEK);
         assertEquals(true, vibeModePlaylist.hasHigherPriority(song1, song2));
     }
 
@@ -155,10 +160,10 @@ public class TestHasHigherPriority {
     {
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "Gary", TODAY);
+                FRIEND_NAME, FRIEND_ID, TODAY);
         song2 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:21", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "Gary", THE_PAST_WEEK);
+                FRIEND_NAME, FRIEND_ID, THE_PAST_WEEK);
         assertEquals(true, vibeModePlaylist.hasHigherPriority(song1, song2));
     }
 
@@ -167,10 +172,10 @@ public class TestHasHigherPriority {
     {
         song1 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Tuesday", "21:20", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "Gary", TODAY);
+                FRIEND_NAME, FRIEND_ID, TODAY);
         song2 = new Song("Title", "Artist", "album", 0, "www", 0,
                 "Monday", "21:19", DEFAULT_COORDINATE, DEFAULT_COORDINATE,
-                "Gary", THE_PAST_WEEK);
+                FRIEND_NAME, FRIEND_ID, THE_PAST_WEEK);
         assertEquals(true, vibeModePlaylist.hasHigherPriority(song1, song2));
     }
 }

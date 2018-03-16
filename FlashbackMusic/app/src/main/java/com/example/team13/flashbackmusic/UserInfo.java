@@ -24,15 +24,60 @@ public class UserInfo extends AppCompatActivity{
 
     static final int REQUEST_LOCATION = 1;
     static final int INVALID_COORDINATE = 200;
-    static final String[] months = {"January", "February", "March",
-            "April", "May", "June", "July", "August", "September", "October",
-            "November", "December"};
 
+    static String time;
+    static int dayOfWeek;
+    static int mmonth, mday, myear;
+    static boolean mockflag = false;
+    static Calendar calendar;
+
+    public static void setCalendar(Calendar cal){
+        calendar = cal;
+    }
+
+    public static void mockTime(int hour, int min){
+        mockflag = true;
+        String minute;
+
+        // Add extra 0 if int is not a double digit
+        if (min < 10) {
+            minute = "0" + Integer.toString(min);
+        } else {
+            minute = Integer.toString(min);
+        }
+
+        time =  hour + ":" + minute;
+    }
+
+    public static void setRealTime(){
+        mockflag = false;
+    }
+
+    public static void mockDate(int month, int day, int year){
+        mockflag = true;
+        mmonth = month + 1;
+        mday = day;
+        myear = year;
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month, day);
+        dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+
+    }
+
+    public static void setRealDate(){
+        mockflag = false;
+    }
 
     public static String getDay()
     {
-        Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_WEEK);
+        int day = 1;
+        if (mockflag){
+            day = dayOfWeek;
+        }
+        else {
+            Calendar calendar = Calendar.getInstance();
+            day = calendar.get(Calendar.DAY_OF_WEEK);
+        }
 
         switch(day)
         {
@@ -57,6 +102,10 @@ public class UserInfo extends AppCompatActivity{
 
     public static String getTime()
     {
+        if (mockflag){
+            return time;
+        }
+
         int hours = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);//currentTime.getHours();
         int mins = Calendar.getInstance().get(Calendar.MINUTE);//currentTime.getMinutes();
         String minute;
@@ -72,32 +121,15 @@ public class UserInfo extends AppCompatActivity{
     }
 
     public static String getDate() {
+        if (mockflag){
+            return mmonth + "/" + mday + "/" + myear;
+        }
         Calendar cal = Calendar.getInstance();
         int month = cal.get(Calendar.MONTH) + 1;
         int day = cal.get(Calendar.DATE);
         int year = cal.get(Calendar.YEAR);
 
         return month + "/" + day + "/" + year;
-    }
-
-    public static int[] getDateValues(String date) {
-        int firstSlash = date.indexOf("/");
-        int secondSlash = date.lastIndexOf("/");
-        int month = Integer.parseInt(date.substring(0, firstSlash));
-        int day = Integer.parseInt(date.substring(firstSlash + 1, secondSlash));
-        int year = Integer.parseInt(date.substring(secondSlash + 1, date.length()));
-
-        int[] returnArray = {month, day, year};
-        return returnArray;
-    }
-
-    public static int[] backOneDay(int month, int day, int year) {
-        Calendar cal = Calendar.getInstance();
-        cal.set(year, month - 1, day);
-        cal.add(Calendar.DAY_OF_YEAR, -1);
-
-        int[] returnArray = {cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DATE), cal.get(Calendar.YEAR)};
-        return returnArray;
     }
 
     public static double[] getLocation(Activity activity, LocationManager locationManager)
@@ -134,15 +166,35 @@ public class UserInfo extends AppCompatActivity{
             {
                 double[] newLocation = {location.getLatitude(), location.getLongitude()};
                 Log.d("UserInfo", Double.toString(newLocation[0]) + ", " +
-                        Double.toString(newLocation[1]));
+                        Double.toString(newLocation[0]));
                 return newLocation;
             }
         }
 
         double[] newLocation = {INVALID_COORDINATE, INVALID_COORDINATE};
-        Log.d("UserInfo", Double.toString(newLocation[0]) + ", " + Double.toString(newLocation[1]));
+        Log.d("UserInfo", Double.toString(newLocation[0]) + ", " + Double.toString(newLocation[0]));
         return newLocation;
 
+    }
+
+    public static int[] getDateValues(String date) {
+        int firstSlash = date.indexOf("/");
+        int secondSlash = date.lastIndexOf("/");
+        int month = Integer.parseInt(date.substring(0, firstSlash));
+        int day = Integer.parseInt(date.substring(firstSlash + 1, secondSlash));
+        int year = Integer.parseInt(date.substring(secondSlash + 1, date.length()));
+
+        int[] returnArray = {month, day, year};
+        return returnArray;
+    }
+
+    public static int[] backOneDay(int month, int day, int year) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month - 1, day);
+        cal.add(Calendar.DAY_OF_YEAR, -1);
+
+        int[] returnArray = {cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DATE), cal.get(Calendar.YEAR)};
+        return returnArray;
     }
 
     @Override

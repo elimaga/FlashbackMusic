@@ -2,7 +2,10 @@ package com.example.team13.flashbackmusic;
 
 import android.util.Log;
 
+import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
+import com.google.api.services.people.v1.model.Source;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,7 +16,7 @@ import java.util.Set;
  */
 
 public class FBMUser {
-    private String ID, name, proxyName;
+    private String ID, name;
     private Set<String> friendsID;
     private String[] proxyPrefix = {"aardvark", "baboon", "chimp", "dingo", "elephant",
         "flamingo", "giraffe", "hyena", "iguana", "jackalope", "kangaroo", "llama", "manatee",
@@ -23,15 +26,12 @@ public class FBMUser {
     public FBMUser() {
         ID = "";
         name = "";
-        proxyName = "";
         friendsID = new HashSet<>();
     }
 
     public FBMUser(String ID, String name) {
         this.ID = ID;
         this.name = name;
-        this.proxyName = createProxyName();
-        Log.d("FBM", "proxy: " + proxyName);
         friendsID = new HashSet<>();
     }
 
@@ -41,10 +41,6 @@ public class FBMUser {
 
     public String getName() {
         return name;
-    }
-
-    public String getProxyName() {
-        return proxyName;
     }
 
     public void setFriendsID(Set<String> friendsID) {
@@ -62,18 +58,27 @@ public class FBMUser {
     public void setConnections(List<Person> connections) {
         if(connections != null) {
             for (Person p : connections) {
-                if(p.getNames().size() > 1) {
-                    friendsID.add(p.getNames().get(1).getMetadata().getSource().getId());
+                if(p.getNames() != null) {
+                    List<Name> names = p.getNames();
+                    for(Name name : names) {
+                        Source contactSource = name.getMetadata().getSource();
+                        String contactType = contactSource.getType();
+                        if(contactType.equals("PROFILE")) {
+                            friendsID.add(contactSource.getId());
+                            Log.d("FBMUser", "id: " + contactSource.getId()
+                                    + "; name: " + name.getDisplayName());
+                        }
+                    }
                 }
             }
         }
     }
 
-    private String createProxyName() {
-        char c = name.toLowerCase().toCharArray()[0];
+    public String createProxyName(String username, String id) {
+        char c = username.toLowerCase().toCharArray()[0];
         int index = ((int) c) - 97;
 
-        return proxyPrefix[index] + ID.substring(ID.length() - 5, ID.length());
+        return proxyPrefix[index] + id.substring(id.length() - 5, id.length());
     }
 
 }

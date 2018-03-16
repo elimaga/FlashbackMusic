@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -46,6 +47,8 @@ public class SongActivity extends AppCompatActivity {
     ArrayList<Integer> songIndices;
     Song currSong;
     boolean vibeModeOn = false;
+    String username = "";
+    String userId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +62,13 @@ public class SongActivity extends AppCompatActivity {
         if(extras != null) {
             songIndices = extras.getIntegerArrayList("songIndices");
             vibeModeOn = extras.getBoolean("vibeModeOn");
+            username = extras.getString("username");
+            userId = extras.getString("userId");
         }
 
 
         // Update the screen for the first song, and play the first song
+        Log.d("Song Activity", "Playing song at index " + songIndices.get(0));
         currSong = musicLibrary.getSongs().get(songIndices.remove(0));
 
         setupUI();
@@ -234,7 +240,7 @@ public class SongActivity extends AppCompatActivity {
         TextView songLocationView = (TextView) findViewById(R.id.locationTextView);
         TextView songDateView = (TextView) findViewById(R.id.dateTextView);
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
-        TextView userTextView = (TextView) findViewById(R.id.userTextView);
+        TextView userNameTextView = (TextView) findViewById(R.id.userNameTextView);
 
         double latitude = song.getLastLatitude();
         double longitude = song.getLastLongitude();
@@ -244,17 +250,39 @@ public class SongActivity extends AppCompatActivity {
         String albumName = song.getAlbumName();
         String date = song.getLastDate();
         String time = song.getLastTime();
-        String user = song.getLastUser();
+        String user;
+        boolean italics = false;
+        if (song.getLastUserId().equals(userId))
+        {
+            user = "you";
+            italics = true;
+        }
+        else
+        {
+            user = song.getLastUserName();
+            italics = false;
+        }
 
-
-        songNameView.setText("Title: " + songName);
-        songArtistView.setText("Artist: " + songArtist);
-        songAlbumView.setText("Album: " + albumName);
-        songDateView.setText("Date: " + date);
-        songTimeView.setText("Time: " + time);
-        userTextView.setText("User: " + user);
-
-        favoriteButton.setSong(song);
+        if(extras != null) {
+            songNameView.setText("Title: " + songName);
+            songArtistView.setText("Artist: " + songArtist);
+            songAlbumView.setText("Album: " + albumName);
+            if(date != null) {
+                songDateView.setText("Date: " + date);
+            }
+            if(time != null) {
+                songTimeView.setText("Time: " + time);
+            }
+            userNameTextView.setText(user);
+            if (italics)
+            {
+                userNameTextView.setTypeface(null, Typeface.ITALIC);
+            }
+            else
+            {
+                userNameTextView.setTypeface(null, Typeface.NORMAL);
+            }
+        }
 
         // Shows the last location to the user
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
@@ -289,8 +317,7 @@ public class SongActivity extends AppCompatActivity {
         String newTime = UserInfo.getTime();
         String newDate = UserInfo.getDate();
 
-        song.setData(newLocation[0], newLocation[1],newDay, newTime, newDate);
-        //TODO: Set User to yourself
+        song.setData(newLocation[0], newLocation[1],newDay, newTime, newDate, username, userId);
         musicLibrary.persistSong(song);
     }
 
