@@ -69,9 +69,11 @@ public class SongActivity extends AppCompatActivity {
 
         // Update the screen for the first song, and play the first song
         Log.d("Song Activity", "Playing song at index " + songIndices.get(0));
+        // TODO: this could cause crash
         currSong = musicLibrary.getSongs().get(songIndices.remove(0));
 
         setupUI();
+
 
         updateScreen();
 
@@ -335,6 +337,7 @@ public class SongActivity extends AppCompatActivity {
                     nextIndex = songIndices.remove(0);
                 } else{
                     finish();
+                    return;
                 }
             }
             // delete till here
