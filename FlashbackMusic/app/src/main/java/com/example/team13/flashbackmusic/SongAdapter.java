@@ -1,10 +1,13 @@
 package com.example.team13.flashbackmusic;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,12 +21,13 @@ public class SongAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private ArrayList<Song> mDataSource;
     private boolean previewMode = false;
-
+    private int[] colors;
 
     public SongAdapter(Context context, ArrayList<Song> items, String mode) {
         this.mContext = context;
         this.mDataSource = items;
         this.mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.colors = new int[items.size()];
 
         if(mode.equals("preview")) {
             previewMode = true;
@@ -62,6 +66,7 @@ public class SongAdapter extends BaseAdapter {
             holder.infoTextView = convertView.findViewById(R.id.info);
             holder.separatorTextView = convertView.findViewById(R.id.separator);
             holder.favoriteStatusImageButton = (FavoriteStatusImageButton) convertView.findViewById(R.id.favoriteSymbol);
+            holder.listItem = convertView.findViewById(R.id.listItem);
 
             convertView.setTag(holder);
         } else {
@@ -73,6 +78,7 @@ public class SongAdapter extends BaseAdapter {
 
         if(previewMode) {
             holder.favoriteStatusImageButton.setVisibility(View.GONE);
+            convertView.setBackgroundColor(colors[position]);
         } else {
             holder.favoriteStatusImageButton.setSong(song);
             holder.favoriteStatusImageButton.setOnClickListener(new View.OnClickListener() {
@@ -96,7 +102,24 @@ public class SongAdapter extends BaseAdapter {
         TextView infoTextView;
         TextView separatorTextView;
         FavoriteStatusImageButton favoriteStatusImageButton;
+        RelativeLayout listItem;
     }
+
+    public void highlightItemAt(int pos) {
+        for(int i=0;i<colors.length;i++) {
+            if(i==pos ) {
+                colors[i]=Color.LTGRAY;
+            }
+            else {
+                colors[i]= Color.WHITE;
+            }
+        }
+
+        //refresh our list to see the change
+        this.notifyDataSetChanged();
+    }
+
+
 
 
 }

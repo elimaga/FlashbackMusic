@@ -56,6 +56,10 @@ public class SongActivity extends AppCompatActivity {
     MusicLibrary musicLibrary;
     ArrayList<Integer> songIndices;
     Song currSong;
+    PopupWindow popupWindow;
+    SongAdapter adapter;
+    View popupView;
+    ConstraintLayout mainLayout;
     boolean vibeModeOn = false;
     String username = "";
     String userId = "";
@@ -99,6 +103,22 @@ public class SongActivity extends AppCompatActivity {
         setupUI();
 
         saveVibeState();
+
+        mainLayout =
+                (ConstraintLayout) findViewById(R.id.activity_song);
+        final LayoutInflater inflater =
+                (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        popupView = inflater.inflate(R.layout.track_preview_popup,
+                (ViewGroup) findViewById(R.id.popup));
+        final int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        final int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        popupWindow = new PopupWindow(popupView, width, height, true);
+
+        final ListView listView =
+                (ListView) popupView.findViewById(R.id.listView);
+        adapter = new SongAdapter(this,
+                musicLibrary.getSongsAtIndices(songIndices), "preview");
+        listView.setAdapter(adapter);
 
     }
 
@@ -325,25 +345,11 @@ public class SongActivity extends AppCompatActivity {
     }
 
     private void openTrackPreview() {
-        final ConstraintLayout mainLayout =
-                (ConstraintLayout) findViewById(R.id.activity_song);
-        final LayoutInflater inflater =
-                (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        final View popupView = inflater.inflate(R.layout.track_preview_popup,
-                (ViewGroup) findViewById(R.id.popup));
-        final int width = LinearLayout.LayoutParams.WRAP_CONTENT;
-        final int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        final PopupWindow popupWindow =
-                new PopupWindow(popupView, width, height, true);
+
         popupWindow.showAtLocation(mainLayout, Gravity.CENTER, 0, 0);
         dimLayout.setVisibility(View.VISIBLE);
 
-        // Populates list view with users stored in goingUsers
-        final ListView listView =
-                (ListView) popupView.findViewById(R.id.listView);
-        SongAdapter adapter = new SongAdapter(this,
-                musicLibrary.getSongsAtIndices(songIndices), "preview");
-        listView.setAdapter(adapter);
+        adapter.highlightItemAt(index - 1);
 
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
