@@ -125,14 +125,7 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
                 songMetadataSet.add(songMetadata);
             }
         }
-//        for (Album album : newlyCreatedAlbums) {
-//            for (Song song : album.getSongs()) {
-//                if (song != null) {
-//                    song.setIndex(songs.size(), true);
-//                    songs.add(song);
-//                }
-//            }
-//        }
+
         persistLibrary();
     }
 
