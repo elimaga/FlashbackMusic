@@ -100,11 +100,11 @@ public class DatabaseMediator implements SongObserver {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         final DatabaseReference locationReference = firebaseDatabase.getReference("Locations");
         final DatabaseReference songReference = firebaseDatabase.getReference("Songs");
-        GeoFire geoFire = new GeoFire(locationReference);
+        final GeoFire geoFire = new GeoFire(locationReference);
 
         // Only want to use a location if we have a valid latitude and longitude
         if(latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180 ) {
-            GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), KILOMETERS_IN_THOUSAND_FEET);
+            final GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), KILOMETERS_IN_THOUSAND_FEET);
 
             geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
 
@@ -115,13 +115,14 @@ public class DatabaseMediator implements SongObserver {
                     // Add the songKey to the ArrayList of queried songs
                     String songKey = key.substring(0, key.indexOf("-"));
                     finishedCallback.incrNumSongsQueried();
-                    DatabaseReference curRef = songReference.child(songKey);
+                    final DatabaseReference curRef = songReference.child(songKey);
                     curRef.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             DatabaseEntry data = dataSnapshot.getValue(DatabaseEntry.class);
                             finishedCallback.callback(data);
                             Log.d("Callback", data.getTitle());
+                            curRef.removeEventListener(this);
                         }
 
                         @Override
@@ -145,6 +146,7 @@ public class DatabaseMediator implements SongObserver {
                 public void onGeoQueryReady() {
                     Log.d("Retrieve Songs by Location", "All initial data has been loaded and events have been fired!");
                     finishedCallback.callback(queriedData);
+                    geoQuery.removeAllListeners();
                 }
 
                 @Override
@@ -156,7 +158,7 @@ public class DatabaseMediator implements SongObserver {
         // Else query at location (0,0), but do not any of the database entries to the playlist because we are not supposed to
         // be querying. This is just so we know when all of our queries have finished.
         else {
-            GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(0, 0), KILOMETERS_IN_THOUSAND_FEET);
+            final GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(0, 0), KILOMETERS_IN_THOUSAND_FEET);
 
             geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
 
@@ -179,6 +181,7 @@ public class DatabaseMediator implements SongObserver {
                 public void onGeoQueryReady() {
                     Log.d("Invalid retrieve Songs by Location", "All initial data has been loaded and events have been fired!");
                     finishedCallback.callback(queriedData);
+                    geoQuery.removeAllListeners();
                 }
 
                 @Override
@@ -209,7 +212,7 @@ public class DatabaseMediator implements SongObserver {
 
             String queryDate = curMonth + "/" + curDay + "/" + curYear;
 
-            Query queryRef = songReference.orderByChild("lastDate").equalTo(queryDate);
+            final Query queryRef = songReference.orderByChild("lastDate").equalTo(queryDate);
 
             queryRef.addChildEventListener(new ChildEventListener() {
                 @Override
@@ -220,6 +223,8 @@ public class DatabaseMediator implements SongObserver {
                     queriedData.add(data);
 
                     Log.d("Retrieve Songs By Date", "Retrieved song titled " + data.getTitle());
+
+                    queryRef.removeEventListener(this);
                 }
 
                 @Override
@@ -260,7 +265,7 @@ public class DatabaseMediator implements SongObserver {
         // Loop through the list of all friends
         for (String friend : friends) {
 
-            Query queryRef = songReference.orderByChild("userId").equalTo(friend);
+            final Query queryRef = songReference.orderByChild("userId").equalTo(friend);
 
             queryRef.addChildEventListener(new ChildEventListener() {
                 @Override
@@ -271,6 +276,8 @@ public class DatabaseMediator implements SongObserver {
                     queriedData.add(data);
 
                     Log.d("Retrieve Songs By Friends", "Retrieved song titled " + data.getTitle());
+
+                    queryRef.removeEventListener(this);
                 }
 
                 @Override
