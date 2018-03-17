@@ -2,6 +2,7 @@ package com.example.team13.flashbackmusic;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +24,12 @@ public class SongTabFragment extends Fragment {
     private MainActivity main;
     private ListView songListView;
     private MusicLibrary musicLibrary;
+    private PagerAdapter.SortKind sortKind;
+    SongAdapter songAdapter;
+
+    public void setSortKind(PagerAdapter.SortKind sortKind) {
+        this.sortKind = sortKind;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,12 +74,44 @@ public class SongTabFragment extends Fragment {
             }
         });
 
-
-        SongAdapter songAdapter = new SongAdapter(main, musicLibrary.getSongs());
+        songAdapter = new SongAdapter(main, getSortedSongs());
         songListView.setAdapter(songAdapter);
+        songAdapter.notifyDataSetChanged();
+        songListView.refreshDrawableState();
 
         return rootView;
 
+    }
+
+    private ArrayList<Song> getSortedSongs() {
+        ArrayList<Song> songs;
+        switch (sortKind) {
+            case TITLE:
+                songs = SongSorter.sortByTitle(musicLibrary.getSongs());
+                break;
+            case ARTIST:
+                songs = SongSorter.sortByArtist(musicLibrary.getSongs());
+                break;
+            case ALBUM:
+                songs = SongSorter.sortByAlbum(musicLibrary.getAlbums());
+                break;
+            case FAVORITE:
+                songs = SongSorter.extractFavorites(musicLibrary.getSongs());
+                break;
+            default:
+                songs = SongSorter.sortByAlbum(musicLibrary.getAlbums());
+                break;
+        }
+        return songs;
+    }
+
+    void refresh() {
+        main.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                songListView.setAdapter(new SongAdapter(main, getSortedSongs()));
+            }
+        });
     }
 
     @Override

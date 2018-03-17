@@ -44,15 +44,16 @@ public class MainActivity extends AppCompatActivity {
     MainActivity instance;
     private DrawerLayout mDrawerLayout;
 
-    private ArrayList<Song> songs;
     private ArrayList<DatabaseMediator> mediators;
     private MusicLibrary musicLibrary;
+    private PagerAdapter pagerAdapter;
 
     LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
     final int INVALID_COORDINATE = 200;
     private GoogleUtility googleUtility;
     public FBMUser usr;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
         instance = this;
 
         musicLibrary = MusicLibrary.getInstance(MainActivity.this);
-        songs = musicLibrary.getSongs();
 
         googleUtility = new GoogleUtility(MainActivity.this, this);
         GoogleSignInAccount acct = googleUtility.getLastAccount();
@@ -103,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = findViewById(R.id.pager);
-        final PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -196,12 +197,16 @@ public class MainActivity extends AppCompatActivity {
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.action_sort_by_title:
+                pagerAdapter.setSortKind(PagerAdapter.SortKind.TITLE);
                 break;
             case R.id.action_sort_by_artist:
+                pagerAdapter.setSortKind(PagerAdapter.SortKind.ARTIST);
                 break;
             case R.id.action_sort_by_album:
+                pagerAdapter.setSortKind(PagerAdapter.SortKind.ALBUM);
                 break;
             case R.id.action_favorite:
+                pagerAdapter.setSortKind(PagerAdapter.SortKind.FAVORITE);
                 break;
             case R.id.flashback_button:
                 openVibeMode();
