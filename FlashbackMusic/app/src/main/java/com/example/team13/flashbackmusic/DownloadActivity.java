@@ -145,14 +145,18 @@ public class DownloadActivity extends AppCompatActivity implements UnzipperObser
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
-        unzipper.removeObserver(this);
+        if (unzipper != null) {
+            unzipper.removeObserver(this);
+        }
         musicLibrary.removeObserver(this);
     }
 
     // DownloadObserver
     @Override
     public void onCompleteDownload(Context context, Intent intent) {
-        String mime = intent.getStringExtra("mime");
+        String extension = MimeTypeMap.getFileExtensionFromUrl(urlString);
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        String mime = mimeTypeMap.getMimeTypeFromExtension(extension);
         String filename = intent.getStringExtra("filename");
         String directoryPath = intent.getStringExtra("directoryPath");
         if (MimeTypeFilter.matches(mime, new String[]{"audio/mpeg","audio/mpeg3","audio/x-mpeg-3","video/mpeg","video/x-mpeg"})!= null){
