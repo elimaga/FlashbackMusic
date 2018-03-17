@@ -74,9 +74,10 @@ public class SongActivity extends AppCompatActivity {
 
         setupUI();
 
-        playSong(currSong);
 
-        updateScreen(currSong);
+        updateScreen();
+
+        playSong();
 
         setupMediaPlayer();
 
@@ -118,9 +119,9 @@ public class SongActivity extends AppCompatActivity {
                     Log.d("More Songs to Play: ", songIndices.size() + " more songs.");
                     Song nextSong = musicLibrary.getSongs().get(songIndices.remove(0));
                     mediaPlayer.reset();
-                    updateScreen(nextSong);
-                    playSong(nextSong);
                     currSong = nextSong;
+                    updateScreen();
+                    playSong();
                 }
                 else {
                     setResult(RESULT_OK);
@@ -138,13 +139,15 @@ public class SongActivity extends AppCompatActivity {
         }
 
         favoriteButton = (FavoriteStatusImageButton) findViewById(R.id.favoriteButton);
-        favoriteButton.setSong(currSong);
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FavoriteStatusImageButton button = (FavoriteStatusImageButton) v;
                 button.updateStatus();
                 button.updateImage();
+                if(currSong.getFavoriteStatus() == Song.FavoriteStatus.DISLIKED) {
+                    skipSong(null);
+                }
             }
         });
 
@@ -184,18 +187,17 @@ public class SongActivity extends AppCompatActivity {
 
     /**
      * Method to load song into media player and play song
-     * @param song - song object to play
      */
-    public void playSong(Song song)
+    public void playSong()
     {
         if (mediaPlayer == null)
         {
             mediaPlayer = new MediaPlayer();
         }
         try {
-            String path = song.getPath();
+            String path = currSong.getPath();
             if (path != null) {
-                File file = new File(song.getPath());
+                File file = new File(currSong.getPath());
                 Uri uri = Uri.fromFile(file);
                 mediaPlayer.setDataSource(SongActivity.this, uri);
                 mediaPlayer.prepareAsync();
@@ -234,7 +236,7 @@ public class SongActivity extends AppCompatActivity {
     /**
      * Method to update the screen so the user knows what song is playing
      */
-    private void updateScreen(Song song) {
+    private void updateScreen() {
 
         TextView songNameView = (TextView) findViewById(R.id.titleTextView);
         TextView songArtistView = (TextView) findViewById(R.id.artistTextView);
@@ -244,24 +246,25 @@ public class SongActivity extends AppCompatActivity {
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
         TextView userNameTextView = (TextView) findViewById(R.id.userNameTextView);
 
-        double latitude = song.getLastLatitude();
-        double longitude = song.getLastLongitude();
+        double latitude = currSong.getLastLatitude();
+        double longitude = currSong.getLastLongitude();
 
-        String songName = song.getTitle();
-        String songArtist = song.getArtist();
-        String albumName = song.getAlbumName();
-        String date = song.getLastDate();
-        String time = song.getLastTime();
+        favoriteButton.setSong(currSong);
+        String songName = currSong.getTitle();
+        String songArtist = currSong.getArtist();
+        String albumName = currSong.getAlbumName();
+        String date = currSong.getLastDate();
+        String time = currSong.getLastTime();
         String user;
         boolean italics = false;
-        if (song.getLastUserId().equals(userId))
+        if (currSong.getLastUserId().equals(userId))
         {
             user = "you";
             italics = true;
         }
         else
         {
-            user = song.getLastUserName();
+            user = currSong.getLastUserName();
             italics = false;
         }
 
@@ -340,9 +343,10 @@ public class SongActivity extends AppCompatActivity {
             // delete till here
             Song nextSong = musicLibrary.getSongs().get(nextIndex);
             mediaPlayer.reset();
-            updateScreen(nextSong);
-            playSong(nextSong);
             currSong = nextSong;
+            updateScreen();
+            playSong();
+
 
         }
         else {

@@ -166,13 +166,13 @@ public class UserInfo extends AppCompatActivity{
             {
                 double[] newLocation = {location.getLatitude(), location.getLongitude()};
                 Log.d("UserInfo", Double.toString(newLocation[0]) + ", " +
-                        Double.toString(newLocation[0]));
+                        Double.toString(newLocation[1]));
                 return newLocation;
             }
         }
 
         double[] newLocation = {INVALID_COORDINATE, INVALID_COORDINATE};
-        Log.d("UserInfo", Double.toString(newLocation[0]) + ", " + Double.toString(newLocation[0]));
+        Log.d("UserInfo", Double.toString(newLocation[0]) + ", " + Double.toString(newLocation[1]));
         return newLocation;
 
     }

@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     final int INVALID_COORDINATE = 200;
     private GoogleUtility googleUtility;
     public FBMUser usr;
+    public static boolean isEspresso = false;
 
 
     @Override
@@ -66,7 +67,12 @@ public class MainActivity extends AppCompatActivity {
 
         googleUtility = new GoogleUtility(MainActivity.this, this);
         GoogleSignInAccount acct = googleUtility.getLastAccount();
-        usr = new FBMUser(acct.getId(), acct.getDisplayName());
+        if(isEspresso) {
+            usr = new FBMUser("1", "Test User");
+        } else {
+            usr = new FBMUser(acct.getId(), acct.getDisplayName());
+        }
+
         googleUtility.setUser(usr);
         Log.d("MainActivity", "Created user: " + usr.getName());
 
