@@ -1,5 +1,6 @@
 package com.example.team13.flashbackmusic;
 
+import android.support.constraint.ConstraintLayout;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -20,10 +21,18 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +46,7 @@ import java.util.Locale;
 
 public class SongActivity extends AppCompatActivity {
 
+    private RelativeLayout dimLayout;
     private MediaPlayer mediaPlayer;
     private LocationManager locationManager;
     final int INVALID_COORDINATE = 200;
@@ -54,6 +64,15 @@ public class SongActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song);
+
+        dimLayout = (RelativeLayout) findViewById(R.id.dim_layout);
+        Button trackPreviewButton = (Button) findViewById(R.id.trackPreviewButton);
+        trackPreviewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openTrackPreview();
+            }
+        });
 
         musicLibrary = MusicLibrary.getInstance(SongActivity.this);
         extras = getIntent().getExtras();
@@ -302,6 +321,46 @@ public class SongActivity extends AppCompatActivity {
 
         song.setData(newLocation[0], newLocation[1],newDay, newTime, newDate, username, userId);
         musicLibrary.persistSong(song);
+    }
+
+    private void openTrackPreview() {
+        final ConstraintLayout mainLayout =
+                (ConstraintLayout) findViewById(R.id.activity_song);
+        final LayoutInflater inflater =
+                (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        final View popupView = inflater.inflate(R.layout.track_preview_popup,
+                (ViewGroup) findViewById(R.id.popup));
+        final int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        final int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        final PopupWindow popupWindow =
+                new PopupWindow(popupView, width, height, true);
+        popupWindow.showAtLocation(mainLayout, Gravity.CENTER, 0, 0);
+        dimLayout.setVisibility(View.VISIBLE);
+
+        // Populates list view with users stored in goingUsers
+        final ListView listView =
+                (ListView) popupView.findViewById(R.id.listView);
+        final ArrayAdapter<String> adapter =
+                new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
+                        new ArrayList<String>());
+        listView.setAdapter(adapter);
+
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                dimLayout.setVisibility(View.GONE);
+            }
+        });
+
+        final Button closeButton =
+                (Button) popupView.findViewById(R.id.close_button);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                popupWindow.dismiss();
+            }
+        });
+
     }
 }
 
