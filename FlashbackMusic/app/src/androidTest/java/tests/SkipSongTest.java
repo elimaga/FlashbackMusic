@@ -11,174 +11,160 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import com.example.team13.flashbackmusic.MainActivity;
-import com.example.team13.flashbackmusic.MusicLibrary;
 import com.example.team13.flashbackmusic.R;
+import com.example.team13.flashbackmusic.SignInActivity;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Before;
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.longClick;
+import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
+import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.is;
-/*
+
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class testSongMetadataDisplay {
-    final double TEST_LATITUDE = 32.881172957516185;
-    final double TEST_LONGITUDE = -117.2374677658081;
-    final String TEST_LOCATION = "Torrey Pines";
-    final String TEST_DAY = "Sunday";
-    final String TEST_TIME = "21:00";
-    final String TEST_DATE = "2/18/2018";
 
-    final double DEFAULT_LATITUDE = 200.0;
-    final double DEFAULT_LONGITUDE = 200.0;
-    final String DEFAULT_LOCATION = "";
-    final String DEFAULT_DAY = "";
-    final String DEFAULT_TIME = "";
-    final String DEFAULT_DATE = "";
+/**
+ * Warning: Test assumes album:
+ *          https://d1b10bmlvqabco.cloudfront.net/attach/jc2fhqnhbwl4ii/j85f4pwtei5258/jdhvwzg7m0f5/Take_Yourself_Too_Seriously.zip
+ *          is downloaded and a google+ account is already signed in
+ */
+public class SkipSongTest {
 
+    public static final int TEN_SECONDS_IN_MS = 10000;
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
-    MusicLibrary musicLibrary = MusicLibrary.getInstance(mActivityTestRule.getActivity());
-
-    @Before
-    public void setup()
-    {
-        musicLibrary.getSongs().get(0).setData(
-                DEFAULT_LATITUDE, DEFAULT_LONGITUDE, DEFAULT_DAY, DEFAULT_TIME, DEFAULT_DATE);
-    }
+    public ActivityTestRule<SignInActivity> mActivityTestRule = new ActivityTestRule<>(SignInActivity.class);
 
     @Test
-    public void testSongMetadataDisplay() {
+    public void skipSongTest() {
+        // Added a sleep statement to match the app's execution delay.
+        // The recommended way to handle such scenarios is to use Espresso idling resources:
+        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
+        try {
+            Thread.sleep(TEN_SECONDS_IN_MS / 5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ViewInteraction tabView = onView(
+                allOf(childAtPosition(
+                        childAtPosition(
+                                withId(R.id.tab_layout),
+                                0),
+                        1),
+                        isDisplayed()));
+        tabView.perform(click());
+
         DataInteraction relativeLayout = onData(anything())
-                .inAdapterView(allOf(ViewMatchers.withId(R.id.song_list_view),
+                .inAdapterView(allOf(withId(R.id.album_list_view),
                         childAtPosition(
                                 withClassName(is("android.widget.RelativeLayout")),
                                 0)))
                 .atPosition(0);
         relativeLayout.perform(click());
 
-        ViewInteraction textView = onView(
-                allOf(withId(R.id.titleTextView), withText("Title: 123 Go"),
+        // Added a sleep statement to match the app's execution delay.
+        // The recommended way to handle such scenarios is to use Espresso idling resources:
+        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
+        try {
+            Thread.sleep(TEN_SECONDS_IN_MS / 5);     
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ViewInteraction textView2 = onView(
+                allOf(withId(R.id.titleTextView), withText("Title: Windows Are The Eyes To The House"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
                                 1),
                         isDisplayed()));
-        textView.check(matches(withText("Title: 123 Go")));
+        textView2.check(matches(withText("Title: Windows Are The Eyes To The House")));
 
-        ViewInteraction textView2 = onView(
-                allOf(withId(R.id.artistTextView), withText("Artist: Keaton Simons"),
+        ViewInteraction textView3 = onView(
+                allOf(withId(R.id.artistTextView), withText("Artist: Forum"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
                                 2),
                         isDisplayed()));
-        textView2.check(matches(withText("Artist: Keaton Simons")));
+        textView3.check(matches(withText("Artist: Forum")));
 
-        ViewInteraction textView3 = onView(
-                allOf(withId(R.id.albumTextView), withText("Album: New & Best of Keaton Simons"),
+        ViewInteraction textView4 = onView(
+                allOf(withId(R.id.albumTextView), withText("Album: Take Yourself Too Seriously"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
                                 3),
                         isDisplayed()));
-        textView3.check(matches(withText("Album: New & Best of Keaton Simons")));
+        textView4.check(matches(withText("Album: Take Yourself Too Seriously")));
 
-        ViewInteraction textView4 = onView(
-                allOf(withId(R.id.locationTextView), withText("Location:"),
+        ViewInteraction appCompatImageButton3 = onView(
+                allOf(withId(R.id.imageButton2),
                         childAtPosition(
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                5),
+                                11),
                         isDisplayed()));
-        textView4.check(matches(withText("Location:")));
+        appCompatImageButton3.perform(click());
 
-        ViewInteraction textView5 = onView(
-                allOf(withId(R.id.dateTextView), withText("Date: "),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                6),
-                        isDisplayed()));
-        textView5.check(matches(withText("Date: ")));
+        try {
+            Thread.sleep(TEN_SECONDS_IN_MS / 5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
 
         ViewInteraction textView6 = onView(
-                allOf(withId(R.id.timeTextView), withText("Time: "),
+                allOf(withId(R.id.titleTextView), withText("Title: Dead Dove Do Not Eat"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                7),
+                                1),
                         isDisplayed()));
-        textView6.check(matches(withText("Time: ")));
-
-        pressBack();
-
-        // change song metadata for testing
-        musicLibrary.getSongs().get(0).setData(
-                TEST_LATITUDE, TEST_LONGITUDE, TEST_DAY, TEST_TIME, TEST_DATE);
-
-        DataInteraction relativeLayout2 = onData(anything())
-                .inAdapterView(allOf(withId(R.id.song_list_view),
-                        childAtPosition(
-                                withClassName(is("android.widget.RelativeLayout")),
-                                0)))
-                .atPosition(0);
-        relativeLayout2.perform(click());
+        textView6.check(matches(withText("Title: Dead Dove Do Not Eat")));
 
         ViewInteraction textView7 = onView(
-                allOf(withId(R.id.locationTextView), withText("Location: " + TEST_LOCATION),
+                allOf(withId(R.id.artistTextView), withText("Artist: Forum"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                5),
+                                2),
                         isDisplayed()));
-        textView7.check(matches(withText("Location: " + TEST_LOCATION)));
+        textView7.check(matches(withText("Artist: Forum")));
 
         ViewInteraction textView8 = onView(
-                allOf(withId(R.id.dateTextView), withText("Date: " + TEST_DATE),
+                allOf(withId(R.id.albumTextView), withText("Album: Take Yourself Too Seriously"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(android.R.id.content),
                                         0),
-                                6),
+                                3),
                         isDisplayed()));
-        textView8.check(matches(withText("Date: " + TEST_DATE)));
-
-        ViewInteraction textView9 = onView(
-                allOf(withId(R.id.timeTextView), withText("Time: " + TEST_TIME),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                7),
-                        isDisplayed()));
-        textView9.check(matches(withText("Time: " + TEST_TIME)));
-
-        pressBack();
+        textView8.check(matches(withText("Album: Take Yourself Too Seriously")));
 
     }
 
@@ -201,4 +187,3 @@ public class testSongMetadataDisplay {
         };
     }
 }
-*/

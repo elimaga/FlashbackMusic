@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
@@ -41,13 +42,11 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity {
 
     MainActivity instance;
-
-    ImageButton vibeModeButton;
     private DrawerLayout mDrawerLayout;
 
-    private ArrayList<Song> songs;
     private ArrayList<DatabaseMediator> mediators;
     private MusicLibrary musicLibrary;
+    private PagerAdapter pagerAdapter;
 
     LocationManager locationManager;
     static final int REQUEST_LOCATION = 1;
@@ -55,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private GoogleUtility googleUtility;
     public FBMUser usr;
     public static boolean isEspresso = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,13 +64,14 @@ public class MainActivity extends AppCompatActivity {
         instance = this;
 
         musicLibrary = MusicLibrary.getInstance(MainActivity.this);
-        songs = musicLibrary.getSongs();
 
         googleUtility = new GoogleUtility(MainActivity.this, this);
         GoogleSignInAccount acct = googleUtility.getLastAccount();
-        if(isEspresso) {
+
+        if (isEspresso){
             usr = new FBMUser("1", "Test User");
-        } else {
+        }
+        else {
             usr = new FBMUser(acct.getId(), acct.getDisplayName());
         }
 
@@ -79,9 +80,10 @@ public class MainActivity extends AppCompatActivity {
 
         setUpUI();
 
+        // recovery vibe mode if the app finished in vibe mode previously
         SharedPreferences sharedPreferences = getSharedPreferences("vibe_mode",MODE_PRIVATE);
         if(sharedPreferences.getBoolean("vibeModeOn",false)){
-            vibeModeButton.performClick();
+            openVibeMode();
         }
 
         // Requesting location permission
@@ -100,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        actionBar.setDisplayShowTitleEnabled(false);
 
         //Tab layout
         TabLayout tabLayout = findViewById(R.id.tab_layout);
@@ -108,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = findViewById(R.id.pager);
-        final PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -176,46 +180,6 @@ public class MainActivity extends AppCompatActivity {
 
         // VibeMode button
         final Context context = getApplicationContext();
-        vibeModeButton = findViewById(R.id.flashback_button);
-        vibeModeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                SharedPreferences sp = getSharedPreferences("UserFriends", MODE_PRIVATE);
-                Set<String> friendsID = sp.getStringSet("friendsID", new HashSet<String>());
-                usr.setFriendsID(friendsID);
-
-                Log.d("User", "Username: " + usr.getName());
-
-                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
-                //String userTime = UserInfo.getTime();
-                //String userDay = UserInfo.getDay();
-                String userDate = UserInfo.getDate();
-                Set<String> userFriends = usr.getFriendsID();
-
-                for(String friend : userFriends) {
-                    Log.d("Friends ID: ", friend);
-                }
-
-                // Generate the Flashback Playlist
-                //FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
-                //        userDay, userTime, userDate);
-                //ArrayList<Song> vibeModePlaylist = flashbackPlaylist.getPlaylist();
-
-                VibeModePlaylist vibeModePlaylist = new VibeModePlaylist(userLocation, userDate, userFriends);
-
-                Callback callback = new DataCallback(musicLibrary.getSongs(), vibeModePlaylist, usr,
-                        MainActivity.this, instance);
-                DatabaseMediator mediator = new DatabaseMediator(callback);
-                mediator.retrieveSongsByFriend(userFriends);
-                mediator.retrieveSongsByDate(userDate);
-                mediator.retrieveSongsByLocation(userLocation[0], userLocation[1]);
-
-                Log.d("Vibe Mode Button", "Vibe Mode button is pressed from main activity");
-
-            }
-        });
 
         // Requesting location permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -229,13 +193,70 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.overflow_menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.action_sort_by_title:
+                pagerAdapter.setSortKind(PagerAdapter.SortKind.TITLE);
+                break;
+            case R.id.action_sort_by_artist:
+                pagerAdapter.setSortKind(PagerAdapter.SortKind.ARTIST);
+                break;
+            case R.id.action_sort_by_album:
+                pagerAdapter.setSortKind(PagerAdapter.SortKind.ALBUM);
+                break;
+            case R.id.action_favorite:
+                pagerAdapter.setSortKind(PagerAdapter.SortKind.FAVORITE);
+                break;
+            case R.id.flashback_button:
+                openVibeMode();
+                break;
+
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openVibeMode() {
+        SharedPreferences sp = getSharedPreferences("UserFriends", MODE_PRIVATE);
+        Set<String> friendsID = sp.getStringSet("friendsID", new HashSet<String>());
+        usr.setFriendsID(friendsID);
+
+        Log.d("User", "Username: " + usr.getName());
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        double[] userLocation = UserInfo.getLocation(MainActivity.this, locationManager);
+        //String userTime = UserInfo.getTime();
+        //String userDay = UserInfo.getDay();
+        String userDate = UserInfo.getDate();
+        Set<String> userFriends = usr.getFriendsID();
+
+        for(String friend : userFriends) {
+            Log.d("Friends ID: ", friend);
+        }
+
+        // Generate the Flashback Playlist
+        //FlashbackPlaylist flashbackPlaylist = new FlashbackPlaylist(songs, userLocation,
+        //        userDay, userTime, userDate);
+        //ArrayList<Song> vibeModePlaylist = flashbackPlaylist.getPlaylist();
+
+        VibeModePlaylist vibeModePlaylist = new VibeModePlaylist(userLocation, userDate, userFriends);
+
+        Callback callback = new DataCallback(musicLibrary.getSongs(), vibeModePlaylist, usr,
+                MainActivity.this, instance);
+        DatabaseMediator mediator = new DatabaseMediator(callback);
+        mediator.retrieveSongsByFriend(userFriends);
+        mediator.retrieveSongsByDate(userDate);
+        mediator.retrieveSongsByLocation(userLocation[0], userLocation[1]);
+
+        Log.d("Vibe Mode Button", "Vibe Mode button is pressed from main activity");
     }
 
 
@@ -257,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
         // if the songs ended normally in Flashback Mode then update the songs and restart
         // flashback mode
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            vibeModeButton.performClick();
+            openVibeMode();
         }
     }
     private void openTimePicker() {
@@ -291,5 +312,8 @@ public class MainActivity extends AppCompatActivity {
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
         datePicker.show();
     }
+
+
+
 }
 

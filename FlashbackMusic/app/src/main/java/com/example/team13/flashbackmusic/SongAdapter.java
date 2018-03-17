@@ -56,7 +56,7 @@ public class SongAdapter extends BaseAdapter {
 
         Song song = (Song) getItem(position);
 
-        if (convertView == null) {
+//        if (convertView == null) {
             convertView = mInflater.inflate(R.layout.list_item_song, null);
 
             holder = new ViewHolder();
@@ -69,9 +69,9 @@ public class SongAdapter extends BaseAdapter {
             holder.listItem = convertView.findViewById(R.id.listItem);
 
             convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
+//        } else {
+//            holder = (ViewHolder) convertView.getTag();
+//        }
 
         holder.titleTextView.setText(song.getTitle());
         holder.artistTextView.setText(song.getArtist());
@@ -85,14 +85,21 @@ public class SongAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View view) {
                     FavoriteStatusImageButton button = (FavoriteStatusImageButton) view;
-                    button.updateStatus(mContext);
+                    button.updateStatus();
                     button.updateImage();
                 }
             });
         }
 
-
         return convertView;
+
+    }
+
+    public void refreshEvents(ArrayList<Song> songs) {
+        this.mDataSource.clear();
+        this.mDataSource.addAll(songs);
+        notifyDataSetChanged();
+
     }
 
     static class ViewHolder
