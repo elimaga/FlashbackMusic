@@ -1,13 +1,17 @@
-package com.example.team13.flashbackmusic;
+package tests;
 
 
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+
+import com.example.team13.flashbackmusic.R;
+import com.example.team13.flashbackmusic.SignInActivity;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -56,7 +60,7 @@ public class SortSongsTest {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         ViewInteraction appCompatTextView = onView(
-                allOf(withId(R.id.title), withText("Sort by title"),
+                allOf(ViewMatchers.withId(R.id.title), withText("Sort by title"),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.support.v7.view.menu.ListMenuItemView")),
