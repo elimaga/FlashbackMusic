@@ -24,6 +24,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,10 +40,9 @@ public class SongActivity extends AppCompatActivity {
 
     private MediaPlayer mediaPlayer;
     private LocationManager locationManager;
-    final int INVALID_COORDINATE = 200;
-    int index = 0;
     Bundle extras;
     Button playPauseButton;
+    FavoriteStatusImageButton favoriteButton;
     MusicLibrary musicLibrary;
     ArrayList<Integer> songIndices;
     Song currSong;
@@ -71,13 +71,13 @@ public class SongActivity extends AppCompatActivity {
         Log.d("Song Activity", "Playing song at index " + songIndices.get(0));
         currSong = musicLibrary.getSongs().get(songIndices.remove(0));
 
-        updateScreen(currSong);
+        setupUI();
 
-        playSong(currSong);
+        updateScreen();
+
+        playSong();
 
         setupMediaPlayer();
-
-        setupUI();
 
         saveVibeState();
 
@@ -117,9 +117,9 @@ public class SongActivity extends AppCompatActivity {
                     Log.d("More Songs to Play: ", songIndices.size() + " more songs.");
                     Song nextSong = musicLibrary.getSongs().get(songIndices.remove(0));
                     mediaPlayer.reset();
-                    updateScreen(nextSong);
-                    playSong(nextSong);
                     currSong = nextSong;
+                    updateScreen();
+                    playSong();
                 }
                 else {
                     setResult(RESULT_OK);
@@ -135,6 +135,20 @@ public class SongActivity extends AppCompatActivity {
         if(vibeModeOn) {
             VibeMode.setText("Vibe Mode");
         }
+
+        favoriteButton = (FavoriteStatusImageButton) findViewById(R.id.favoriteButton);
+        favoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FavoriteStatusImageButton button = (FavoriteStatusImageButton) v;
+                button.updateStatus();
+                button.updateImage();
+                if(currSong.getFavoriteStatus() == Song.FavoriteStatus.DISLIKED) {
+                    skipSong(null);
+                }
+            }
+        });
+
 
         playPauseButton = (Button) findViewById(R.id.playPauseButton);
         playPauseButton.setOnClickListener(new View.OnClickListener() {
@@ -171,19 +185,24 @@ public class SongActivity extends AppCompatActivity {
 
     /**
      * Method to load song into media player and play song
-     * @param song - song object to play
      */
-    public void playSong(Song song)
+    public void playSong()
     {
         if (mediaPlayer == null)
         {
             mediaPlayer = new MediaPlayer();
         }
         try {
-            File file = new File(song.getPath());
-            Uri uri = Uri.fromFile(file);
-            mediaPlayer.setDataSource(SongActivity.this, uri);
-            mediaPlayer.prepareAsync();
+            String path = currSong.getPath();
+            if (path != null) {
+                File file = new File(currSong.getPath());
+                Uri uri = Uri.fromFile(file);
+                mediaPlayer.setDataSource(SongActivity.this, uri);
+                mediaPlayer.prepareAsync();
+            } else {
+                // TODO: enqeue a song to download here
+                skipSong(null);
+            }
         }
         catch (Exception e)
         {
@@ -215,7 +234,7 @@ public class SongActivity extends AppCompatActivity {
     /**
      * Method to update the screen so the user knows what song is playing
      */
-    private void updateScreen(Song song) {
+    private void updateScreen() {
 
         TextView songNameView = (TextView) findViewById(R.id.titleTextView);
         TextView songArtistView = (TextView) findViewById(R.id.artistTextView);
@@ -225,24 +244,25 @@ public class SongActivity extends AppCompatActivity {
         TextView songTimeView = (TextView) findViewById(R.id.timeTextView);
         TextView userNameTextView = (TextView) findViewById(R.id.userNameTextView);
 
-        double latitude = song.getLastLatitude();
-        double longitude = song.getLastLongitude();
+        double latitude = currSong.getLastLatitude();
+        double longitude = currSong.getLastLongitude();
 
-        String songName = song.getTitle();
-        String songArtist = song.getArtist();
-        String albumName = song.getAlbumName();
-        String date = song.getLastDate();
-        String time = song.getLastTime();
+        favoriteButton.setSong(currSong);
+        String songName = currSong.getTitle();
+        String songArtist = currSong.getArtist();
+        String albumName = currSong.getAlbumName();
+        String date = currSong.getLastDate();
+        String time = currSong.getLastTime();
         String user;
         boolean italics = false;
-        if (song.getLastUserId().equals(userId))
+        if (currSong.getLastUserId().equals(userId))
         {
             user = "you";
             italics = true;
         }
         else
         {
-            user = song.getLastUserName();
+            user = currSong.getLastUserName();
             italics = false;
         }
 
@@ -302,6 +322,33 @@ public class SongActivity extends AppCompatActivity {
 
         song.setData(newLocation[0], newLocation[1],newDay, newTime, newDate, username, userId);
         musicLibrary.persistSong(song);
+    }
+
+    public void skipSong(View view) {
+        if(songIndices.size() > 0) {
+            int nextIndex = songIndices.remove(0);
+            // TODO:
+            // this while-loop should not be needed. please delete after implementing updateLibrary()
+            // because musicLibrary always must have specified index.
+            while (nextIndex >= musicLibrary.getSongs().size()) {
+                if (songIndices.size() > 0) {
+                    nextIndex = songIndices.remove(0);
+                } else{
+                    finish();
+                }
+            }
+            // delete till here
+            Song nextSong = musicLibrary.getSongs().get(nextIndex);
+            mediaPlayer.reset();
+            currSong = nextSong;
+            updateScreen();
+            playSong();
+
+
+        }
+        else {
+            finish();
+        }
     }
 }
 
