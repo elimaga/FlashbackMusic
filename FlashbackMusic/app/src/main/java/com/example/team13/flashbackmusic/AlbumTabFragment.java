@@ -65,9 +65,7 @@ public class AlbumTabFragment extends Fragment {
 
 
         AlbumAdapter albumAdapter = new AlbumAdapter(main, musicLibrary.getAlbums());
-
         albumListView.setAdapter(albumAdapter);
-
 
         return rootView;
     }

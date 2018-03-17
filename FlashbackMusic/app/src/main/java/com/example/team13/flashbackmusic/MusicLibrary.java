@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.team13.flashbackmusic.interfaces.MusicLibraryObserver;
 import com.example.team13.flashbackmusic.interfaces.SongObserver;
@@ -91,6 +92,20 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
     public ArrayList<Song> getSongs() { return new ArrayList<>(songs); }
 
     ArrayList<Album> getAlbums() { return new ArrayList<>(albums); }
+
+    public ArrayList<Song> getSongsAtIndices(ArrayList<Integer> songIndices) {
+        ArrayList<Song> tracks = new ArrayList<>();
+
+        for(int i = 0; i < songIndices.size(); i++) {
+            int index = songIndices.get(i);
+            Log.d("MusicLibrary", "index: " + index);
+            tracks.add(songs.get(index));
+            Log.d("MusicLibrary", "title: " + songs.get(index).getTitle());
+
+        }
+
+        return tracks;
+    }
 
     private void addSongsIntoLibraryFromPath(ArrayList<String> paths, String url) {
         for (String path : paths) {

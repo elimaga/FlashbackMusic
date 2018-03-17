@@ -1,5 +1,6 @@
 package com.example.team13.flashbackmusic;
 
+import android.support.constraint.ConstraintLayout;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -20,10 +21,18 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +47,7 @@ import java.util.Locale;
 
 public class SongActivity extends AppCompatActivity {
 
+    private RelativeLayout dimLayout;
     private MediaPlayer mediaPlayer;
     private LocationManager locationManager;
     Bundle extras;
@@ -46,6 +56,10 @@ public class SongActivity extends AppCompatActivity {
     MusicLibrary musicLibrary;
     ArrayList<Integer> songIndices;
     Song currSong;
+    PopupWindow popupWindow;
+    SongAdapter adapter;
+    View popupView;
+    ConstraintLayout mainLayout;
     boolean vibeModeOn = false;
     String username = "";
     String userId = "";
@@ -55,9 +69,17 @@ public class SongActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song);
 
+        dimLayout = (RelativeLayout) findViewById(R.id.dim_layout);
+        Button trackPreviewButton = (Button) findViewById(R.id.trackPreviewButton);
+        trackPreviewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openTrackPreview();
+            }
+        });
+
         musicLibrary = MusicLibrary.getInstance(SongActivity.this);
         extras = getIntent().getExtras();
-
 
         if(extras != null) {
             songIndices = extras.getIntegerArrayList("songIndices");
@@ -69,8 +91,9 @@ public class SongActivity extends AppCompatActivity {
 
         // Update the screen for the first song, and play the first song
         Log.d("Song Activity", "Playing song at index " + songIndices.get(0));
-        // TODO: this could cause crash
-        currSong = musicLibrary.getSongs().get(songIndices.remove(0));
+        currSong = musicLibrary.getSongs().get(songIndices.get(index));
+        index++;
+
 
         setupUI();
 
@@ -81,6 +104,22 @@ public class SongActivity extends AppCompatActivity {
         setupMediaPlayer();
 
         saveVibeState();
+
+        mainLayout =
+                (ConstraintLayout) findViewById(R.id.activity_song);
+        final LayoutInflater inflater =
+                (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        popupView = inflater.inflate(R.layout.track_preview_popup,
+                (ViewGroup) findViewById(R.id.popup));
+        final int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        final int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        popupWindow = new PopupWindow(popupView, width, height, true);
+
+        final ListView listView =
+                (ListView) popupView.findViewById(R.id.listView);
+        adapter = new SongAdapter(this,
+                musicLibrary.getSongsAtIndices(songIndices), "preview");
+        listView.setAdapter(adapter);
 
     }
 
@@ -114,11 +153,12 @@ public class SongActivity extends AppCompatActivity {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 updateSong(currSong);
-                if(songIndices.size() > 0) {
+                if(index < songIndices.size()) {
                     Log.d("More Songs to Play: ", songIndices.size() + " more songs.");
-                    Song nextSong = musicLibrary.getSongs().get(songIndices.remove(0));
+                    Song nextSong = musicLibrary.getSongs().get(songIndices.get(index));
                     mediaPlayer.reset();
                     currSong = nextSong;
+                    index++;       
                     updateScreen();
                     playSong();
                 }
@@ -325,6 +365,30 @@ public class SongActivity extends AppCompatActivity {
         musicLibrary.persistSong(song);
     }
 
+    private void openTrackPreview() {
+
+        popupWindow.showAtLocation(mainLayout, Gravity.CENTER, 0, 0);
+        dimLayout.setVisibility(View.VISIBLE);
+
+        adapter.highlightItemAt(index - 1);
+
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                dimLayout.setVisibility(View.GONE);
+            }
+        });
+
+        final Button closeButton =
+                (Button) popupView.findViewById(R.id.close_button);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                popupWindow.dismiss();
+            }
+        });
+
+
     public void skipSong(View view) {
         if(songIndices.size() > 0) {
             int nextIndex = songIndices.remove(0);
@@ -351,6 +415,7 @@ public class SongActivity extends AppCompatActivity {
         else {
             finish();
         }
+
     }
 }
 

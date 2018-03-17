@@ -131,6 +131,7 @@ public class SignInActivityTest {
                                                 withId(R.id.appBar),
                                                 0)),
                                 0),
+
                         isDisplayed()));
         appCompatImageButton.perform(click());
 

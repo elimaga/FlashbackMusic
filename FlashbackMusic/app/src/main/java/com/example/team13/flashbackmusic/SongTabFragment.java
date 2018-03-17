@@ -74,7 +74,7 @@ public class SongTabFragment extends Fragment {
             }
         });
 
-        songAdapter = new SongAdapter(main, getSortedSongs());
+        SongAdapter songAdapter = new SongAdapter(main, musicLibrary.getSongs(), "main");
         songListView.setAdapter(songAdapter);
         songAdapter.notifyDataSetChanged();
         songListView.refreshDrawableState();
@@ -117,6 +117,6 @@ public class SongTabFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        songListView.setAdapter(new SongAdapter(main, musicLibrary.getSongs()));
+        songListView.setAdapter(new SongAdapter(main, musicLibrary.getSongs(), "main"));
     }
 }
