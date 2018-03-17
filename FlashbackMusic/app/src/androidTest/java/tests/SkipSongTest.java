@@ -84,7 +84,7 @@ public class SkipSongTest {
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
         try {
-            Thread.sleep(TEN_SECONDS_IN_MS / 2);
+            Thread.sleep(TEN_SECONDS_IN_MS / 5);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -130,7 +130,7 @@ public class SkipSongTest {
         appCompatImageButton3.perform(click());
 
         try {
-            Thread.sleep(TEN_SECONDS_IN_MS / 2);
+            Thread.sleep(TEN_SECONDS_IN_MS / 5);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
