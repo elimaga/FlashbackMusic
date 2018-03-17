@@ -77,7 +77,6 @@ public class SongActivity extends AppCompatActivity {
         musicLibrary = MusicLibrary.getInstance(SongActivity.this);
         extras = getIntent().getExtras();
 
-
         if(extras != null) {
             songIndices = extras.getIntegerArrayList("songIndices");
             vibeModeOn = extras.getBoolean("vibeModeOn");
@@ -88,7 +87,8 @@ public class SongActivity extends AppCompatActivity {
 
         // Update the screen for the first song, and play the first song
         Log.d("Song Activity", "Playing song at index " + songIndices.get(0));
-        currSong = musicLibrary.getSongs().get(songIndices.remove(0));
+        currSong = musicLibrary.getSongs().get(songIndices.get(index));
+        index++;
 
         updateScreen(currSong);
 
@@ -132,13 +132,14 @@ public class SongActivity extends AppCompatActivity {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 updateSong(currSong);
-                if(songIndices.size() > 0) {
+                if(index < songIndices.size()) {
                     Log.d("More Songs to Play: ", songIndices.size() + " more songs.");
-                    Song nextSong = musicLibrary.getSongs().get(songIndices.remove(0));
+                    Song nextSong = musicLibrary.getSongs().get(songIndices.get(index));
                     mediaPlayer.reset();
                     updateScreen(nextSong);
                     playSong(nextSong);
                     currSong = nextSong;
+                    index++;
                 }
                 else {
                     setResult(RESULT_OK);
@@ -340,9 +341,8 @@ public class SongActivity extends AppCompatActivity {
         // Populates list view with users stored in goingUsers
         final ListView listView =
                 (ListView) popupView.findViewById(R.id.listView);
-        final ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
-                        new ArrayList<String>());
+        SongAdapter adapter = new SongAdapter(this,
+                musicLibrary.getSongsAtIndices(songIndices), "preview");
         listView.setAdapter(adapter);
 
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {

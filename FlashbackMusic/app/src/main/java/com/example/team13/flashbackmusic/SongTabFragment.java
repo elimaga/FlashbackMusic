@@ -67,8 +67,7 @@ public class SongTabFragment extends Fragment {
             }
         });
 
-
-        SongAdapter songAdapter = new SongAdapter(main, musicLibrary.getSongs());
+        SongAdapter songAdapter = new SongAdapter(main, musicLibrary.getSongs(), "main");
         songListView.setAdapter(songAdapter);
 
         return rootView;
@@ -78,6 +77,6 @@ public class SongTabFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        songListView.setAdapter(new SongAdapter(main, musicLibrary.getSongs()));
+        songListView.setAdapter(new SongAdapter(main, musicLibrary.getSongs(), "main"));
     }
 }

@@ -92,6 +92,17 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
 
     ArrayList<Album> getAlbums() { return new ArrayList<>(albums); }
 
+    public ArrayList<Song> getSongsAtIndices(ArrayList<Integer> songIndices) {
+        ArrayList<Song> tracks = new ArrayList<>();
+
+        for(int i = 0; i < songIndices.size(); i++) {
+            int index = songIndices.get(i);
+            tracks.add(songs.get(index));
+        }
+
+        return tracks;
+    }
+
     void addSongsIntoLibraryFromPath(ArrayList<String> paths, String url) {
         for (String path : paths) {
             HashMap<String, String> songMetadata = retrieveSongMetadata(path);

@@ -17,12 +17,17 @@ public class SongAdapter extends BaseAdapter {
     private Context mContext;
     private LayoutInflater mInflater;
     private ArrayList<Song> mDataSource;
+    private boolean previewMode = false;
 
 
-    public SongAdapter(Context context, ArrayList<Song> items) {
+    public SongAdapter(Context context, ArrayList<Song> items, String mode) {
         this.mContext = context;
         this.mDataSource = items;
         this.mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        if(mode.equals("preview")) {
+            previewMode = true;
+        }
     }
 
     @Override
@@ -65,21 +70,23 @@ public class SongAdapter extends BaseAdapter {
 
         holder.titleTextView.setText(song.getTitle());
         holder.artistTextView.setText(song.getArtist());
-        holder.favoriteStatusImageButton.setSong(song);
 
-        holder.favoriteStatusImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        if(previewMode) {
+            holder.favoriteStatusImageButton.setVisibility(View.GONE);
+        } else {
+            holder.favoriteStatusImageButton.setSong(song);
+            holder.favoriteStatusImageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
                     FavoriteStatusImageButton button = (FavoriteStatusImageButton) view;
                     button.updateStatus(mContext);
                     button.updateImage();
-            }
-        });
+                }
+            });
+        }
 
 
         return convertView;
-
-
     }
 
     static class ViewHolder
