@@ -67,9 +67,11 @@ public class MainActivity extends AppCompatActivity {
 
         googleUtility = new GoogleUtility(MainActivity.this, this);
         GoogleSignInAccount acct = googleUtility.getLastAccount();
-        if(isEspresso) {
+
+        if (isEspresso){
             usr = new FBMUser("1", "Test User");
-        } else {
+        }
+        else {
             usr = new FBMUser(acct.getId(), acct.getDisplayName());
         }
 

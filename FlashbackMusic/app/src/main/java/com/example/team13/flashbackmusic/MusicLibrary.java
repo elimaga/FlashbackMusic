@@ -125,6 +125,7 @@ public class MusicLibrary extends AsyncTask<String, Integer, Boolean> implements
                 songMetadataSet.add(songMetadata);
             }
         }
+
         persistLibrary();
     }
 

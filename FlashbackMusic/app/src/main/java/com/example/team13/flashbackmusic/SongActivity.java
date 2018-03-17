@@ -74,7 +74,6 @@ public class SongActivity extends AppCompatActivity {
 
         setupUI();
 
-
         updateScreen();
 
         playSong();
