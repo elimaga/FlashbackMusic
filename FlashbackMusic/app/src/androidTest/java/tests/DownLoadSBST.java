@@ -2,10 +2,14 @@ package tests;
 
 
 import android.content.Intent;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiSelector;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +31,6 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.replaceText;
-import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
@@ -39,30 +42,42 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class DownloadSBST {
+public class DownLoadSBST {
+    private UiDevice uiDevice;
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule =
             new ActivityTestRule<>(MainActivity.class, true, false);
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception{
         MainActivity.isEspresso = true;
         mActivityTestRule.launchActivity(new Intent());
+        uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
     }
 
     @Test
-    public void DownloadSBST() {
+    public void downLoadSBST() throws Exception{
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
+        try {
+            Thread.sleep(6240);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        UiObject dialog = uiDevice.findObject(new UiSelector().text("ALLOW"));
+        if (dialog.exists())
+            dialog.click();
+
         try {
             Thread.sleep(6000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        ViewInteraction appCompatImageButton2 = onView(
+        ViewInteraction appCompatImageButton = onView(
                 allOf(withContentDescription("Navigate up"),
                         childAtPosition(
                                 allOf(ViewMatchers.withId(R.id.toolbar),
@@ -71,18 +86,18 @@ public class DownloadSBST {
                                                 0)),
                                 2),
                         isDisplayed()));
-        appCompatImageButton2.perform(click());
+        appCompatImageButton.perform(click());
 
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ViewInteraction actionBar$Tab = onView(
+                allOf(childAtPosition(
+                        childAtPosition(
+                                withId(R.id.tab_layout),
+                                0),
+                        0),
+                        isDisplayed()));
+        actionBar$Tab.check(matches(isDisplayed()));
 
-        ViewInteraction navigationMenuItemView2 = onView(
+        ViewInteraction navigationMenuItemView = onView(
                 allOf(childAtPosition(
                         allOf(withId(R.id.design_navigation_view),
                                 childAtPosition(
@@ -90,13 +105,23 @@ public class DownloadSBST {
                                         0)),
                         2),
                         isDisplayed()));
-        navigationMenuItemView2.perform(click());
+        navigationMenuItemView.perform(click());
 
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
         try {
-            Thread.sleep(5000);
+            Thread.sleep(6240);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        dialog = uiDevice.findObject(new UiSelector().text("ALLOW"));
+        if (dialog.exists())
+            dialog.click();
+
+        try {
+            Thread.sleep(6240);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -109,11 +134,19 @@ public class DownloadSBST {
                                         0),
                                 1),
                         isDisplayed()));
+        appCompatEditText.perform(click());
 
-        appCompatEditText.perform(typeText(
-                "https://www.dropbox.com/s/ilvs4t50l2rxxzz/spiraling-stars.mp3?dl=1"));
+        ViewInteraction appCompatEditText2 = onView(
+                allOf(withId(R.id.editText),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.CoordinatorLayout")),
+                                        0),
+                                1),
+                        isDisplayed()));
+        appCompatEditText2.perform(replaceText("https://www.dropbox.com/s/ilvs4t50l2rxxzz/spiraling-stars.mp3?dl=1"), closeSoftKeyboard());
 
-        ViewInteraction appCompatButton2 = onView(
+        ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.downloadButton), withText("DOWNLOAD"),
                         childAtPosition(
                                 childAtPosition(
@@ -121,8 +154,52 @@ public class DownloadSBST {
                                         0),
                                 0),
                         isDisplayed()));
-        appCompatButton2.perform(click());
+        appCompatButton.perform(click());
 
+        try {
+            Thread.sleep(15040);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ViewInteraction appCompatImageButton2 = onView(
+                allOf(withId(R.id.imageButton),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.CoordinatorLayout")),
+                                        0),
+                                3),
+                        isDisplayed()));
+        appCompatImageButton2.perform(click());
+
+        // Added a sleep statement to match the app's execution delay.
+        // The recommended way to handle such scenarios is to use Espresso idling resources:
+        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
+        try {
+            Thread.sleep(7116);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ViewInteraction relativeLayout = onView(
+                allOf(childAtPosition(
+                        allOf(withId(R.id.song_list_view),
+                                childAtPosition(
+                                        IsInstanceOf.<View>instanceOf(android.widget.RelativeLayout.class),
+                                        0)),
+                        0),
+                        isDisplayed()));
+        relativeLayout.check(matches(isDisplayed()));
+
+        ViewInteraction textView = onView(
+                allOf(withId(R.id.title), withText("Spiraling Stars"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.song_list_view),
+                                        0),
+                                0),
+                        isDisplayed()));
+        textView.check(matches(withText("Spiraling Stars")));
 
     }
 
