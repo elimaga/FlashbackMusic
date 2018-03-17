@@ -1,6 +1,7 @@
 package tests;
 
 
+import android.content.Intent;
 import android.support.test.espresso.DataInteraction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.matcher.ViewMatchers;
@@ -20,6 +21,7 @@ import com.example.team13.flashbackmusic.Song;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,8 +52,14 @@ public class FavoriteSongTest {
 
     public static final int TEN_SECONDS_IN_MS = 10000;
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<MainActivity> mActivityTestRule =
+            new ActivityTestRule<>(MainActivity.class, true, false);
 
+    @Before
+    public void setUp() {
+        MainActivity.isEspresso = true;
+        mActivityTestRule.launchActivity(new Intent());
+    }
     @Test
     public void favoriteSongTest() {
         // Added a sleep statement to match the app's execution delay.
