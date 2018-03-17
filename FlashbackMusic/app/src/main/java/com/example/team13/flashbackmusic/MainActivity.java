@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     final int INVALID_COORDINATE = 200;
     private GoogleUtility googleUtility;
     public FBMUser usr;
-    private boolean isEspresso;
+    public static boolean isEspresso = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
