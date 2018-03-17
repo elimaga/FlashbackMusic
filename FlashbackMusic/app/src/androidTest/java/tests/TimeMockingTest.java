@@ -79,7 +79,7 @@ public class TimeMockingTest {
                                         childAtPosition(
                                                 withId(R.id.appBar),
                                                 0)),
-                                2),
+                                0),
                         isDisplayed()));
         appCompatImageButton.perform(click());
 
