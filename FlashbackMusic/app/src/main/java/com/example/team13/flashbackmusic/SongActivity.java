@@ -392,13 +392,12 @@ public class SongActivity extends AppCompatActivity {
 
 
     public void skipSong(View view) {
-        if(songIndices.size() > 0) {
+        if(index < songIndices.size()) {
             int nextIndex = songIndices.get(index);
-            // TODO:
             // this while-loop should not be needed. please delete after implementing updateLibrary()
             // because musicLibrary always must have specified index.
             while (nextIndex >= musicLibrary.getSongs().size()) {
-                if (index < songIndices.size()) {
+                if (index < songIndices.size() - 1) {
                     index++;
                     nextIndex = songIndices.get(index);
                 } else{
