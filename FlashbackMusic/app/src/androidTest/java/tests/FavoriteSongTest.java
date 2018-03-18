@@ -267,11 +267,7 @@ public class FavoriteSongTest {
 
         ViewInteraction favoriteStatusImageButton = onView(
                 allOf(withId(R.id.favoriteButton),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                12),
+
                         isDisplayed()));
         favoriteStatusImageButton.perform(click());
 
@@ -283,21 +279,13 @@ public class FavoriteSongTest {
 
         ViewInteraction imageButton = onView(
                 allOf(withId(R.id.favoriteButton),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                12),
+
                         isDisplayed()));
         imageButton.check(matches(isDisplayed()));
 
         ViewInteraction appCompatImageButton3 = onView(
                 allOf(withId(R.id.imageButton2),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                11),
+
                         isDisplayed()));
         appCompatImageButton3.perform(click());
 
@@ -319,11 +307,7 @@ public class FavoriteSongTest {
 
         ViewInteraction favoriteStatusImageButton2 = onView(
                 allOf(withId(R.id.favoriteButton),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                12),
+
                         isDisplayed()));
         favoriteStatusImageButton2.perform(click());
 
@@ -332,14 +316,9 @@ public class FavoriteSongTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         ViewInteraction favoriteStatusImageButton3 = onView(
                 allOf(withId(R.id.favoriteButton),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                12),
+
                         isDisplayed()));
         favoriteStatusImageButton3.perform(click());
 
@@ -351,11 +330,7 @@ public class FavoriteSongTest {
 
         ViewInteraction imageButton2 = onView(
                 allOf(withId(R.id.favoriteButton),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                12),
+
                         isDisplayed()));
         imageButton2.check(matches(isDisplayed()));
 

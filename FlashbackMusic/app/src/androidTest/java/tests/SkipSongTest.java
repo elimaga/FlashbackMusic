@@ -121,11 +121,7 @@ public class SkipSongTest {
 
         ViewInteraction appCompatImageButton3 = onView(
                 allOf(withId(R.id.imageButton2),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                11),
+
                         isDisplayed()));
         appCompatImageButton3.perform(click());
 

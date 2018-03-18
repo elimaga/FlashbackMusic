@@ -109,7 +109,7 @@ public class SongTabFragment extends Fragment {
         main.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                songListView.setAdapter(new SongAdapter(main, getSortedSongs()));
+                songListView.setAdapter(new SongAdapter(main, musicLibrary.getSongs(), "main"));
             }
         });
     }

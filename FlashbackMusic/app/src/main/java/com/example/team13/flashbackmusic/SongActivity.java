@@ -63,6 +63,7 @@ public class SongActivity extends AppCompatActivity {
     boolean vibeModeOn = false;
     String username = "";
     String userId = "";
+    int index = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -387,17 +388,19 @@ public class SongActivity extends AppCompatActivity {
                 popupWindow.dismiss();
             }
         });
+    }
 
 
     public void skipSong(View view) {
         if(songIndices.size() > 0) {
-            int nextIndex = songIndices.remove(0);
+            int nextIndex = songIndices.get(index);
             // TODO:
             // this while-loop should not be needed. please delete after implementing updateLibrary()
             // because musicLibrary always must have specified index.
             while (nextIndex >= musicLibrary.getSongs().size()) {
-                if (songIndices.size() > 0) {
-                    nextIndex = songIndices.remove(0);
+                if (index < songIndices.size()) {
+                    index++;
+                    nextIndex = songIndices.get(index);
                 } else{
                     finish();
                     return;
@@ -409,6 +412,8 @@ public class SongActivity extends AppCompatActivity {
             currSong = nextSong;
             updateScreen();
             playSong();
+            index++;
+
 
 
         }
